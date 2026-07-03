@@ -127,7 +127,7 @@ export default function Quiz() {
   const showCompleteBtn = quizQuestions.length > 0 && allMCAnswered && allSAAnswered && !showResults;
 
   return (
-    <div className="flex-1 p-8 bg-[#0A0A0A] overflow-y-auto" id="quiz-view">
+    <div className="flex-1 p-8 bg-[#0A0A0A] overflow-y-auto min-h-0" id="quiz-view">
       {/* Header */}
       <div className="mb-8 border-b border-[#222] pb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
