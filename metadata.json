@@ -1,0 +1,6 @@
+{
+  "name": "PDF Scholar RAG",
+  "description": "Interactive PDF summarizer and RAG engine with automated quiz generation and contextual Q&A.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
