@@ -40,7 +40,7 @@ async function generateChunkEmbedding(text: string): Promise<number[]> {
   const values = response.embedding?.values || (Array.isArray(response.embeddings) ? response.embeddings[0]?.values : undefined);
 
   if (!values) {
-    throw new Error("Failed to retrieve embeddings from Gemini API.");
+    throw new Error("Failed to retrieve embeddings from API.");
   }
   return values;
 }
@@ -145,7 +145,7 @@ app.post("/api/ingest", async (req, res) => {
         });
       } catch (embedError: any) {
         console.error(`Embedding failed at chunk ${i}:`, embedError);
-        res.status(500).json({ error: `Gemini API embedding generation failed: ${embedError.message}` });
+        res.status(500).json({ error: `Embedding generation failed: ${embedError.message}` });
         return;
       }
     }

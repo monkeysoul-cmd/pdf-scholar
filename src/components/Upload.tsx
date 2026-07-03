@@ -24,7 +24,7 @@ export default function Upload() {
   const steps = [
     { title: "Reading PDF file", desc: "Accessing content buffer on client", icon: FileText },
     { title: "Extracting & Splitting Text", desc: "Running recursive chunking parsing", icon: Layers },
-    { title: "Generating Vector Embeddings", desc: "Sending chunks to Gemini embedding models", icon: Cpu },
+    { title: "Generating Vector Embeddings", desc: "Sending chunks to embedding models", icon: Cpu },
     { title: "Ingesting to Vector Database", desc: "Writing index matrices to Local storage", icon: Database },
   ];
 
