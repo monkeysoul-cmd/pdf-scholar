@@ -37,7 +37,7 @@ async function generateChunkEmbedding(text: string): Promise<number[]> {
   })) as any;
 
   // Handles both single embedding object and plural embeddings array in standard/custom SDK builds
-  const values = response.embedding?.values || response.embeddings?.values || response.embeddings?.[0]?.values;
+  const values = response.embedding?.values || (Array.isArray(response.embeddings) ? response.embeddings[0]?.values : undefined);
 
   if (!values) {
     throw new Error("Failed to retrieve embeddings from Gemini API.");

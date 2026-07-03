@@ -98,7 +98,7 @@ $$;`;
   ];
 
   return (
-    <div className="flex-1 p-8 bg-[#0A0A0A] overflow-y-auto" id="guide-view">
+    <div className="flex-1 p-8 bg-[#0A0A0A] overflow-y-auto min-h-0" id="guide-view">
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Header */}
         <div className="border-b border-[#222] pb-6">

@@ -52,7 +52,7 @@ export default function Sidebar() {
       </div>
 
       {/* Main Navigation */}
-      <nav className="flex-1 px-6 py-8 space-y-4 overflow-y-auto">
+      <nav className="flex-1 px-6 py-8 space-y-4 overflow-y-auto min-h-0">
         <div className="text-[10px] font-mono tracking-wider text-zinc-600 uppercase font-black">
           Navigation
         </div>
