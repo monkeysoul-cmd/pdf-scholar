@@ -10,6 +10,8 @@
     "dotenv": "^17.2.3",
     "express": "^4.21.2",
     "mongodb": "^6.13.0",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
     "pdf-parse": "^2.4.5"
   }
 }

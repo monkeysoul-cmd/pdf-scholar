@@ -6,9 +6,14 @@ import Upload from "./components/Upload";
 import Quiz from "./components/Quiz";
 import Chat from "./components/Chat";
 import Guide from "./components/Guide";
+import Auth from "./components/Auth";
 
 function AppContent() {
-  const { activeTab } = useAppState();
+  const { token, activeTab } = useAppState();
+
+  if (!token) {
+    return <Auth />;
+  }
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-[#0A0A0A] font-sans text-white" id="main-app-container">
