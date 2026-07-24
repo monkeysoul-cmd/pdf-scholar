@@ -345,8 +345,8 @@ ${contentSample}`;
 
 // Vite Middleware & Static Asset Serving Setup
 async function start() {
-  if (process.env.VERCEL) {
-    // Under Vercel, we do not start the listener or Vite middleware.
+  // If running as a Vercel Serverless Function (no PORT set in serverless env), exit early
+  if (process.env.VERCEL && !process.env.PORT) {
     return;
   }
 
@@ -356,6 +356,14 @@ async function start() {
   } catch (dbErr) {
     console.error("FATAL: Failed to connect to MongoDB Atlas at startup:", dbErr.message || dbErr);
     process.exit(1);
+  }
+
+  // If running as a Vercel Service (multi-service architecture)
+  if (process.env.VERCEL) {
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`PDF Scholar Backend Service running on port ${PORT}`);
+    });
+    return;
   }
 
   if (process.env.NODE_ENV !== "production") {
