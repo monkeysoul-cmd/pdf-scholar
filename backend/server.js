@@ -6,11 +6,31 @@ import { PDFParse } from "pdf-parse";
 import { RecursiveCharacterTextSplitter } from "./lib/splitter.js";
 import { LocalVectorDB } from "./lib/local-vector-db.js";
 import dotenv from "dotenv";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 dotenv.config();
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
+const JWT_SECRET = process.env.JWT_SECRET || "super-secure-pdf-scholar-hub-secret-key-12345";
+
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+
+  if (!token) {
+    return res.status(401).json({ error: "Access token is missing." });
+  }
+
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) {
+      return res.status(403).json({ error: "Invalid or expired token." });
+    }
+    req.user = user;
+    next();
+  });
+}
 
 // Increase request size limits for handling base64 PDFs
 app.use(express.json({ limit: "50mb" }));
@@ -74,11 +94,79 @@ async function generateContentWithFallback(params, initialModel = "gemini-3.5-fl
   throw lastError || new Error("All fallback models failed.");
 }
 
+// Authentication Routes
+// 1. User Registration
+app.post("/api/auth/register", async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    if (!username || !password) {
+      return res.status(400).json({ error: "Username and password are required." });
+    }
+
+    const database = await LocalVectorDB.getDb();
+    
+    // Check if user already exists
+    const existingUser = await database.collection("users").findOne({ username: username.toLowerCase() });
+    if (existingUser) {
+      return res.status(400).json({ error: "Username is already taken." });
+    }
+
+    const passwordHash = await bcrypt.hash(password, 10);
+    await database.collection("users").insertOne({
+      username: username.toLowerCase(),
+      passwordHash,
+      createdAt: new Date()
+    });
+
+    res.json({ success: true, message: "Registration successful! Please login." });
+  } catch (error) {
+    console.error("Registration Error:", error);
+    res.status(500).json({ error: error.message || "Internal registration error." });
+  }
+});
+
+// 2. User Login
+app.post("/api/auth/login", async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    if (!username || !password) {
+      return res.status(400).json({ error: "Username and password are required." });
+    }
+
+    const database = await LocalVectorDB.getDb();
+    const user = await database.collection("users").findOne({ username: username.toLowerCase() });
+    if (!user) {
+      return res.status(400).json({ error: "Invalid username or password." });
+    }
+
+    const validPassword = await bcrypt.compare(password, user.passwordHash);
+    if (!validPassword) {
+      return res.status(400).json({ error: "Invalid username or password." });
+    }
+
+    const token = jwt.sign({ id: user._id.toString(), username: user.username }, JWT_SECRET, {
+      expiresIn: "7d"
+    });
+
+    res.json({
+      success: true,
+      token,
+      user: {
+        id: user._id.toString(),
+        username: user.username
+      }
+    });
+  } catch (error) {
+    console.error("Login Error:", error);
+    res.status(500).json({ error: error.message || "Internal login error." });
+  }
+});
+
 // API Routes
 // 1. Get List of Ingested Documents
-app.get("/api/documents", async (req, res) => {
+app.get("/api/documents", authenticateToken, async (req, res) => {
   try {
-    const db = await LocalVectorDB.get();
+    const db = await LocalVectorDB.get(req.user.id);
     res.json({ documents: db.documents });
   } catch (error) {
     res.status(500).json({ error: error.message || "Failed to fetch documents" });
@@ -86,10 +174,10 @@ app.get("/api/documents", async (req, res) => {
 });
 
 // 2. Delete Document
-app.delete("/api/documents/:id", async (req, res) => {
+app.delete("/api/documents/:id", authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
-    await LocalVectorDB.deleteDocument(id);
+    await LocalVectorDB.deleteDocument(id, req.user.id);
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: error.message || "Failed to delete document" });
@@ -97,7 +185,7 @@ app.delete("/api/documents/:id", async (req, res) => {
 });
 
 // 3. Upload & Ingest PDF Document
-app.post("/api/ingest", async (req, res) => {
+app.post("/api/ingest", authenticateToken, async (req, res) => {
   try {
     const { pdfBase64, filename, size } = req.body;
     if (!pdfBase64 || !filename) {
@@ -180,7 +268,7 @@ app.post("/api/ingest", async (req, res) => {
     }
 
     // Save to Local DB
-    await LocalVectorDB.addDocument(docMeta, chunkRecords);
+    await LocalVectorDB.addDocument(docMeta, chunkRecords, req.user.id);
 
     res.json({
       success: true,
@@ -193,7 +281,7 @@ app.post("/api/ingest", async (req, res) => {
 });
 
 // 4. RAG Chat Endpoint
-app.post("/api/chat", async (req, res) => {
+app.post("/api/chat", authenticateToken, async (req, res) => {
   try {
     const { documentId, message, history } = req.body;
     if (!message) {
@@ -211,7 +299,7 @@ app.post("/api/chat", async (req, res) => {
     }
 
     // 2. Search local DB for similar chunks
-    const searchResults = await LocalVectorDB.similaritySearch(queryEmbedding, 3, documentId);
+    const searchResults = await LocalVectorDB.similaritySearch(queryEmbedding, 3, documentId, req.user.id);
 
     if (searchResults.length === 0) {
       res.json({
@@ -264,7 +352,7 @@ ${contextText}`;
 });
 
 // 5. Generate Interactive Quiz Endpoint
-app.post("/api/quiz", async (req, res) => {
+app.post("/api/quiz", authenticateToken, async (req, res) => {
   try {
     const { documentId, count = 5 } = req.body;
     if (!documentId) {
@@ -273,7 +361,7 @@ app.post("/api/quiz", async (req, res) => {
     }
 
     // Load document chunks
-    const db = await LocalVectorDB.get();
+    const db = await LocalVectorDB.get(req.user.id);
     const doc = db.documents.find(d => d.id === documentId);
     if (!doc) {
       res.status(404).json({ error: "Document not found." });
@@ -345,8 +433,8 @@ ${contentSample}`;
 
 // Vite Middleware & Static Asset Serving Setup
 async function start() {
-  if (process.env.VERCEL) {
-    // Under Vercel, we do not start the listener or Vite middleware.
+  // If running as a Vercel Serverless Function (no PORT set in serverless env), exit early
+  if (process.env.VERCEL && !process.env.PORT) {
     return;
   }
 
@@ -356,6 +444,14 @@ async function start() {
   } catch (dbErr) {
     console.error("FATAL: Failed to connect to MongoDB Atlas at startup:", dbErr.message || dbErr);
     process.exit(1);
+  }
+
+  // If running as a Vercel Service (multi-service architecture)
+  if (process.env.VERCEL) {
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`PDF Scholar Backend Service running on port ${PORT}`);
+    });
+    return;
   }
 
   if (process.env.NODE_ENV !== "production") {

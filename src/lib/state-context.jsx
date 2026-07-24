@@ -3,11 +3,21 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 const StateContext = createContext(undefined);
 
 export function StateProvider({ children }) {
+  const [token, setToken] = useState(() => localStorage.getItem("pdf_scholar_token") || null);
+  const [user, setUser] = useState(() => {
+    try {
+      const saved = localStorage.getItem("pdf_scholar_user");
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+
   const [documents, setDocuments] = useState([]);
   const [selectedDocumentId, setSelectedDocumentId] = useState(null);
   const [quizQuestions, setQuizQuestions] = useState([]);
+  
   const [chatHistory, setChatHistory] = useState(() => {
-    // Load chat history from localStorage if present
     try {
       const saved = localStorage.getItem("pdf_scholar_chat_history");
       return saved ? JSON.parse(saved) : {};
@@ -23,14 +33,33 @@ export function StateProvider({ children }) {
     localStorage.setItem("pdf_scholar_chat_history", JSON.stringify(chatHistory));
   }, [chatHistory]);
 
+  const authenticatedFetch = async (url, options = {}) => {
+    const headers = {
+      "Content-Type": "application/json",
+      ...options.headers,
+    };
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+    }
+    const res = await fetch(url, {
+      ...options,
+      headers
+    });
+    if (res.status === 401 || res.status === 403) {
+      logout();
+      throw new Error("Session expired. Please log in again.");
+    }
+    return res;
+  };
+
   const fetchDocuments = async () => {
+    if (!token) return;
     setIsLoadingDocs(true);
     try {
-      const res = await fetch("/api/documents");
+      const res = await authenticatedFetch("/api/documents");
       const data = await res.json();
       if (data.documents) {
         setDocuments(data.documents);
-        // If there is only one document and none is selected, auto-select it
         if (data.documents.length > 0 && !selectedDocumentId) {
           setSelectedDocumentId(data.documents[0].id);
         }
@@ -43,24 +72,66 @@ export function StateProvider({ children }) {
   };
 
   useEffect(() => {
-    fetchDocuments();
-  }, []);
+    if (token) {
+      fetchDocuments();
+    } else {
+      setDocuments([]);
+      setSelectedDocumentId(null);
+    }
+  }, [token]);
+
+  const login = async (username, password) => {
+    const res = await fetch("/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password })
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error || "Login failed.");
+    }
+    setToken(data.token);
+    setUser(data.user);
+    localStorage.setItem("pdf_scholar_token", data.token);
+    localStorage.setItem("pdf_scholar_user", JSON.stringify(data.user));
+  };
+
+  const register = async (username, password) => {
+    const res = await fetch("/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password })
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      throw new Error(data.error || "Registration failed.");
+    }
+    return data;
+  };
+
+  const logout = () => {
+    setToken(null);
+    setUser(null);
+    setDocuments([]);
+    setSelectedDocumentId(null);
+    setQuizQuestions([]);
+    localStorage.removeItem("pdf_scholar_token");
+    localStorage.removeItem("pdf_scholar_user");
+  };
 
   const selectDocument = (docId) => {
     setSelectedDocumentId(docId);
-    // Clear current quiz questions when changing documents
     setQuizQuestions([]);
   };
 
   const deleteDocument = async (docId) => {
     try {
-      const res = await fetch(`/api/documents/${docId}`, { method: "DELETE" });
+      const res = await authenticatedFetch(`/api/documents/${docId}`, { method: "DELETE" });
       if (res.ok) {
         setDocuments(prev => prev.filter(d => d.id !== docId));
         if (selectedDocumentId === docId) {
           setSelectedDocumentId(null);
         }
-        // Delete history
         setChatHistory(prev => {
           const updated = { ...prev };
           delete updated[docId];
@@ -105,6 +176,8 @@ export function StateProvider({ children }) {
   return (
     <StateContext.Provider
       value={{
+        token,
+        user,
         documents,
         selectedDocumentId,
         quizQuestions,
@@ -118,6 +191,10 @@ export function StateProvider({ children }) {
         addMessage,
         setQuestions,
         clearChat,
+        login,
+        register,
+        logout,
+        authenticatedFetch
       }}
     >
       {children}

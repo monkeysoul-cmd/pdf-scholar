@@ -24,24 +24,28 @@ export class LocalVectorDB {
     return db;
   }
 
-  static async get() {
+  static async get(userId) {
     const database = await this.getDb();
-    const documents = await database.collection("documents").find({}).toArray();
-    const chunks = await database.collection("chunks").find({}).toArray();
+    const documents = await database.collection("documents").find({ userId }).toArray();
+    const chunks = await database.collection("chunks").find({ userId }).toArray();
     return { documents, chunks };
   }
 
-  static async addDocument(doc, chunks) {
+  static async addDocument(doc, chunks, userId) {
     const database = await this.getDb();
     
-    // Remove existing if any (override)
-    await database.collection("documents").deleteOne({ id: doc.id });
-    await database.collection("chunks").deleteMany({ documentId: doc.id });
+    // Tag doc with owner's user ID
+    const docWithUser = { ...doc, userId };
 
-    await database.collection("documents").insertOne(doc);
+    // Remove existing if any (override)
+    await database.collection("documents").deleteOne({ id: doc.id, userId });
+    await database.collection("chunks").deleteMany({ documentId: doc.id, userId });
+
+    await database.collection("documents").insertOne(docWithUser);
 
     const chunkRecords = chunks.map((c, i) => ({
       ...c,
+      userId,
       id: `${doc.id}_chunk_${i}`
     }));
 
@@ -50,10 +54,10 @@ export class LocalVectorDB {
     }
   }
 
-  static async deleteDocument(docId) {
+  static async deleteDocument(docId, userId) {
     const database = await this.getDb();
-    await database.collection("documents").deleteOne({ id: docId });
-    await database.collection("chunks").deleteMany({ documentId: docId });
+    await database.collection("documents").deleteOne({ id: docId, userId });
+    await database.collection("chunks").deleteMany({ documentId: docId, userId });
   }
 
   static cosineSimilarity(vecA, vecB) {
@@ -75,12 +79,11 @@ export class LocalVectorDB {
     return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
   }
 
-  static async similaritySearch(queryEmbedding, topK = 3, documentId) {
+  static async similaritySearch(queryEmbedding, topK = 3, documentId, userId) {
     const database = await this.getDb();
     
     // Hybrid Vector Search approach:
     // 1. Try to use MongoDB Atlas Vector Search ($vectorSearch).
-    // This requires a vector index named 'vector_index' on the 'chunks' collection.
     try {
       console.log("Attempting MongoDB Atlas Vector Search...");
       const vectorSearchStage = {
@@ -95,15 +98,15 @@ export class LocalVectorDB {
         { $vectorSearch: vectorSearchStage }
       ];
       
+      const matchFilter = { userId };
       if (documentId) {
-        pipeline.push({
-          $match: { documentId }
-        });
+        matchFilter.documentId = documentId;
       }
+      pipeline.push({ $match: matchFilter });
       
       pipeline.push({
         $project: {
-          embedding: 0, // Omit embedding
+          embedding: 0,
           score: { $meta: "vectorSearchScore" }
         }
       });
@@ -122,12 +125,15 @@ export class LocalVectorDB {
         });
       }
     } catch (vectorSearchError) {
-      console.warn("Atlas Vector Search failed or index 'vector_index' is not configured. Falling back to local in-memory cosine similarity... Error:", vectorSearchError.message || vectorSearchError);
+      console.warn("Atlas Vector Search failed or index not configured. Falling back to local cosine similarity...");
     }
     
     // 2. Fallback: Fetch candidate chunks and calculate cosine similarity in-memory
     console.log("Running fallback local similarity search...");
-    const query = documentId ? { documentId } : {};
+    const query = { userId };
+    if (documentId) {
+      query.documentId = documentId;
+    }
     const candidateChunks = await database.collection("chunks").find(query).toArray();
 
     const scored = candidateChunks.map(chunk => {

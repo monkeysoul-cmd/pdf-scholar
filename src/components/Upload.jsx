@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 
 export default function Upload() {
-  const { fetchDocuments, selectDocument, setTab } = useAppState();
+  const { fetchDocuments, selectDocument, setTab, authenticatedFetch } = useAppState();
   const [dragActive, setDragActive] = useState(false);
   const [file, setFile] = useState(null);
   const [status, setStatus] = useState("idle");
@@ -43,25 +43,13 @@ export default function Upload() {
     setDragActive(false);
 
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      const droppedFile = e.dataTransfer.files[0];
-      if (droppedFile.type === "application/pdf") {
-        setFile(droppedFile);
-        startIngestion(droppedFile);
-      } else {
-        showError("Invalid file format. Please upload a PDF document.");
-      }
+      handleUpload(e.dataTransfer.files[0]);
     }
   };
 
   const handleFileInput = (e) => {
     if (e.target.files && e.target.files[0]) {
-      const selectedFile = e.target.files[0];
-      if (selectedFile.type === "application/pdf") {
-        setFile(selectedFile);
-        startIngestion(selectedFile);
-      } else {
-        showError("Invalid file format. Please upload a PDF document.");
-      }
+      handleUpload(e.target.files[0]);
     }
   };
 
@@ -70,7 +58,13 @@ export default function Upload() {
     setErrorMessage(msg);
   };
 
-  const startIngestion = async (pdfFile) => {
+  const handleUpload = async (pdfFile) => {
+    if (pdfFile.type !== "application/pdf") {
+      showError("Invalid file format. Please upload a PDF document.");
+      return;
+    }
+
+    setFile(pdfFile);
     setStatus("reading");
     setCurrentStep(0);
     setErrorMessage("");
@@ -98,7 +92,7 @@ export default function Upload() {
       setStatus("processing");
 
       // Step 2-4 handled by the backend
-      const response = await fetch("/api/ingest", {
+      const response = await authenticatedFetch("/api/ingest", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

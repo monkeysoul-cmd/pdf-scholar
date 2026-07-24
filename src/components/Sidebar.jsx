@@ -8,7 +8,8 @@ import {
   HelpCircle,
   FileText,
   Trash2,
-  Cloud
+  Cloud,
+  LogOut
 } from "lucide-react";
 
 export default function Sidebar() {
@@ -18,7 +19,9 @@ export default function Sidebar() {
     activeTab,
     setTab,
     selectDocument,
-    deleteDocument
+    deleteDocument,
+    user,
+    logout
   } = useAppState();
 
   const menuItems = [
@@ -157,13 +160,23 @@ export default function Sidebar() {
         )}
       </nav>
 
-      {/* Powered Footer */}
-      <div className="p-6 border-t border-[#222] flex items-center justify-between text-[10px] text-zinc-600 font-mono uppercase tracking-wider">
-        <div className="flex items-center gap-1.5">
-          <Cloud className="w-3.5 h-3.5 text-zinc-600" />
-          <span>MongoDB Atlas Connected</span>
+      {/* User Info & Logout Footer */}
+      <div className="p-6 border-t border-[#222] flex flex-col gap-4 text-xs font-mono uppercase tracking-wider shrink-0 bg-[#070707]">
+        <div className="flex items-center justify-between text-[10px] text-zinc-500">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <Cloud className="w-3.5 h-3.5 text-zinc-600 shrink-0" />
+            <span className="truncate">User: <strong className="text-zinc-300">{user?.username}</strong></span>
+          </div>
+          <div className="w-2 h-2 rounded-full bg-[#00FF66] shadow-md shadow-[#00FF66]/50 animate-pulse shrink-0" />
         </div>
-        <div className="w-2 h-2 rounded-full bg-[#00FF66] shadow-md shadow-[#00FF66]/50 animate-pulse" />
+        
+        <button
+          onClick={logout}
+          className="w-full py-2 bg-transparent hover:bg-red-950/20 border border-[#222] hover:border-red-900/30 text-zinc-400 hover:text-red-500 rounded-xs text-[10px] font-black uppercase tracking-wider transition-colors flex items-center justify-center gap-1.5"
+        >
+          <LogOut className="w-3.5 h-3.5" />
+          <span>Sign Out</span>
+        </button>
       </div>
     </aside>
   );
