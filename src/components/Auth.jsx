@@ -46,8 +46,8 @@ export default function Auth() {
   };
 
   return (
-    <div className="flex-1 min-h-screen bg-[#0A0A0A] flex flex-col items-center justify-center p-6 select-none" id="auth-view">
-      <div className="max-w-md w-full bg-[#111] border border-[#222] rounded-xs p-8 md:p-10 shadow-2xl relative overflow-hidden">
+    <div className="h-screen w-screen overflow-y-auto bg-[#0A0A0A] flex flex-col items-center justify-center py-8 px-6 select-none" id="auth-view">
+      <div className="max-w-md w-full bg-[#111] border border-[#222] rounded-xs p-8 md:p-10 shadow-2xl relative overflow-hidden my-auto">
         {/* Decorative background glow */}
         <div className="absolute -top-24 -left-24 w-48 h-48 bg-[#00FF66]/5 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-24 -right-24 w-48 h-48 bg-[#00FF66]/5 rounded-full blur-3xl pointer-events-none" />
