@@ -76,9 +76,9 @@ async function generateContentWithFallback(params, initialModel = "gemini-3.5-fl
 
 // API Routes
 // 1. Get List of Ingested Documents
-app.get("/api/documents", (req, res) => {
+app.get("/api/documents", async (req, res) => {
   try {
-    const db = LocalVectorDB.get();
+    const db = await LocalVectorDB.get();
     res.json({ documents: db.documents });
   } catch (error) {
     res.status(500).json({ error: error.message || "Failed to fetch documents" });
@@ -86,10 +86,10 @@ app.get("/api/documents", (req, res) => {
 });
 
 // 2. Delete Document
-app.delete("/api/documents/:id", (req, res) => {
+app.delete("/api/documents/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    LocalVectorDB.deleteDocument(id);
+    await LocalVectorDB.deleteDocument(id);
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ error: error.message || "Failed to delete document" });
@@ -180,7 +180,7 @@ app.post("/api/ingest", async (req, res) => {
     }
 
     // Save to Local DB
-    LocalVectorDB.addDocument(docMeta, chunkRecords);
+    await LocalVectorDB.addDocument(docMeta, chunkRecords);
 
     res.json({
       success: true,
@@ -211,7 +211,7 @@ app.post("/api/chat", async (req, res) => {
     }
 
     // 2. Search local DB for similar chunks
-    const searchResults = LocalVectorDB.similaritySearch(queryEmbedding, 3, documentId);
+    const searchResults = await LocalVectorDB.similaritySearch(queryEmbedding, 3, documentId);
 
     if (searchResults.length === 0) {
       res.json({
@@ -273,7 +273,7 @@ app.post("/api/quiz", async (req, res) => {
     }
 
     // Load document chunks
-    const db = LocalVectorDB.get();
+    const db = await LocalVectorDB.get();
     const doc = db.documents.find(d => d.id === documentId);
     if (!doc) {
       res.status(404).json({ error: "Document not found." });
@@ -345,6 +345,14 @@ ${contentSample}`;
 
 // Vite Middleware & Static Asset Serving Setup
 async function start() {
+  try {
+    console.log("Connecting to MongoDB Atlas...");
+    await LocalVectorDB.connect();
+  } catch (dbErr) {
+    console.error("FATAL: Failed to connect to MongoDB Atlas at startup:", dbErr.message || dbErr);
+    process.exit(1);
+  }
+
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
       server: { middlewareMode: true },
