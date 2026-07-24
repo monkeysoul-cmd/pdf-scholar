@@ -6,9 +6,9 @@ import {
   Loader2,
   CheckCircle,
   XCircle,
-  Cpu,
   Layers,
-  Database
+  Cloud,
+  Smile
 } from "lucide-react";
 
 export default function Upload() {
@@ -21,10 +21,10 @@ export default function Upload() {
   const fileInputRef = useRef(null);
 
   const steps = [
-    { title: "Reading PDF file", desc: "Accessing content buffer on client", icon: FileText },
-    { title: "Extracting & Splitting Text", desc: "Running recursive chunking parsing", icon: Layers },
-    { title: "Generating Vector Embeddings", desc: "Sending chunks to embedding models", icon: Cpu },
-    { title: "Ingesting to Vector Database", desc: "Writing index matrices to Local storage", icon: Database },
+    { title: "Opening PDF file", desc: "Reading the contents of your document", icon: FileText },
+    { title: "Splitting into Pages", desc: "Preparing the text for reading", icon: Layers },
+    { title: "Saving to Cloud Storage", desc: "Storing document safely in MongoDB Atlas", icon: Cloud },
+    { title: "Finalizing", desc: "Setting up your discussion partner", icon: Smile },
   ];
 
   const handleDrag = (e) => {
@@ -148,9 +148,9 @@ export default function Upload() {
       <div className="max-w-2xl w-full bg-[#111] border border-[#222] rounded-xs p-8 md:p-12 shadow-2xl my-auto">
         {/* Header */}
         <div className="text-center mb-10">
-          <h2 className="text-3xl font-black tracking-tight text-white uppercase mb-2">Ingest Academic Target</h2>
+          <h2 className="text-3xl font-black tracking-tight text-white uppercase mb-2">Add Study Document</h2>
           <p className="text-xs text-zinc-500 max-w-md mx-auto uppercase font-mono">
-            Deploy textbook chapters, scientific papers, or core PDFs to index similarity matrices in our RAG system.
+            Upload textbook chapters, articles, or study sheets to read them with your study partner.
           </p>
         </div>
 
@@ -179,7 +179,7 @@ export default function Upload() {
             <div className="w-16 h-16 bg-[#0A0A0A] border border-[#222] text-[#00FF66] flex items-center justify-center mx-auto mb-4 rounded-xs">
               <UploadCloud className="w-8 h-8" />
             </div>
-            <h3 className="font-black text-white text-xs uppercase tracking-wider">Select or Drop PDF Document</h3>
+            <h3 className="font-black text-white text-xs uppercase tracking-wider">Select or Drop PDF File</h3>
             <p className="text-zinc-500 text-[10px] mt-1.5 font-mono uppercase">Max Size: 10MB • format: PDF only</p>
           </div>
         )}
@@ -191,10 +191,10 @@ export default function Upload() {
               <Loader2 className="w-5 h-5 text-[#00FF66] animate-spin shrink-0" />
               <div className="min-w-0 flex-1">
                 <span className="text-xs font-black text-white block truncate uppercase tracking-wider">
-                  Ingesting: {file?.name}
+                  Processing: {file?.name}
                 </span>
                 <span className="text-[10px] text-zinc-500 font-mono uppercase">
-                  Running sequential chunk indexes... Please wait
+                  Loading file into the database... Please wait
                 </span>
               </div>
             </div>

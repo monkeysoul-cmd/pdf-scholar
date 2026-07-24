@@ -5,7 +5,7 @@ import {
   Trash2,
   Calendar,
   Database,
-  Cpu,
+  Cloud,
   Layers,
   ArrowRight,
   Plus
@@ -32,9 +32,9 @@ export default function Overview() {
   };
 
   const stats = [
-    { label: "Total Embeddings (Chunks)", value: totalChunks, icon: Layers },
-    { label: "Vector Dimensions", value: "768", icon: Cpu },
-    { label: "Active Database Mode", value: "LOCAL JSON", icon: Database },
+    { label: "Total Reading Segments", value: totalChunks, icon: Layers },
+    { label: "Cloud Server Status", value: "ONLINE", icon: Cloud },
+    { label: "Storage Location", value: "MONGODB ATLAS", icon: Database },
   ];
 
   return (
@@ -43,17 +43,17 @@ export default function Overview() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-[#222] pb-8 mb-8">
         <div>
           <div className="flex items-center gap-3 mb-2">
-            <span className="text-[10px] font-mono tracking-wider uppercase text-zinc-500">Active Engine</span>
-            <span className="bg-[#FF5F00] text-black text-[9px] font-black px-1.5 py-0.5 rounded-xs uppercase tracking-wider">
-              Local JSON Fallback
+            <span className="text-[10px] font-mono tracking-wider uppercase text-zinc-500">Database Status</span>
+            <span className="bg-[#00FF66] text-black text-[9px] font-black px-1.5 py-0.5 rounded-xs uppercase tracking-wider">
+              MongoDB Cloud Connected
             </span>
           </div>
-          <h2 className="text-sm font-mono tracking-wider uppercase text-zinc-400">PDF Scholar Analytics</h2>
+          <h2 className="text-sm font-mono tracking-wider uppercase text-zinc-400">Study Hub Overview</h2>
         </div>
         
         <div className="flex items-center gap-4">
           <span className="bg-[#00FF66] text-black px-3 py-1 font-black text-xs rounded-xs uppercase tracking-wider">
-            V.2.5 FLASH READY
+            Study Assistant Online
           </span>
           <button
             onClick={() => setTab("upload")}
@@ -68,8 +68,8 @@ export default function Overview() {
       {/* 84px Giant Bold Heading */}
       <section className="mb-10">
         <h1 className="text-5xl md:text-8xl font-black tracking-tighter leading-none uppercase text-white">
-          RAG ENGINE<br />
-          <span className="text-zinc-800">OVERVIEW</span>
+          Study Hub<br />
+          <span className="text-zinc-800">Dashboard</span>
         </h1>
       </section>
 
@@ -96,11 +96,11 @@ export default function Overview() {
       <div className="bg-[#0A0A0A] border border-[#222] rounded-xs mb-10 overflow-hidden">
         <div className="p-6 border-b border-[#222] flex items-center justify-between bg-[#111]/30">
           <div>
-            <h3 className="font-black text-white text-base uppercase tracking-wider">Ingested Academic Library</h3>
-            <p className="text-[11px] text-zinc-500 mt-1 uppercase font-mono">Select a document below to mount to active workspace.</p>
+            <h3 className="font-black text-white text-base uppercase tracking-wider">My Study Materials</h3>
+            <p className="text-[11px] text-zinc-500 mt-1 uppercase font-mono">Select a document below to start reading and discussing.</p>
           </div>
           <span className="text-[10px] font-mono font-black bg-[#222] text-[#00FF66] px-3 py-1 rounded-xs border border-[#333]">
-            {documents.length} AVAILABLE TARGETS
+            {documents.length} DOCUMENTS UPLOADED
           </span>
         </div>
 
@@ -109,11 +109,11 @@ export default function Overview() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-[#111]/50 text-zinc-500 font-black text-[10px] tracking-wider uppercase border-b-2 border-white">
-                  <th className="py-4 px-6">Document Target</th>
-                  <th className="py-4 px-6">Ingested At</th>
-                  <th className="py-4 px-6 text-center">Structure Specs</th>
-                  <th className="py-4 px-6">Volume Size</th>
-                  <th className="py-4 px-6 text-right">Engine Action</th>
+                  <th className="py-4 px-6">Document Name</th>
+                  <th className="py-4 px-6">Uploaded At</th>
+                  <th className="py-4 px-6 text-center">Reading Details</th>
+                  <th className="py-4 px-6">File Size</th>
+                  <th className="py-4 px-6 text-right">Study Options</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#222] text-xs">
@@ -140,7 +140,7 @@ export default function Overview() {
                             </span>
                             {isSelected && (
                               <span className="inline-flex items-center gap-1 mt-1 text-[9px] font-black text-[#00FF66] tracking-wider uppercase bg-[#00FF66]/10 px-1.5 py-0.2 rounded-xs border border-[#00FF66]/20">
-                                ACTIVE WORKSPACE
+                                CURRENT STUDY TARGET
                               </span>
                             )}
                           </div>
@@ -162,7 +162,7 @@ export default function Overview() {
                         <span className="text-zinc-500 text-[10px]"> PAGES</span>
                         <span className="mx-2 text-[#222] font-black">/</span>
                         <span className="font-bold text-[#00FF66]">{doc.chunkCount}</span>
-                        <span className="text-zinc-500 text-[10px]"> CHUNKS</span>
+                        <span className="text-zinc-500 text-[10px]"> SECTIONS</span>
                       </td>
 
                       {/* size */}
@@ -178,7 +178,7 @@ export default function Overview() {
                               onClick={() => setTab("chat")}
                               className="inline-flex items-center gap-1 px-3 py-1.5 bg-[#00FF66] hover:bg-[#00e55b] text-black text-[10px] font-black uppercase tracking-wide rounded-xs transition-colors"
                             >
-                              <span>Enter Chat</span>
+                              <span>Open Chat</span>
                               <ArrowRight className="w-3 h-3" />
                             </button>
                           ) : (
@@ -186,7 +186,7 @@ export default function Overview() {
                               onClick={() => selectDocument(doc.id)}
                               className="px-3 py-1.5 bg-transparent hover:bg-[#111] border border-[#222] text-zinc-300 hover:text-white text-[10px] font-black uppercase tracking-wide rounded-xs transition-colors"
                             >
-                              Activate
+                              Open
                             </button>
                           )}
                           <button
@@ -209,15 +209,15 @@ export default function Overview() {
             <div className="w-12 h-12 bg-[#111] border border-[#222] text-[#FF5F00] flex items-center justify-center mx-auto mb-4">
               <FileText className="w-6 h-6" />
             </div>
-            <h4 className="font-black text-white text-sm uppercase tracking-wider">No Targets Registered</h4>
+            <h4 className="font-black text-white text-sm uppercase tracking-wider">No Study Materials Yet</h4>
             <p className="text-zinc-500 text-xs max-w-sm mx-auto mt-1 mb-6 uppercase font-mono">
-              Upload textbook chapters, articles, or research papers to build your local retrieval engine.
+              Upload textbook chapters, articles, or notes to get started.
             </p>
             <button
               onClick={() => setTab("upload")}
               className="px-5 py-2.5 bg-[#00FF66] hover:bg-[#00e55b] text-black text-xs font-black uppercase tracking-wider rounded-xs transition-colors"
             >
-              Upload PDF Target
+              Upload PDF File
             </button>
           </div>
         )}
@@ -227,16 +227,16 @@ export default function Overview() {
       <section className="mt-auto border-t border-[#222] pt-8">
         <div className="stepper grid grid-cols-4 gap-6">
           <div className="step border-t-4 border-[#00FF66] pt-3 relative">
-            <div className="step-label text-[10px] font-black text-[#00FF66] uppercase tracking-wider">1. Read Target</div>
+            <div className="step-label text-[10px] font-black text-[#00FF66] uppercase tracking-wider">1. Read Document</div>
           </div>
           <div className="step border-t-4 border-[#00FF66] pt-3 relative">
-            <div className="step-label text-[10px] font-black text-[#00FF66] uppercase tracking-wider">2. Split Chunks</div>
+            <div className="step-label text-[10px] font-black text-[#00FF66] uppercase tracking-wider">2. Process Sections</div>
           </div>
           <div className="step border-t-4 border-[#00FF66] pt-3 relative">
-            <div className="step-label text-[10px] font-black text-[#00FF66] uppercase tracking-wider">3. Embed Vectors</div>
+            <div className="step-label text-[10px] font-black text-[#00FF66] uppercase tracking-wider">3. Connect to Database</div>
           </div>
           <div className="step border-t-4 border-zinc-800 pt-3 relative">
-            <div className="step-label text-[10px] font-black text-zinc-600 uppercase tracking-wider">4. Ready Loop</div>
+            <div className="step-label text-[10px] font-black text-zinc-600 uppercase tracking-wider">4. Ready to Study</div>
           </div>
         </div>
       </section>

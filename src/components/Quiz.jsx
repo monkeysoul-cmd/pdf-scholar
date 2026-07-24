@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useAppState } from "../lib/state-context";
 import {
-  BrainCircuit,
+  GraduationCap,
   Loader2,
   Award,
   ChevronRight,
@@ -127,7 +127,7 @@ export default function Quiz() {
       {/* Header */}
       <div className="mb-8 border-b border-[#222] pb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-black tracking-tight text-white uppercase">Adaptive Quiz Generator</h2>
+          <h2 className="text-2xl font-black tracking-tight text-white uppercase">Practice Quiz</h2>
           <p className="text-[11px] text-[#00FF66] font-mono uppercase mt-1">
             DEPLOYED ON: "{activeDoc?.name}"
           </p>
@@ -176,9 +176,9 @@ export default function Quiz() {
       {isGenerating && (
         <div className="py-24 text-center max-w-md mx-auto bg-[#111] border border-[#222] p-10 rounded-xs shadow-2xl" id="quiz-loader">
           <Loader2 className="w-12 h-12 text-[#00FF66] animate-spin mx-auto mb-5" />
-          <h3 className="font-black text-white text-base uppercase tracking-wider">Synthesizing Courseware</h3>
+          <h3 className="font-black text-white text-base uppercase tracking-wider">Creating Your Quiz</h3>
           <p className="text-[10px] text-zinc-500 mt-2 max-w-xs mx-auto font-mono uppercase leading-relaxed">
-            Reading indexed vector matrices to construct custom diagnostic questions.
+            Reading the document text to compile practice questions for you.
           </p>
         </div>
       )}
@@ -187,11 +187,11 @@ export default function Quiz() {
       {quizQuestions.length === 0 && !isGenerating && (
         <div className="text-center py-20 max-w-sm mx-auto">
           <div className="w-16 h-16 bg-[#111] border border-[#222] text-[#00FF66] rounded-xs flex items-center justify-center mx-auto mb-5 shadow-lg">
-            <BrainCircuit className="w-8 h-8" />
+            <GraduationCap className="w-8 h-8" />
           </div>
-          <h3 className="font-black text-white text-lg uppercase tracking-wide">Generate Quiz</h3>
+          <h3 className="font-black text-white text-lg uppercase tracking-wide">Create Practice Quiz</h3>
           <p className="text-[11px] text-zinc-500 font-mono uppercase mt-2 mb-8 leading-relaxed">
-            The system will parse key passages from <span className="text-[#00FF66]">"{activeDoc?.name}"</span> and draft structured diagnostic questions.
+            Our assistant will review <span className="text-[#00FF66]">"{activeDoc?.name}"</span> and prepare practice questions to test your knowledge.
           </p>
           <div className="flex items-center justify-center gap-3 bg-[#111] border border-[#222] p-3 rounded-xs shadow-2xl">
             <span className="text-[10px] font-black text-zinc-500 font-mono uppercase">Select:</span>
@@ -293,7 +293,7 @@ export default function Quiz() {
                           disabled={!(shortAnswersText[q.id] || "").trim()}
                           className="self-end inline-flex items-center gap-1.5 px-4 py-2 bg-[#00FF66] hover:bg-[#00e55b] disabled:opacity-30 disabled:cursor-not-allowed text-black font-black text-[10px] uppercase tracking-wider rounded-xs transition-colors"
                         >
-                          <span>Reveal Answer Criteria</span>
+                          <span>Check Answer</span>
                           <ChevronRight className="w-3.5 h-3.5" />
                         </button>
                       </div>
@@ -305,13 +305,13 @@ export default function Quiz() {
                         </div>
                         
                         <div className="border-t border-[#222] pt-4">
-                           <span className="text-[10px] font-black text-[#00FF66] tracking-widest block mb-1">Grading Key Points:</span>
+                           <span className="text-[10px] font-black text-[#00FF66] tracking-widest block mb-1">Answer Key:</span>
                            <p className="text-zinc-300 leading-relaxed font-sans normal-case">{q.correctAnswer}</p>
                         </div>
 
                         {/* Self Grading buttons */}
                         <div className="border-t border-[#222] pt-4 flex flex-wrap items-center justify-between gap-3">
-                          <span className="text-[10px] text-zinc-500 font-black tracking-wider">Self-Grade this answer:</span>
+                           <span className="text-[10px] text-zinc-500 font-black tracking-wider">How did you do?</span>
                           <div className="flex gap-2">
                             <button
                               onClick={() => handleSelfGrade(q.id, "correct")}
@@ -321,7 +321,7 @@ export default function Quiz() {
                                   : "bg-transparent border-[#222] text-zinc-400 hover:text-white"
                               }`}
                             >
-                              I hit the key points
+                               My answer is correct
                             </button>
                             <button
                               onClick={() => handleSelfGrade(q.id, "needs-review")}
@@ -331,7 +331,7 @@ export default function Quiz() {
                                   : "bg-transparent border-[#222] text-zinc-400 hover:text-white"
                               }`}
                             >
-                              Needs review
+                               Needs more study
                             </button>
                           </div>
                         </div>
@@ -345,7 +345,7 @@ export default function Quiz() {
                   <div className="bg-black p-4 border border-[#222] rounded-xs flex items-start gap-3 mt-1 text-[11px] font-mono uppercase">
                     <BookOpen className="w-4 h-4 text-zinc-500 shrink-0 mt-0.5" />
                     <div>
-                      <span className="font-black text-white block mb-1 tracking-wider">Explanation & Context:</span>
+                      <span className="font-black text-white block mb-1 tracking-wider">Explanation & Details:</span>
                       <p className="text-zinc-400 leading-relaxed font-sans normal-case">{q.explanation}</p>
                     </div>
                   </div>
@@ -361,7 +361,7 @@ export default function Quiz() {
                 onClick={() => setShowResults(true)}
                 className="px-6 py-3 bg-[#00FF66] hover:bg-[#00e55b] text-black font-black text-xs uppercase tracking-wider rounded-xs shadow-lg transition-all"
               >
-                Submit and View Report
+                Finish and View Results
               </button>
             </div>
           )}
@@ -374,7 +374,7 @@ export default function Quiz() {
           <div className="w-20 h-20 bg-[#00FF66]/10 border border-[#00FF66]/20 text-[#00FF66] rounded-xs flex items-center justify-center mx-auto mb-6 shadow-md">
             <Award className="w-10 h-10" />
           </div>
-          <h3 className="font-black text-white text-xl uppercase tracking-wide">Diagnostic Scorecard</h3>
+          <h3 className="font-black text-white text-xl uppercase tracking-wide">Quiz Scorecard</h3>
           <p className="text-[10px] text-zinc-500 font-mono uppercase mt-1.5 max-w-xs mx-auto">
             You've completed the quiz generated for "{activeDoc?.name}".
           </p>
