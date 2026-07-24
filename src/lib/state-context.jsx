@@ -86,7 +86,12 @@ export function StateProvider({ children }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password })
     });
-    const data = await res.json();
+    let data;
+    try {
+      data = await res.json();
+    } catch {
+      throw new Error("Server is not responding correctly. Please check your deployment environment variables (MONGODB_URI, GEMINI_API_KEY, JWT_SECRET).");
+    }
     if (!res.ok) {
       throw new Error(data.error || "Login failed.");
     }
@@ -102,7 +107,12 @@ export function StateProvider({ children }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password })
     });
-    const data = await res.json();
+    let data;
+    try {
+      data = await res.json();
+    } catch {
+      throw new Error("Server is not responding correctly. Please check your deployment environment variables (MONGODB_URI, GEMINI_API_KEY, JWT_SECRET).");
+    }
     if (!res.ok) {
       throw new Error(data.error || "Registration failed.");
     }
