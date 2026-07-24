@@ -431,6 +431,18 @@ ${contentSample}`;
   }
 });
 
+// Global 404 handler — always returns JSON
+app.use((req, res) => {
+  res.status(404).json({ error: `Route ${req.method} ${req.path} not found.` });
+});
+
+// Global error handler — always returns JSON (never HTML)
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
+  console.error("Unhandled server error:", err);
+  res.status(500).json({ error: err.message || "Internal server error." });
+});
+
 // Vite Middleware & Static Asset Serving Setup
 async function start() {
   // If running as a Vercel Serverless Function (no PORT set in serverless env), exit early
