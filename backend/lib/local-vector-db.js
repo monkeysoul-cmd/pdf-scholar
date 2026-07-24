@@ -1,58 +1,59 @@
-import fs from "fs";
-import path from "path";
+import { MongoClient } from "mongodb";
 
-const DB_FILE_PATH = path.join(process.cwd(), "local_db.json");
+let client = null;
+let db = null;
 
 export class LocalVectorDB {
-  static ensureFile() {
-    if (!fs.existsSync(DB_FILE_PATH)) {
-      const initial = { documents: [], chunks: [] };
-      fs.writeFileSync(DB_FILE_PATH, JSON.stringify(initial, null, 2), "utf-8");
+  static async connect() {
+    if (db) return db;
+    const uri = process.env.MONGODB_URI;
+    if (!uri) {
+      throw new Error("MONGODB_URI environment variable is missing.");
     }
+    client = new MongoClient(uri);
+    await client.connect();
+    db = client.db();
+    console.log("Connected successfully to MongoDB Atlas");
+    return db;
   }
 
-  static get() {
-    this.ensureFile();
-    try {
-      const content = fs.readFileSync(DB_FILE_PATH, "utf-8");
-      return JSON.parse(content);
-    } catch (e) {
-      console.error("Failed to read local DB file, resetting:", e);
-      return { documents: [], chunks: [] };
+  static async getDb() {
+    if (!db) {
+      await this.connect();
     }
+    return db;
   }
 
-  static save(db) {
-    try {
-      fs.writeFileSync(DB_FILE_PATH, JSON.stringify(db, null, 2), "utf-8");
-    } catch (e) {
-      console.error("Failed to write local DB file:", e);
-    }
+  static async get() {
+    const database = await this.getDb();
+    const documents = await database.collection("documents").find({}).toArray();
+    const chunks = await database.collection("chunks").find({}).toArray();
+    return { documents, chunks };
   }
 
-  static addDocument(doc, chunks) {
-    const db = this.get();
+  static async addDocument(doc, chunks) {
+    const database = await this.getDb();
     
     // Remove existing if any (override)
-    db.documents = db.documents.filter(d => d.id !== doc.id);
-    db.chunks = db.chunks.filter(c => c.documentId !== doc.id);
+    await database.collection("documents").deleteOne({ id: doc.id });
+    await database.collection("chunks").deleteMany({ documentId: doc.id });
 
-    db.documents.push(doc);
+    await database.collection("documents").insertOne(doc);
 
     const chunkRecords = chunks.map((c, i) => ({
       ...c,
       id: `${doc.id}_chunk_${i}`
     }));
 
-    db.chunks.push(...chunkRecords);
-    this.save(db);
+    if (chunkRecords.length > 0) {
+      await database.collection("chunks").insertMany(chunkRecords);
+    }
   }
 
-  static deleteDocument(docId) {
-    const db = this.get();
-    db.documents = db.documents.filter(d => d.id !== docId);
-    db.chunks = db.chunks.filter(c => c.documentId !== docId);
-    this.save(db);
+  static async deleteDocument(docId) {
+    const database = await this.getDb();
+    await database.collection("documents").deleteOne({ id: docId });
+    await database.collection("chunks").deleteMany({ documentId: docId });
   }
 
   static cosineSimilarity(vecA, vecB) {
@@ -74,17 +75,63 @@ export class LocalVectorDB {
     return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
   }
 
-  static similaritySearch(queryEmbedding, topK = 3, documentId) {
-    const db = this.get();
-    let candidateChunks = db.chunks;
-
-    if (documentId) {
-      candidateChunks = candidateChunks.filter(c => c.documentId === documentId);
+  static async similaritySearch(queryEmbedding, topK = 3, documentId) {
+    const database = await this.getDb();
+    
+    // Hybrid Vector Search approach:
+    // 1. Try to use MongoDB Atlas Vector Search ($vectorSearch).
+    // This requires a vector index named 'vector_index' on the 'chunks' collection.
+    try {
+      console.log("Attempting MongoDB Atlas Vector Search...");
+      const vectorSearchStage = {
+        index: "vector_index",
+        path: "embedding",
+        queryVector: queryEmbedding,
+        numCandidates: 100,
+        limit: topK * 3 // Pull a few more for matching/filtering
+      };
+      
+      const pipeline = [
+        { $vectorSearch: vectorSearchStage }
+      ];
+      
+      if (documentId) {
+        pipeline.push({
+          $match: { documentId }
+        });
+      }
+      
+      pipeline.push({
+        $project: {
+          embedding: 0, // Omit embedding
+          score: { $meta: "vectorSearchScore" }
+        }
+      });
+      
+      pipeline.push({
+        $limit: topK
+      });
+      
+      const results = await database.collection("chunks").aggregate(pipeline).toArray();
+      
+      if (results && results.length > 0) {
+        console.log(`Atlas Vector Search succeeded returning ${results.length} chunks.`);
+        return results.map(r => {
+          const { score, ...chunk } = r;
+          return { chunk, score };
+        });
+      }
+    } catch (vectorSearchError) {
+      console.warn("Atlas Vector Search failed or index 'vector_index' is not configured. Falling back to local in-memory cosine similarity... Error:", vectorSearchError.message || vectorSearchError);
     }
+    
+    // 2. Fallback: Fetch candidate chunks and calculate cosine similarity in-memory
+    console.log("Running fallback local similarity search...");
+    const query = documentId ? { documentId } : {};
+    const candidateChunks = await database.collection("chunks").find(query).toArray();
 
     const scored = candidateChunks.map(chunk => {
       const score = this.cosineSimilarity(queryEmbedding, chunk.embedding);
-      // Omit embedding to save network bandwidth and state sizes
       const { embedding, ...chunkWithoutEmbedding } = chunk;
       return {
         chunk: chunkWithoutEmbedding,
