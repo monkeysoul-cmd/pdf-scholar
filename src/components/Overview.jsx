@@ -38,7 +38,7 @@ export default function Overview() {
   ];
 
   return (
-    <div className="flex-1 p-8 md:p-12 overflow-y-auto bg-[#0A0A0A] text-white select-none" id="overview-view">
+    <div className="flex-1 p-8 md:p-12 overflow-y-auto min-h-0 flex flex-col bg-[#0A0A0A] text-white select-none" id="overview-view">
       {/* Upper header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-[#222] pb-8 mb-8">
         <div>

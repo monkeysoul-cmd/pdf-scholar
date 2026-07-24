@@ -123,7 +123,7 @@ export default function Quiz() {
   const showCompleteBtn = quizQuestions.length > 0 && allMCAnswered && allSAAnswered && !showResults;
 
   return (
-    <div className="flex-1 p-8 bg-[#0A0A0A] overflow-y-auto" id="quiz-view">
+    <div className="flex-1 p-8 bg-[#0A0A0A] overflow-y-auto min-h-0" id="quiz-view">
       {/* Header */}
       <div className="mb-8 border-b border-[#222] pb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -191,7 +191,7 @@ export default function Quiz() {
           </div>
           <h3 className="font-black text-white text-lg uppercase tracking-wide">Generate Quiz</h3>
           <p className="text-[11px] text-zinc-500 font-mono uppercase mt-2 mb-8 leading-relaxed">
-            Gemini will parse key passages from <span className="text-[#00FF66]">"{activeDoc?.name}"</span> and draft structured diagnostic questions.
+            The system will parse key passages from <span className="text-[#00FF66]">"{activeDoc?.name}"</span> and draft structured diagnostic questions.
           </p>
           <div className="flex items-center justify-center gap-3 bg-[#111] border border-[#222] p-3 rounded-xs shadow-2xl">
             <span className="text-[10px] font-black text-zinc-500 font-mono uppercase">Select:</span>

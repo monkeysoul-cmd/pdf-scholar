@@ -88,8 +88,8 @@ export default function Chat() {
 
   if (!selectedDocumentId) {
     return (
-      <div className="flex-1 p-8 bg-[#0A0A0A] flex flex-col justify-center items-center" id="chat-view">
-        <div className="text-center max-w-sm border border-[#222] bg-[#111] p-10 rounded-xs shadow-2xl">
+      <div className="flex-1 p-8 bg-[#0A0A0A] flex flex-col items-center min-h-0" id="chat-view">
+        <div className="text-center max-w-sm border border-[#222] bg-[#111] p-10 rounded-xs shadow-2xl my-auto">
           <MessageSquare className="w-12 h-12 text-[#00FF66] mx-auto mb-4" />
           <h3 className="font-black text-white text-base uppercase tracking-wider">No Active Target</h3>
           <p className="text-[11px] text-zinc-500 font-mono uppercase mt-2 mb-6">
@@ -101,7 +101,7 @@ export default function Chat() {
   }
 
   return (
-    <div className="flex-1 bg-[#0A0A0A] flex flex-col h-full" id="chat-view">
+    <div className="flex-1 bg-[#0A0A0A] flex flex-col min-h-0 h-full" id="chat-view">
       {/* Thread Header */}
       <div className="p-4 bg-[#111] border-b border-[#222] flex items-center justify-between shadow-xs shrink-0">
         <div>

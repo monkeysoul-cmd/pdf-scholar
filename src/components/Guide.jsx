@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS document_chunks (
   id TEXT PRIMARY KEY,
   document_id TEXT REFERENCES documents(id) ON DELETE CASCADE,
   text TEXT NOT NULL,
-  embedding vector(768), -- Dimension size of gemini-embedding-2-preview
+  embedding vector(768), -- Dimension size of embedding vector
   page_index INT NOT NULL
 );
 
@@ -84,17 +84,17 @@ $$;`;
       desc: "Authored custom RecursiveCharacterTextSplitter for logical, boundary-safe structural chunking (800-char sizes with 200-char overlaps) to prevent content fragmentation."
     },
     {
-      title: "Gemini Vector Embedding Matrices",
-      desc: "Engineered deep vector lookups on the server via gemini-embedding-2-preview (768-dimensions), keeping secret keys completely secure and away from client-side bundles."
+      title: "Vector Embedding Matrices",
+      desc: "Engineered deep vector lookups on the server via high-dimensional embeddings (768-dimensions), keeping secret keys completely secure and away from client-side bundles."
     },
     {
       title: "Deterministic Grounding Guardrails",
-      desc: "Designed low-temperature generative prompting with Gemini 3.5 Flash to enforce strict factual grounding, introducing auto-activated guardrails that safely block hallucinations."
+      desc: "Designed low-temperature generative prompting with a reasoning language model to enforce strict factual grounding, introducing auto-activated guardrails that safely block hallucinations."
     }
   ];
 
   return (
-    <div className="flex-1 p-8 bg-[#0A0A0A] overflow-y-auto" id="guide-view">
+    <div className="flex-1 p-8 bg-[#0A0A0A] overflow-y-auto min-h-0" id="guide-view">
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Header */}
         <div className="border-b border-[#222] pb-6">
@@ -134,7 +134,7 @@ $$;`;
 
             <div className="bg-black border border-[#222] p-4 rounded-xs">
               <span className="text-[9px] font-mono font-bold text-[#00FF66] block mb-1 uppercase tracking-widest">Step 3</span>
-              <strong className="text-xs font-black text-white block uppercase">Gemini Embed</strong>
+              <strong className="text-xs font-black text-white block uppercase">Vector Embed</strong>
               <span className="text-[9px] text-zinc-500 block font-mono mt-1 uppercase">768 Dim Vector</span>
             </div>
           </div>

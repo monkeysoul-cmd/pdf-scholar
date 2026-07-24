@@ -23,7 +23,7 @@ export default function Upload() {
   const steps = [
     { title: "Reading PDF file", desc: "Accessing content buffer on client", icon: FileText },
     { title: "Extracting & Splitting Text", desc: "Running recursive chunking parsing", icon: Layers },
-    { title: "Generating Vector Embeddings", desc: "Sending chunks to Gemini embedding models", icon: Cpu },
+    { title: "Generating Vector Embeddings", desc: "Sending chunks to embedding models", icon: Cpu },
     { title: "Ingesting to Vector Database", desc: "Writing index matrices to Local storage", icon: Database },
   ];
 
@@ -144,8 +144,8 @@ export default function Upload() {
   };
 
   return (
-    <div className="flex-1 p-8 bg-[#0A0A0A] overflow-y-auto flex flex-col justify-center items-center" id="upload-view">
-      <div className="max-w-2xl w-full bg-[#111] border border-[#222] rounded-xs p-8 md:p-12 shadow-2xl">
+    <div className="flex-1 p-8 bg-[#0A0A0A] overflow-y-auto min-h-0 flex flex-col items-center" id="upload-view">
+      <div className="max-w-2xl w-full bg-[#111] border border-[#222] rounded-xs p-8 md:p-12 shadow-2xl my-auto">
         {/* Header */}
         <div className="text-center mb-10">
           <h2 className="text-3xl font-black tracking-tight text-white uppercase mb-2">Ingest Academic Target</h2>
