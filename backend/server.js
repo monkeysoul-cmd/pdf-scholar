@@ -345,6 +345,11 @@ ${contentSample}`;
 
 // Vite Middleware & Static Asset Serving Setup
 async function start() {
+  if (process.env.VERCEL) {
+    // Under Vercel, we do not start the listener or Vite middleware.
+    return;
+  }
+
   try {
     console.log("Connecting to MongoDB Atlas...");
     await LocalVectorDB.connect();
@@ -373,3 +378,5 @@ async function start() {
 }
 
 start();
+
+export default app;
