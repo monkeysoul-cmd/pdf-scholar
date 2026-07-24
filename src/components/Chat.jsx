@@ -107,10 +107,10 @@ export default function Chat() {
         <div>
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-[#00FF66] animate-pulse" />
-            <h3 className="font-black text-white text-xs uppercase tracking-wider">Interactive RAG Session</h3>
+            <h3 className="font-black text-white text-xs uppercase tracking-wider">Chat Session</h3>
           </div>
           <p className="text-[10px] text-zinc-500 font-mono mt-1 max-w-lg truncate uppercase" title={activeDoc?.name}>
-            Context Target: <strong className="text-white">"{activeDoc?.name}"</strong>
+            Active Book/Document: <strong className="text-white">"{activeDoc?.name}"</strong>
           </p>
         </div>
 
@@ -132,9 +132,9 @@ export default function Chat() {
             <div className="w-16 h-16 bg-[#111] border border-[#222] text-[#00FF66] rounded-xs flex items-center justify-center mb-5">
               <MessageSquare className="w-8 h-8" />
             </div>
-            <h4 className="font-black text-white text-base uppercase tracking-wider">Start PDF Consultation</h4>
+            <h4 className="font-black text-white text-base uppercase tracking-wider">Discuss Your Document</h4>
             <p className="text-zinc-500 text-[11px] mt-1.5 max-w-xs font-mono uppercase leading-relaxed">
-              Ask questions. Our RAG engine will perform vector lookups, pull matching passages, and draft grounded answers.
+              Type your question below, and we will find the matching sections and help you answer it.
             </p>
             <div className="grid grid-cols-1 gap-2 mt-8 w-full text-left">
               {[
@@ -187,7 +187,7 @@ export default function Chat() {
                       <div className="border-t border-[#222] mt-4 pt-3.5 space-y-2">
                         <div className="flex items-center gap-1.5 text-[9px] font-mono font-black text-zinc-500 uppercase tracking-widest mb-2">
                           <BookOpen className="w-3.5 h-3.5 text-zinc-500" />
-                          <span>Grounded Excerpts ({msg.sources.length})</span>
+                          <span>Matching Sections ({msg.sources.length})</span>
                         </div>
                         
                         <div className="flex flex-wrap gap-2">
@@ -208,12 +208,12 @@ export default function Chat() {
                                 >
                                   <div className="flex items-center gap-2">
                                     <span className="bg-[#111] border border-[#222] text-[#00FF66] px-1.5 py-0.5 rounded-xs font-mono text-[9px]">
-                                      Excerpt {srcIdx + 1}
+                                      Section {srcIdx + 1}
                                     </span>
                                     <span>Page {src.chunk.pageIndex}</span>
                                     <span className="text-zinc-800">•</span>
                                     <span className="font-mono text-[9px] text-[#00FF66] bg-[#00FF66]/5 border border-[#00FF66]/15 px-1.5 py-0.2 rounded-xs">
-                                      Match: {scorePercent}%
+                                      Relevance: {scorePercent}%
                                     </span>
                                   </div>
                                   {isExpanded ? (
@@ -240,9 +240,9 @@ export default function Chat() {
                       <div className="flex items-start gap-2.5 bg-amber-950/20 text-amber-500 border border-amber-900/30 rounded-xs p-3.5 mt-4 text-[10px] font-mono uppercase">
                         <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 mt-0.5" />
                         <div>
-                          <strong className="font-black text-white block mb-0.5 tracking-wider">Strict Grounding Activated</strong>
+                          <strong className="font-black text-white block mb-0.5 tracking-wider">Note on Source Content</strong>
                           <p className="text-zinc-400 leading-relaxed font-sans normal-case">
-                            This query fell outside the PDF source text. Hallucination restricted.
+                            We couldn't find information for this question in the document itself.
                           </p>
                         </div>
                       </div>
@@ -257,13 +257,13 @@ export default function Chat() {
         {isSending && (
           <div className="flex flex-col gap-1.5 items-start max-w-4xl mx-auto" id="chat-thinking-bubble">
             <div className="flex items-center gap-2 text-[9px] font-mono text-zinc-500 uppercase px-1 tracking-wider">
-              <span>PDF Scholar AI</span>
+              <span>Study Assistant</span>
               <span>•</span>
               <span>Thinking...</span>
             </div>
             <div className="bg-[#111] border border-[#222] rounded-xs p-4 text-zinc-400 flex items-center gap-2.5 text-xs shadow-lg font-mono uppercase">
               <Loader2 className="w-4 h-4 text-[#00FF66] animate-spin" />
-              <span>Analyzing vector chunks and mapping context...</span>
+              <span>Searching the document and compiling your answer...</span>
             </div>
           </div>
         )}

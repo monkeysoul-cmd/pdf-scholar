@@ -3,12 +3,12 @@ import { useAppState } from "../lib/state-context";
 import {
   BookOpen,
   UploadCloud,
-  BrainCircuit,
+  GraduationCap,
   MessageSquare,
   HelpCircle,
   FileText,
   Trash2,
-  Sparkles
+  Cloud
 } from "lucide-react";
 
 export default function Sidebar() {
@@ -24,9 +24,9 @@ export default function Sidebar() {
   const menuItems = [
     { id: "overview", label: "Overview", icon: BookOpen },
     { id: "upload", label: "Upload PDF", icon: UploadCloud },
-    { id: "quiz", label: "Adaptive Quiz", icon: BrainCircuit, disabled: !selectedDocumentId },
-    { id: "chat", label: "Interactive Chat", icon: MessageSquare, disabled: !selectedDocumentId },
-    { id: "guide", label: "Setup Guide", icon: HelpCircle },
+    { id: "quiz", label: "Practice Quiz", icon: GraduationCap, disabled: !selectedDocumentId },
+    { id: "chat", label: "Chat with PDF", icon: MessageSquare, disabled: !selectedDocumentId },
+    { id: "guide", label: "How to Use", icon: HelpCircle },
   ];
 
   const activeDoc = documents.find(d => d.id === selectedDocumentId);
@@ -37,10 +37,10 @@ export default function Sidebar() {
       <div className="p-8 border-b border-[#222] flex flex-col gap-1.5">
         <div className="logo font-black text-xl tracking-tighter uppercase text-[#00FF66] flex items-center gap-2">
           <BookOpen className="w-5 h-5 text-[#00FF66]" />
-          <span>PDF Scholar RAG</span>
+          <span>PDF Scholar Hub</span>
         </div>
         <p className="text-[10px] font-mono tracking-wider text-zinc-500 uppercase">
-          V-ENGINE OPERATIONAL
+          Cloud Storage Connected
         </p>
       </div>
 
@@ -160,8 +160,8 @@ export default function Sidebar() {
       {/* Powered Footer */}
       <div className="p-6 border-t border-[#222] flex items-center justify-between text-[10px] text-zinc-600 font-mono uppercase tracking-wider">
         <div className="flex items-center gap-1.5">
-          <Sparkles className="w-3.5 h-3.5 text-zinc-600" />
-          <span>Local Fallback Core</span>
+          <Cloud className="w-3.5 h-3.5 text-zinc-600" />
+          <span>MongoDB Atlas Connected</span>
         </div>
         <div className="w-2 h-2 rounded-full bg-[#00FF66] shadow-md shadow-[#00FF66]/50 animate-pulse" />
       </div>
