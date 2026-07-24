@@ -445,20 +445,20 @@ app.use((err, req, res, next) => {
 
 // Vite Middleware & Static Asset Serving Setup
 async function start() {
-  // If running as a Vercel Serverless Function (no PORT set in serverless env), exit early
+  // If running as a Vercel Serverless Function (no PORT set), exit early — Vercel handles routing
   if (process.env.VERCEL && !process.env.PORT) {
     return;
   }
 
-  try {
-    console.log("Connecting to MongoDB Atlas...");
-    await LocalVectorDB.connect();
-  } catch (dbErr) {
-    console.error("FATAL: Failed to connect to MongoDB Atlas at startup:", dbErr.message || dbErr);
-    process.exit(1);
+  // Warn about missing env vars but do NOT crash — DB connects lazily on first request
+  if (!process.env.MONGODB_URI) {
+    console.warn("WARNING: MONGODB_URI is not set. Database requests will fail.");
+  }
+  if (!process.env.GEMINI_API_KEY) {
+    console.warn("WARNING: GEMINI_API_KEY is not set. AI features will be unavailable.");
   }
 
-  // If running as a Vercel Service (multi-service architecture)
+  // If running as a Vercel Service (multi-service, PORT is assigned by Vercel)
   if (process.env.VERCEL) {
     app.listen(PORT, "0.0.0.0", () => {
       console.log(`PDF Scholar Backend Service running on port ${PORT}`);
