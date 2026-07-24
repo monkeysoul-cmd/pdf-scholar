@@ -94,11 +94,6 @@ async function generateContentWithFallback(params, initialModel = "gemini-3.5-fl
   throw lastError || new Error("All fallback models failed.");
 }
 
-// Health-check — Vercel probes GET / on the backend service
-app.get("/", (req, res) => {
-  res.json({ status: "ok", service: "pdf-scholar-backend" });
-});
-
 // Authentication Routes
 // 1. User Registration
 app.post("/api/auth/register", async (req, res) => {
