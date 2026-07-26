@@ -1,6 +1,5 @@
 import express from "express";
 import path from "path";
-import { createServer as createViteServer } from "vite";
 import { GoogleGenAI, Type } from "@google/genai";
 import { PDFParse } from "pdf-parse";
 import { RecursiveCharacterTextSplitter } from "./lib/splitter.js";
@@ -14,6 +13,14 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || "super-secure-pdf-scholar-hub-secret-key-12345";
+
+// Middleware to normalize URL paths for Vercel Serverless Function rewrites
+app.use((req, res, next) => {
+  if (!req.url.startsWith("/api") && !req.path.startsWith("/api")) {
+    req.url = "/api" + (req.url.startsWith("/") ? "" : "/") + req.url;
+  }
+  next();
+});
 
 function authenticateToken(req, res, next) {
   const authHeader = req.headers["authorization"];
@@ -36,9 +43,9 @@ function authenticateToken(req, res, next) {
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
-// Initialize Google Gen AI
+// Initialize Google Gen AI with fallback dummy key if not present during startup
 const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY,
+  apiKey: process.env.GEMINI_API_KEY || "dummy-key-for-initialization",
   httpOptions: {
     headers: {
       "User-Agent": "aistudio-build",
@@ -445,8 +452,8 @@ app.use((err, req, res, next) => {
 
 // Vite Middleware & Static Asset Serving Setup
 async function start() {
-  // If running as a Vercel Serverless Function (no PORT set), exit early — Vercel handles routing
-  if (process.env.VERCEL && !process.env.PORT) {
+  // If running as a Vercel Serverless Function, exit early — Vercel handles routing
+  if (process.env.VERCEL) {
     return;
   }
 
@@ -458,15 +465,8 @@ async function start() {
     console.warn("WARNING: GEMINI_API_KEY is not set. AI features will be unavailable.");
   }
 
-  // If running as a Vercel Service (multi-service, PORT is assigned by Vercel)
-  if (process.env.VERCEL) {
-    app.listen(PORT, "0.0.0.0", () => {
-      console.log(`PDF Scholar Backend Service running on port ${PORT}`);
-    });
-    return;
-  }
-
   if (process.env.NODE_ENV !== "production") {
+    const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
