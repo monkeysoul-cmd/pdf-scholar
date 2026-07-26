@@ -1,7 +1,6 @@
 import express from "express";
 import path from "path";
 import { GoogleGenAI, Type } from "@google/genai";
-import { PDFParse } from "pdf-parse";
 import { RecursiveCharacterTextSplitter } from "./lib/splitter.js";
 import { LocalVectorDB } from "./lib/local-vector-db.js";
 import dotenv from "dotenv";
@@ -207,10 +206,11 @@ app.post("/api/ingest", authenticateToken, async (req, res) => {
     let text = "";
     let pageCount = 1;
     try {
+      const { PDFParse } = await import("pdf-parse");
       const parser = new PDFParse({ data: buffer });
       const parsedPdf = await parser.getText();
       text = parsedPdf.text || "";
-      pageCount = parsedPdf.pages.length || parsedPdf.total || 1;
+      pageCount = parsedPdf.pages?.length || parsedPdf.total || 1;
       await parser.destroy();
     } catch (parseErr) {
       console.error("PDF Parsing Error:", parseErr);
