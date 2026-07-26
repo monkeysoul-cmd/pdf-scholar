@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 
 export default function Quiz() {
-  const { documents, selectedDocumentId, quizQuestions, setQuestions } = useAppState();
+  const { documents, selectedDocumentId, quizQuestions, setQuestions, authenticatedFetch } = useAppState();
   const [questionCount, setQuestionCount] = useState(5);
   const [isGenerating, setIsGenerating] = useState(false);
   const [answers, setAnswers] = useState({});
@@ -31,7 +31,7 @@ export default function Quiz() {
     setShortAnswerSelfGrades({});
 
     try {
-      const res = await fetch("/api/quiz", {
+      const res = await authenticatedFetch("/api/quiz", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 
 export default function Chat() {
-  const { documents, selectedDocumentId, chatHistory, addMessage, clearChat } = useAppState();
+  const { documents, selectedDocumentId, chatHistory, addMessage, clearChat, authenticatedFetch } = useAppState();
   const [inputText, setInputText] = useState("");
   const [isSending, setIsSending] = useState(false);
   const [expandedSourceId, setExpandedSourceId] = useState(null);
@@ -46,7 +46,7 @@ export default function Chat() {
         { role: "user", text: userMessage }
       ];
 
-      const res = await fetch("/api/chat", {
+      const res = await authenticatedFetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

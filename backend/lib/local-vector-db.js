@@ -8,13 +8,22 @@ export class LocalVectorDB {
     if (db) return db;
     const uri = process.env.MONGODB_URI;
     if (!uri) {
-      throw new Error("MONGODB_URI environment variable is missing.");
+      throw new Error("MONGODB_URI environment variable is missing in Vercel deployment settings.");
     }
-    client = new MongoClient(uri);
-    await client.connect();
-    db = client.db();
-    console.log("Connected successfully to MongoDB Atlas");
-    return db;
+    try {
+      client = new MongoClient(uri, {
+        serverSelectionTimeoutMS: 5000,
+        connectTimeoutMS: 5000,
+      });
+      await client.connect();
+      db = client.db();
+      console.log("Connected successfully to MongoDB Atlas");
+      return db;
+    } catch (err) {
+      client = null;
+      db = null;
+      throw new Error(`MongoDB connection failed (${err.message}). Ensure MONGODB_URI is set in Vercel and MongoDB Atlas Network Access allows 0.0.0.0/0.`);
+    }
   }
 
   static async getDb() {

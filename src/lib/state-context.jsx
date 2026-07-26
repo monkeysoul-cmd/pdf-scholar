@@ -86,14 +86,15 @@ export function StateProvider({ children }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password })
     });
+    const text = await res.text();
     let data;
     try {
-      data = await res.json();
+      data = JSON.parse(text);
     } catch {
-      throw new Error("Server is not responding correctly. Please check your deployment environment variables (MONGODB_URI, GEMINI_API_KEY, JWT_SECRET).");
+      throw new Error(`Server returned non-JSON error (status ${res.status}): ${text.slice(0, 180) || "Check deployment environment variables (MONGODB_URI, GEMINI_API_KEY, JWT_SECRET)."}`);
     }
     if (!res.ok) {
-      throw new Error(data.error || "Login failed.");
+      throw new Error(data.error || `Login failed (status ${res.status}).`);
     }
     setToken(data.token);
     setUser(data.user);
@@ -107,14 +108,15 @@ export function StateProvider({ children }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, password })
     });
+    const text = await res.text();
     let data;
     try {
-      data = await res.json();
+      data = JSON.parse(text);
     } catch {
-      throw new Error("Server is not responding correctly. Please check your deployment environment variables (MONGODB_URI, GEMINI_API_KEY, JWT_SECRET).");
+      throw new Error(`Server returned non-JSON error (status ${res.status}): ${text.slice(0, 180) || "Check deployment environment variables (MONGODB_URI, GEMINI_API_KEY, JWT_SECRET)."}`);
     }
     if (!res.ok) {
-      throw new Error(data.error || "Registration failed.");
+      throw new Error(data.error || `Registration failed (status ${res.status}).`);
     }
     return data;
   };
