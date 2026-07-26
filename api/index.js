@@ -1,5 +1,2 @@
-export default function handler(req, res) {
-  res.statusCode = 200;
-  res.setHeader("Content-Type", "application/json");
-  res.end(JSON.stringify({ ok: true, message: "Hello from Vercel Serverless Function!" }));
-}
+import app from "../backend/server.js";
+export default app;
