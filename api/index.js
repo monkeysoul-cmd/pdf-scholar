@@ -11,10 +11,4 @@ app.post("/api/auth/login", (req, res) => {
   res.json({ test: "working", body: req.body });
 });
 
-export default function handler(req, res) {
-  return new Promise((resolve) => {
-    res.on("finish", resolve);
-    res.on("close", resolve);
-    app(req, res);
-  });
-}
+export default app;
