@@ -1,0 +1,472 @@
+import express from "express";
+import path from "path";
+import { GoogleGenAI, Type } from "@google/genai";
+import { RecursiveCharacterTextSplitter } from "./lib/splitter.js";
+import { LocalVectorDB } from "./lib/local-vector-db.js";
+import dotenv from "dotenv";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+
+dotenv.config();
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+const JWT_SECRET = process.env.JWT_SECRET || "super-secure-pdf-scholar-hub-secret-key-12345";
+
+// Middleware to normalize URL paths for Vercel Serverless Function rewrites
+app.use((req, res, next) => {
+  if (!req.url.startsWith("/api") && !req.path.startsWith("/api")) {
+    req.url = "/api" + (req.url.startsWith("/") ? "" : "/") + req.url;
+  }
+  next();
+});
+
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+
+  if (!token) {
+    return res.status(401).json({ error: "Access token is missing." });
+  }
+
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) {
+      return res.status(403).json({ error: "Invalid or expired token." });
+    }
+    req.user = user;
+    next();
+  });
+}
+
+// Increase request size limits for handling base64 PDFs
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
+
+// Initialize Google Gen AI with fallback dummy key if not present during startup
+const ai = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY || "dummy-key-for-initialization",
+  httpOptions: {
+    headers: {
+      "User-Agent": "aistudio-build",
+    },
+  },
+});
+
+// Helper: safe embedding generator
+async function generateChunkEmbedding(text) {
+  if (!process.env.GEMINI_API_KEY) {
+    throw new Error("GEMINI_API_KEY environment variable is missing.");
+  }
+  const response = await ai.models.embedContent({
+    model: "gemini-embedding-2-preview",
+    contents: text,
+  });
+
+  const values = response.embedding?.values || (Array.isArray(response.embeddings) ? response.embeddings[0]?.values : undefined);
+
+  if (!values) {
+    throw new Error("Failed to retrieve embeddings from API.");
+  }
+  return values;
+}
+
+// Helper: safe content generator with fallback models
+async function generateContentWithFallback(params, initialModel = "gemini-3.5-flash") {
+  const models = [
+    initialModel,
+    "gemini-3.6-flash",
+    "gemini-3.5-flash-lite",
+    "gemini-2.5-flash"
+  ];
+
+  let lastError = null;
+
+  for (const model of models) {
+    try {
+      console.log(`Attempting content generation using model: ${model}...`);
+      const response = await ai.models.generateContent({
+        ...params,
+        model,
+      });
+      console.log(`Successfully generated content using model: ${model}`);
+      return response;
+    } catch (error) {
+      lastError = error;
+      console.warn(`Model ${model} failed: ${error.message || error}. Trying next fallback...`);
+    }
+  }
+
+  throw lastError || new Error("All fallback models failed.");
+}
+
+// Authentication Routes
+// 1. User Registration
+app.post("/api/auth/register", async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    if (!username || !password) {
+      return res.status(400).json({ error: "Username and password are required." });
+    }
+
+    const database = await LocalVectorDB.getDb();
+    
+    const existingUser = await database.collection("users").findOne({ username: username.toLowerCase() });
+    if (existingUser) {
+      return res.status(400).json({ error: "Username is already taken." });
+    }
+
+    const passwordHash = await bcrypt.hash(password, 10);
+    await database.collection("users").insertOne({
+      username: username.toLowerCase(),
+      passwordHash,
+      createdAt: new Date()
+    });
+
+    res.json({ success: true, message: "Registration successful! Please login." });
+  } catch (error) {
+    console.error("Registration Error:", error);
+    res.status(500).json({ error: error.message || "Internal registration error." });
+  }
+});
+
+// 2. User Login
+app.post("/api/auth/login", async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    if (!username || !password) {
+      return res.status(400).json({ error: "Username and password are required." });
+    }
+
+    const database = await LocalVectorDB.getDb();
+    const user = await database.collection("users").findOne({ username: username.toLowerCase() });
+    if (!user) {
+      return res.status(400).json({ error: "Invalid username or password." });
+    }
+
+    const validPassword = await bcrypt.compare(password, user.passwordHash);
+    if (!validPassword) {
+      return res.status(400).json({ error: "Invalid username or password." });
+    }
+
+    const token = jwt.sign({ id: user._id.toString(), username: user.username }, JWT_SECRET, {
+      expiresIn: "7d"
+    });
+
+    res.json({
+      success: true,
+      token,
+      user: {
+        id: user._id.toString(),
+        username: user.username
+      }
+    });
+  } catch (error) {
+    console.error("Login Error:", error);
+    res.status(500).json({ error: error.message || "Internal login error." });
+  }
+});
+
+// API Routes
+// 1. Get List of Ingested Documents
+app.get("/api/documents", authenticateToken, async (req, res) => {
+  try {
+    const db = await LocalVectorDB.get(req.user.id);
+    res.json({ documents: db.documents });
+  } catch (error) {
+    res.status(500).json({ error: error.message || "Failed to fetch documents" });
+  }
+});
+
+// 2. Delete Document
+app.delete("/api/documents/:id", authenticateToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+    await LocalVectorDB.deleteDocument(id, req.user.id);
+    res.json({ success: true });
+  } catch (error) {
+    res.status(500).json({ error: error.message || "Failed to delete document" });
+  }
+});
+
+// 3. Upload & Ingest PDF Document
+app.post("/api/ingest", authenticateToken, async (req, res) => {
+  try {
+    const { pdfBase64, filename, size } = req.body;
+    if (!pdfBase64 || !filename) {
+      res.status(400).json({ error: "Missing pdfBase64 or filename parameter." });
+      return;
+    }
+
+    const buffer = Buffer.from(pdfBase64, "base64");
+
+    let text = "";
+    let pageCount = 1;
+    try {
+      const { PDFParse } = await import("pdf-parse");
+      const parser = new PDFParse({ data: buffer });
+      const parsedPdf = await parser.getText();
+      text = parsedPdf.text || "";
+      pageCount = parsedPdf.pages?.length || parsedPdf.total || 1;
+      await parser.destroy();
+    } catch (parseErr) {
+      console.error("PDF Parsing Error:", parseErr);
+      res.status(400).json({ error: `Failed to parse PDF document. Ensure it's not corrupt or password-protected. Error: ${parseErr.message}` });
+      return;
+    }
+
+    if (!text.trim()) {
+      res.status(400).json({ error: "The uploaded PDF appears to have no extractable text." });
+      return;
+    }
+
+    const splitter = new RecursiveCharacterTextSplitter({
+      chunkSize: 800,
+      chunkOverlap: 200,
+    });
+    const rawChunks = splitter.splitText(text);
+
+    if (rawChunks.length === 0) {
+      res.status(400).json({ error: "Failed to split text into readable chunks." });
+      return;
+    }
+
+    const docId = `doc_${Date.now()}`;
+    const docMeta = {
+      id: docId,
+      name: filename,
+      pageCount,
+      chunkCount: rawChunks.length,
+      uploadedAt: new Date().toISOString(),
+      size: size || buffer.length,
+    };
+
+    const chunkRecords = [];
+    console.log(`Generating embeddings for ${rawChunks.length} chunks of document "${filename}"...`);
+
+    for (let i = 0; i < rawChunks.length; i++) {
+      const chunkText = rawChunks[i];
+      try {
+        const embedding = await generateChunkEmbedding(chunkText);
+        const pageIndex = Math.min(
+          pageCount,
+          Math.max(1, Math.ceil((i / rawChunks.length) * pageCount))
+        );
+
+        chunkRecords.push({
+          documentId: docId,
+          documentName: filename,
+          text: chunkText,
+          embedding,
+          pageIndex,
+        });
+      } catch (embedError) {
+        console.error(`Embedding failed at chunk ${i}:`, embedError);
+        res.status(500).json({ error: `Embedding generation failed: ${embedError.message}` });
+        return;
+      }
+    }
+
+    await LocalVectorDB.addDocument(docMeta, chunkRecords, req.user.id);
+
+    res.json({
+      success: true,
+      document: docMeta,
+    });
+  } catch (error) {
+    console.error("Ingestion Endpoint Error:", error);
+    res.status(500).json({ error: error.message || "Internal server error during PDF ingestion." });
+  }
+});
+
+// 4. RAG Chat Endpoint
+app.post("/api/chat", authenticateToken, async (req, res) => {
+  try {
+    const { documentId, message, history } = req.body;
+    if (!message) {
+      res.status(400).json({ error: "Missing message parameter." });
+      return;
+    }
+
+    let queryEmbedding;
+    try {
+      queryEmbedding = await generateChunkEmbedding(message);
+    } catch (embedError) {
+      res.status(500).json({ error: `Embedding query failed: ${embedError.message}` });
+      return;
+    }
+
+    const searchResults = await LocalVectorDB.similaritySearch(queryEmbedding, 3, documentId, req.user.id);
+
+    if (searchResults.length === 0) {
+      res.json({
+        text: "I couldn't find any documents or chunks to base my answer on. Please upload a PDF first.",
+        sources: [],
+      });
+      return;
+    }
+
+    const contextText = searchResults
+      .map((r, i) => `[Source ${i + 1}] (Page ${r.chunk.pageIndex}):\n${r.chunk.text}`)
+      .join("\n\n");
+
+    const systemInstruction = `You are PDF Scholar, an advanced RAG academic assistant. You answer user questions strictly based on the provided PDF context excerpts.
+
+If the provided context does not contain enough information to answer the question, or is completely unrelated, you MUST reply exactly with: "I'm sorry, but the provided document does not contain enough information to answer this question." Do not fabricate information, make up references, or use outside knowledge.
+
+Be concise, clear, and perfectly grounded. Always cite your sources by mentioning source index (e.g., [Source 1], [Source 2]) where appropriate.
+
+Here is the Ground-Truth Document Context:
+${contextText}`;
+
+    const formattedHistory = (history || []).map((h) => ({
+      role: h.role === "assistant" ? "model" : "user",
+      parts: [{ text: h.text }],
+    }));
+
+    const response = await generateContentWithFallback({
+      contents: [
+        ...formattedHistory,
+        { role: "user", parts: [{ text: message }] },
+      ],
+      config: {
+        systemInstruction,
+        temperature: 0.1,
+      },
+    });
+
+    res.json({
+      text: response.text || "No response received from model.",
+      sources: searchResults,
+    });
+  } catch (error) {
+    console.error("Chat Endpoint Error:", error);
+    res.status(500).json({ error: error.message || "Internal server error during chat." });
+  }
+});
+
+// 5. Generate Interactive Quiz Endpoint
+app.post("/api/quiz", authenticateToken, async (req, res) => {
+  try {
+    const { documentId, count = 5 } = req.body;
+    if (!documentId) {
+      res.status(400).json({ error: "Missing documentId parameter." });
+      return;
+    }
+
+    const db = await LocalVectorDB.get(req.user.id);
+    const doc = db.documents.find(d => d.id === documentId);
+    if (!doc) {
+      res.status(404).json({ error: "Document not found." });
+      return;
+    }
+
+    const docChunks = db.chunks.filter(c => c.documentId === documentId);
+    if (docChunks.length === 0) {
+      res.status(400).json({ error: "No chunks found for this document." });
+      return;
+    }
+
+    const contentSample = docChunks
+      .slice(0, 10)
+      .map(c => c.text)
+      .join("\n\n");
+
+    const prompt = `Based strictly on the following excerpt from the document "${doc.name}", generate an interactive quiz of exactly ${count} questions.
+Include a mix of multiple-choice (with 4 options) and short-answer questions.
+For multiple-choice: provide an options array, the correctAnswer (which MUST match one of the options exactly), and an explanation.
+For short-answer: leave options empty, provide the correctAnswer as the key criteria/rubric, and an explanation of the concept.
+
+Document Excerpt:
+${contentSample}`;
+
+    const quizResponseSchema = {
+      type: Type.OBJECT,
+      properties: {
+        questions: {
+          type: Type.ARRAY,
+          items: {
+            type: Type.OBJECT,
+            properties: {
+              id: { type: Type.STRING, description: "A unique sequential ID, e.g. q1, q2" },
+              type: { type: Type.STRING, description: "Must be exactly 'multiple-choice' or 'short-answer'" },
+              question: { type: Type.STRING, description: "The quiz question text." },
+              options: {
+                type: Type.ARRAY,
+                items: { type: Type.STRING },
+                description: "Array of 4 options for multiple-choice. Keep empty for short-answer."
+              },
+              correctAnswer: { type: Type.STRING, description: "For multiple-choice, the exact correct option string. For short-answer, a concise list of key terms/rubric that should be in the answer." },
+              explanation: { type: Type.STRING, description: "Detailed explanation of why this is correct, referencing the content." }
+            },
+            required: ["id", "type", "question", "correctAnswer", "explanation"]
+          }
+        }
+      },
+      required: ["questions"]
+    };
+
+    const response = await generateContentWithFallback({
+      contents: prompt,
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: quizResponseSchema,
+        temperature: 0.3,
+      },
+    });
+
+    const quizData = JSON.parse(response.text || '{"questions":[]}');
+    res.json(quizData);
+  } catch (error) {
+    console.error("Quiz Endpoint Error:", error);
+    res.status(500).json({ error: error.message || "Internal server error during quiz generation." });
+  }
+});
+
+// Global 404 handler — always returns JSON
+app.use((req, res) => {
+  res.status(404).json({ error: `Route ${req.method} ${req.path} not found.` });
+});
+
+// Global error handler — always returns JSON (never HTML)
+// eslint-disable-next-line no-unused-vars
+app.use((err, req, res, next) => {
+  console.error("Unhandled server error:", err);
+  res.status(500).json({ error: err.message || "Internal server error." });
+});
+
+// Vite Middleware & Static Asset Serving Setup
+async function start() {
+  if (process.env.VERCEL) {
+    return;
+  }
+
+  if (!process.env.MONGODB_URI) {
+    console.warn("WARNING: MONGODB_URI is not set. Database requests will fail.");
+  }
+  if (!process.env.GEMINI_API_KEY) {
+    console.warn("WARNING: GEMINI_API_KEY is not set. AI features will be unavailable.");
+  }
+
+  if (process.env.NODE_ENV !== "production") {
+    const { createServer: createViteServer } = await import("vite");
+    const vite = await createViteServer({
+      server: { middlewareMode: true },
+      appType: "spa",
+    });
+    app.use(vite.middlewares);
+  } else {
+    const distPath = path.join(process.cwd(), "dist");
+    app.use(express.static(distPath));
+    app.get("*", (req, res) => {
+      res.sendFile(path.join(distPath, "index.html"));
+    });
+  }
+
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log(`PDF Scholar Server running on http://localhost:${PORT} in ${process.env.NODE_ENV || "development"} mode`);
+  });
+}
+
+start();
+
+export default app;
