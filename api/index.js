@@ -1,12 +1,13 @@
-export default async function handler(req, res) {
-  try {
-    const { default: app } = await import("../backend/server.js");
-    return app(req, res);
-  } catch (err) {
-    console.error("Vercel Function Init Error:", err);
-    return res.status(500).json({
-      error: `Serverless Function Initialization Error: ${err.message || String(err)}`,
-      stack: err.stack
+import app from "../backend/server.js";
+
+export default function handler(req, res) {
+  return new Promise((resolve, reject) => {
+    res.on("finish", resolve);
+    res.on("close", resolve);
+    res.on("error", (err) => {
+      console.error("Vercel response error:", err);
+      resolve();
     });
-  }
+    app(req, res);
+  });
 }
