@@ -13,8 +13,22 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || "super-secure-pdf-scholar-hub-secret-key-12345";
 
+// CORS Middleware for Vercel / cross-origin requests
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization");
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+  next();
+});
+
 // Middleware to normalize URL paths for Vercel Serverless Function rewrites
 app.use((req, res, next) => {
+  if (req.url.startsWith("/api/index.js")) {
+    req.url = req.url.replace("/api/index.js", "/api");
+  }
   if (!req.url.startsWith("/api") && !req.path.startsWith("/api")) {
     req.url = "/api" + (req.url.startsWith("/") ? "" : "/") + req.url;
   }
@@ -42,46 +56,67 @@ function authenticateToken(req, res, next) {
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
-// Initialize Google Gen AI with fallback dummy key if not present during startup
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY || "dummy-key-for-initialization",
-  httpOptions: {
-    headers: {
-      "User-Agent": "aistudio-build",
+// Helper: safe AI client getter
+function getAIClient() {
+  const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.GEMINI_KEY;
+  return new GoogleGenAI({
+    apiKey: apiKey || "dummy-key-for-initialization",
+    httpOptions: {
+      headers: {
+        "User-Agent": "aistudio-build",
+      },
     },
-  },
-});
-
-// Helper: safe embedding generator
-async function generateChunkEmbedding(text) {
-  if (!process.env.GEMINI_API_KEY) {
-    throw new Error("GEMINI_API_KEY environment variable is missing.");
-  }
-  const response = await ai.models.embedContent({
-    model: "gemini-embedding-2-preview",
-    contents: text,
   });
+}
 
-  const values = response.embedding?.values || (Array.isArray(response.embeddings) ? response.embeddings[0]?.values : undefined);
-
-  if (!values) {
-    throw new Error("Failed to retrieve embeddings from API.");
+// Helper: safe embedding generator with model fallbacks
+async function generateChunkEmbedding(text) {
+  const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.GEMINI_KEY;
+  if (!apiKey) {
+    throw new Error("GEMINI_API_KEY environment variable is missing in Vercel deployment settings.");
   }
-  return values;
+
+  const ai = getAIClient();
+  const embeddingModels = ["gemini-embedding-2-preview", "text-embedding-004", "embedding-001"];
+  let lastErr = null;
+
+  for (const model of embeddingModels) {
+    try {
+      const response = await ai.models.embedContent({
+        model,
+        contents: text,
+      });
+
+      const values = response.embedding?.values || (Array.isArray(response.embeddings) ? response.embeddings[0]?.values : undefined);
+      if (values) return values;
+    } catch (err) {
+      lastErr = err;
+    }
+  }
+
+  throw lastErr || new Error("Failed to retrieve embeddings from Gemini API.");
 }
 
 // Helper: safe content generator with fallback models
-async function generateContentWithFallback(params, initialModel = "gemini-3.5-flash") {
+async function generateContentWithFallback(params, initialModel = "gemini-2.5-flash") {
+  const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.GEMINI_KEY;
+  if (!apiKey) {
+    throw new Error("GEMINI_API_KEY environment variable is missing in Vercel deployment settings.");
+  }
+
+  const ai = getAIClient();
   const models = [
     initialModel,
-    "gemini-3.6-flash",
-    "gemini-3.5-flash-lite",
-    "gemini-2.5-flash"
+    "gemini-2.5-flash",
+    "gemini-2.0-flash",
+    "gemini-1.5-flash"
   ];
+  // Remove duplicates while keeping order
+  const uniqueModels = [...new Set(models)];
 
   let lastError = null;
 
-  for (const model of models) {
+  for (const model of uniqueModels) {
     try {
       console.log(`Attempting content generation using model: ${model}...`);
       const response = await ai.models.generateContent({
@@ -202,12 +237,21 @@ app.post("/api/ingest", authenticateToken, async (req, res) => {
     let text = "";
     let pageCount = 1;
     try {
-      const { PDFParse } = await import("pdf-parse");
-      const parser = new PDFParse({ data: buffer });
-      const parsedPdf = await parser.getText();
-      text = parsedPdf.text || "";
-      pageCount = parsedPdf.pages?.length || parsedPdf.total || 1;
-      await parser.destroy();
+      const pdfModule = await import("pdf-parse");
+      const pdf = pdfModule.default || pdfModule;
+      if (typeof pdf === "function") {
+        const parsed = await pdf(buffer);
+        text = parsed.text || "";
+        pageCount = parsed.numpages || 1;
+      } else if (pdf.PDFParse) {
+        const parser = new pdf.PDFParse({ data: buffer });
+        const parsedPdf = await parser.getText();
+        text = parsedPdf.text || "";
+        pageCount = parsedPdf.pages?.length || parsedPdf.total || 1;
+        if (typeof parser.destroy === "function") await parser.destroy();
+      } else {
+        throw new Error("Unrecognized pdf-parse export format.");
+      }
     } catch (parseErr) {
       console.error("PDF Parsing Error:", parseErr);
       res.status(400).json({ error: `Failed to parse PDF document. Ensure it's not corrupt or password-protected. Error: ${parseErr.message}` });
@@ -243,27 +287,28 @@ app.post("/api/ingest", authenticateToken, async (req, res) => {
     const chunkRecords = [];
     console.log(`Generating embeddings for ${rawChunks.length} chunks of document "${filename}"...`);
 
-    for (let i = 0; i < rawChunks.length; i++) {
-      const chunkText = rawChunks[i];
-      try {
-        const embedding = await generateChunkEmbedding(chunkText);
-        const pageIndex = Math.min(
-          pageCount,
-          Math.max(1, Math.ceil((i / rawChunks.length) * pageCount))
-        );
-
-        chunkRecords.push({
-          documentId: docId,
-          documentName: filename,
-          text: chunkText,
-          embedding,
-          pageIndex,
-        });
-      } catch (embedError) {
-        console.error(`Embedding failed at chunk ${i}:`, embedError);
-        res.status(500).json({ error: `Embedding generation failed: ${embedError.message}` });
-        return;
-      }
+    // Process chunk embeddings in parallel batches of 5 to avoid Vercel serverless function timeouts
+    const BATCH_SIZE = 5;
+    for (let i = 0; i < rawChunks.length; i += BATCH_SIZE) {
+      const batch = rawChunks.slice(i, i + BATCH_SIZE);
+      const batchResults = await Promise.all(
+        batch.map(async (chunkText, batchIdx) => {
+          const actualIndex = i + batchIdx;
+          const embedding = await generateChunkEmbedding(chunkText);
+          const pageIndex = Math.min(
+            pageCount,
+            Math.max(1, Math.ceil((actualIndex / rawChunks.length) * pageCount))
+          );
+          return {
+            documentId: docId,
+            documentName: filename,
+            text: chunkText,
+            embedding,
+            pageIndex,
+          };
+        })
+      );
+      chunkRecords.push(...batchResults);
     }
 
     await LocalVectorDB.addDocument(docMeta, chunkRecords, req.user.id);

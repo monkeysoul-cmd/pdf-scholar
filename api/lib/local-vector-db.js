@@ -5,15 +5,27 @@ let db = null;
 
 export class LocalVectorDB {
   static async connect() {
-    if (db) return db;
-    const uri = process.env.MONGODB_URI;
+    if (db && client) {
+      try {
+        await db.command({ ping: 1 });
+        return db;
+      } catch (e) {
+        console.warn("MongoDB cached connection stale or dropped, reconnecting...", e.message);
+        client = null;
+        db = null;
+      }
+    }
+
+    const uri = process.env.MONGODB_URI || process.env.MONGO_URI || process.env.MONGODB_URL;
     if (!uri) {
-      throw new Error("MONGODB_URI environment variable is missing in Vercel deployment settings.");
+      throw new Error("MONGODB_URI environment variable is missing in Vercel deployment settings. Please set MONGODB_URI in Vercel project environment variables.");
     }
     try {
       client = new MongoClient(uri, {
-        serverSelectionTimeoutMS: 5000,
-        connectTimeoutMS: 5000,
+        serverSelectionTimeoutMS: 15000,
+        connectTimeoutMS: 15000,
+        maxPoolSize: 10,
+        retryWrites: true,
       });
       await client.connect();
       db = client.db();
@@ -27,10 +39,7 @@ export class LocalVectorDB {
   }
 
   static async getDb() {
-    if (!db) {
-      await this.connect();
-    }
-    return db;
+    return await this.connect();
   }
 
   static async get(userId) {
