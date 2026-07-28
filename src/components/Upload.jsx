@@ -8,8 +8,11 @@ import {
   XCircle,
   Layers,
   Cloud,
-  Smile
+  Smile,
+  Sparkles,
+  ArrowRight
 } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
 
 export default function Upload() {
   const { fetchDocuments, selectDocument, setTab, authenticatedFetch } = useAppState();
@@ -22,9 +25,9 @@ export default function Upload() {
 
   const steps = [
     { title: "Opening PDF file", desc: "Reading the contents of your document", icon: FileText },
-    { title: "Splitting into Pages", desc: "Preparing the text for reading", icon: Layers },
+    { title: "Splitting into Pages", desc: "Preparing text chunks for vector processing", icon: Layers },
     { title: "Saving to Cloud Storage", desc: "Storing document safely in MongoDB Atlas", icon: Cloud },
-    { title: "Finalizing", desc: "Setting up your discussion partner", icon: Smile },
+    { title: "Finalizing AI Index", desc: "Setting up your academic discussion partner", icon: Smile },
   ];
 
   const handleDrag = (e) => {
@@ -70,7 +73,6 @@ export default function Upload() {
     setErrorMessage("");
 
     try {
-      // Step 1: Read PDF base64 on client
       const base64Promise = new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = () => {
@@ -87,11 +89,9 @@ export default function Upload() {
 
       const base64Str = await base64Promise;
       
-      // Delay to show step completion visually
       setCurrentStep(1);
       setStatus("processing");
 
-      // Step 2-4 handled by the backend
       const response = await authenticatedFetch("/api/ingest", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -108,14 +108,11 @@ export default function Upload() {
         throw new Error(data.error || "Failed to ingest document.");
       }
 
-      setCurrentStep(3); // Completing embedding
-      
-      // Artificial slight delay to let user see "Ingesting to Database" step complete
-      await new Promise(resolve => setTimeout(resolve, 800));
+      setCurrentStep(3);
+      await new Promise(resolve => setTimeout(resolve, 600));
       setCurrentStep(4);
       setStatus("success");
 
-      // Refresh documents list and select the newly uploaded doc
       await fetchDocuments();
       if (data.document && data.document.id) {
         selectDocument(data.document.id);
@@ -138,28 +135,45 @@ export default function Upload() {
   };
 
   return (
-    <div className="flex-1 p-8 bg-[#0A0A0A] overflow-y-auto min-h-0 flex flex-col items-center" id="upload-view">
-      <div className="max-w-2xl w-full bg-[#111] border border-[#222] rounded-xs p-8 md:p-12 shadow-2xl my-auto">
+    <div className="flex-1 p-8 bg-[#080808] overflow-y-auto min-h-0 flex flex-col items-center justify-center relative select-none" id="upload-view">
+      {/* Glow Backdrop */}
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-96 h-96 bg-[#00FF66]/5 rounded-full blur-[140px] pointer-events-none" />
+
+      <motion.div
+        initial={{ opacity: 0, y: 25, scale: 0.96 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        className="max-w-2xl w-full bg-[#101010] border border-zinc-800/80 rounded-2xl p-8 md:p-12 shadow-2xl relative z-10 my-auto overflow-hidden"
+      >
+        {/* Top Glow Accent */}
+        <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-[#00FF66]/40 to-transparent" />
+
         {/* Header */}
-        <div className="text-center mb-10">
-          <h2 className="text-3xl font-black tracking-tight text-white uppercase mb-2">Add Study Document</h2>
-          <p className="text-xs text-zinc-500 max-w-md mx-auto uppercase font-mono">
-            Upload textbook chapters, articles, or study sheets to read them with your study partner.
+        <div className="text-center mb-9">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#00FF66]/10 border border-[#00FF66]/20 text-[#00FF66] text-[10px] font-mono font-bold uppercase tracking-wider mb-3">
+            <Sparkles className="w-3 h-3" /> Vector Ingestion Engine
+          </div>
+          <h2 className="text-2xl md:text-3xl font-black tracking-tight text-white uppercase">
+            Add Study Document
+          </h2>
+          <p className="text-xs text-zinc-400 max-w-md mx-auto uppercase font-mono mt-2">
+            Upload textbook chapters, articles, or notes for AI discussion.
           </p>
         </div>
 
-        {/* Upload Drop Zone / Active steps */}
+        {/* Upload Drop Zone */}
         {status === "idle" && (
-          <div
+          <motion.div
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.99 }}
             onDragEnter={handleDrag}
             onDragOver={handleDrag}
             onDragLeave={handleDrag}
             onDrop={handleDrop}
             onClick={triggerFileSelect}
-            className={`border-2 border-dashed rounded-xs p-12 text-center cursor-pointer transition-all select-none ${
+            className={`border-2 border-dashed rounded-2xl p-12 text-center cursor-pointer transition-all ${
               dragActive
-                ? "border-[#00FF66] bg-[#00FF66]/5"
-                : "border-[#222] hover:border-[#00FF66] hover:bg-black"
+                ? "border-[#00FF66] bg-[#00FF66]/10 shadow-[0_0_30px_rgba(0,255,102,0.15)]"
+                : "border-zinc-800 hover:border-[#00FF66]/60 hover:bg-zinc-900/60"
             }`}
             id="drop-zone"
           >
@@ -170,71 +184,82 @@ export default function Upload() {
               accept="application/pdf"
               className="hidden"
             />
-            <div className="w-16 h-16 bg-[#0A0A0A] border border-[#222] text-[#00FF66] flex items-center justify-center mx-auto mb-4 rounded-xs">
+            <motion.div
+              animate={{ y: [0, -4, 0] }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              className="w-16 h-16 bg-zinc-900 border border-zinc-800 text-[#00FF66] flex items-center justify-center mx-auto mb-4 rounded-2xl shadow-lg"
+            >
               <UploadCloud className="w-8 h-8" />
-            </div>
-            <h3 className="font-black text-white text-xs uppercase tracking-wider">Select or Drop PDF File</h3>
-            <p className="text-zinc-500 text-[10px] mt-1.5 font-mono uppercase">Max Size: 10MB • format: PDF only</p>
-          </div>
+            </motion.div>
+            <h3 className="font-extrabold text-white text-sm uppercase tracking-wider">
+              Select or Drop PDF File
+            </h3>
+            <p className="text-zinc-500 text-[10px] mt-2 font-mono uppercase">
+              Max Size: 10MB • Format: PDF Only
+            </p>
+          </motion.div>
         )}
 
         {/* Stepper Progress */}
         {(status === "reading" || status === "processing") && (
           <div className="space-y-6" id="progress-stepper">
-            <div className="bg-black border border-[#222] rounded-xs p-5 flex items-center gap-4">
+            <div className="bg-zinc-900/80 border border-zinc-800 rounded-xl p-5 flex items-center gap-4">
               <Loader2 className="w-5 h-5 text-[#00FF66] animate-spin shrink-0" />
               <div className="min-w-0 flex-1">
-                <span className="text-xs font-black text-white block truncate uppercase tracking-wider">
+                <span className="text-xs font-bold text-white block truncate uppercase tracking-wider">
                   Processing: {file?.name}
                 </span>
-                <span className="text-[10px] text-zinc-500 font-mono uppercase">
-                  Loading file into the database... Please wait
+                <span className="text-[10px] text-zinc-400 font-mono uppercase">
+                  Embedding PDF chunks... Please wait
                 </span>
               </div>
             </div>
 
-            <div className="space-y-3.5">
+            <div className="space-y-3">
               {steps.map((step, index) => {
                 const Icon = step.icon;
                 const isCompleted = index < currentStep;
                 const isActive = index === currentStep;
 
                 return (
-                  <div
+                  <motion.div
                     key={index}
-                    className={`flex items-start gap-4 p-4 rounded-xs border transition-all ${
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className={`flex items-start gap-4 p-4 rounded-xl border transition-all ${
                       isCompleted
-                        ? "bg-[#00FF66]/5 border-[#00FF66]/20"
+                        ? "bg-[#00FF66]/5 border-[#00FF66]/30 text-white"
                         : isActive
-                        ? "bg-black border-white"
-                        : "bg-transparent border-[#222] opacity-30"
+                        ? "bg-zinc-900 border-[#00FF66] shadow-[0_0_15px_rgba(0,255,102,0.1)]"
+                        : "bg-transparent border-zinc-800/40 opacity-40"
                     }`}
                   >
-                    <div className={`p-2 rounded-xs shrink-0 ${
+                    <div className={`p-2 rounded-lg shrink-0 ${
                       isCompleted
                         ? "bg-[#00FF66] text-black"
                         : isActive
                         ? "bg-white text-black animate-pulse"
-                        : "bg-[#0A0A0A] text-zinc-600 border border-[#222]"
+                        : "bg-zinc-900 text-zinc-600 border border-zinc-800"
                     }`}>
                       <Icon className="w-4 h-4" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <h4 className={`text-xs font-black uppercase tracking-wider ${
+                        <h4 className={`text-xs font-bold uppercase tracking-wider ${
                           isCompleted ? "text-[#00FF66]" : isActive ? "text-white" : "text-zinc-500"
                         }`}>
                           {step.title}
                         </h4>
                         {isCompleted && (
-                          <span className="text-[9px] bg-[#00FF66] text-black px-1.5 py-0.2 rounded-xs font-black tracking-widest">
+                          <span className="text-[9px] bg-[#00FF66] text-black px-2 py-0.5 rounded-full font-black tracking-widest">
                             DONE
                           </span>
                         )}
                       </div>
-                      <p className="text-[10px] text-zinc-500 font-mono uppercase mt-0.5">{step.desc}</p>
+                      <p className="text-[10px] text-zinc-400 font-mono uppercase mt-0.5">{step.desc}</p>
                     </div>
-                  </div>
+                  </motion.div>
                 );
               })}
             </div>
@@ -243,66 +268,90 @@ export default function Upload() {
 
         {/* Success Screen */}
         {status === "success" && (
-          <div className="text-center py-6" id="upload-success">
-            <div className="w-16 h-16 bg-[#00FF66]/10 text-[#00FF66] border border-[#00FF66]/20 flex items-center justify-center mx-auto mb-5 rounded-xs">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center py-6"
+            id="upload-success"
+          >
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 200 }}
+              className="w-16 h-16 bg-[#00FF66]/10 text-[#00FF66] border border-[#00FF66]/30 flex items-center justify-center mx-auto mb-5 rounded-2xl shadow-[0_0_30px_rgba(0,255,102,0.2)]"
+            >
               <CheckCircle className="w-8 h-8" />
-            </div>
-            <h3 className="font-black text-white text-lg uppercase tracking-wide">Document Ingested Successfully!</h3>
+            </motion.div>
+            <h3 className="font-black text-white text-xl uppercase tracking-wide">
+              Document Ingested Successfully!
+            </h3>
             <p className="text-xs text-zinc-400 mt-2 max-w-sm mx-auto uppercase font-mono">
-              The target <strong className="text-white font-black">"{file?.name}"</strong> is indexed into vector space.
+              Target <strong className="text-[#00FF66] font-bold">"{file?.name}"</strong> is indexed and ready for discussion.
             </p>
             
             <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
-              <button
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
                 onClick={() => setTab("chat")}
-                className="w-full sm:w-auto px-5 py-2.5 bg-[#00FF66] hover:bg-[#00e55b] text-black font-black text-xs uppercase tracking-wider rounded-xs transition-colors"
+                className="w-full sm:w-auto px-6 py-3 bg-[#00FF66] hover:bg-[#00e55b] text-black font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all shadow-[0_0_15px_rgba(0,255,102,0.2)] flex items-center justify-center gap-1.5"
               >
-                Start Chat Q&A
-              </button>
-              <button
+                <span>Start Chat Q&A</span>
+                <ArrowRight className="w-4 h-4" />
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
                 onClick={() => setTab("quiz")}
-                className="w-full sm:w-auto px-5 py-2.5 bg-transparent hover:bg-black text-white border border-[#222] font-black text-xs uppercase tracking-wider rounded-xs transition-colors"
+                className="w-full sm:w-auto px-6 py-3 bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-700 font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all"
               >
                 Generate Quiz
-              </button>
+              </motion.button>
               <button
                 onClick={resetUploader}
-                className="w-full sm:w-auto px-5 py-2.5 text-zinc-500 hover:text-white font-black text-xs uppercase tracking-wider transition-colors"
+                className="w-full sm:w-auto px-4 py-3 text-zinc-400 hover:text-white font-bold text-xs uppercase tracking-wider transition-colors"
               >
                 Upload Another
               </button>
             </div>
-          </div>
+          </motion.div>
         )}
 
         {/* Error Screen */}
         {status === "error" && (
-          <div className="text-center py-6" id="upload-error">
-            <div className="w-16 h-16 bg-red-950/20 text-red-500 border border-red-900/30 flex items-center justify-center mx-auto mb-5 rounded-xs">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center py-6"
+            id="upload-error"
+          >
+            <div className="w-16 h-16 bg-red-950/40 text-red-400 border border-red-800/40 flex items-center justify-center mx-auto mb-5 rounded-2xl">
               <XCircle className="w-8 h-8" />
             </div>
             <h3 className="font-black text-white text-lg uppercase tracking-wide">Ingestion Failed</h3>
-            <div className="bg-black text-red-400 border border-red-900/40 rounded-xs p-4 text-[11px] mt-4 max-w-md mx-auto text-left font-mono break-words uppercase">
+            <div className="bg-zinc-950 text-red-400 border border-red-900/40 rounded-xl p-4 text-[11px] mt-4 max-w-md mx-auto text-left font-mono break-words uppercase">
               {errorMessage}
             </div>
 
             <div className="mt-8 flex items-center justify-center gap-3">
-              <button
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
                 onClick={resetUploader}
-                className="px-5 py-2.5 bg-red-600 hover:bg-red-500 text-white font-black text-xs uppercase tracking-wider rounded-xs transition-colors"
+                className="px-6 py-3 bg-red-600 hover:bg-red-500 text-white font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all"
               >
                 Try Again
-              </button>
+              </motion.button>
               <button
                 onClick={() => setTab("overview")}
-                className="px-5 py-2.5 text-zinc-500 hover:text-white font-black text-xs uppercase tracking-wider transition-colors"
+                className="px-5 py-3 text-zinc-400 hover:text-white font-bold text-xs uppercase tracking-wider transition-colors"
               >
                 Go to Dashboard
               </button>
             </div>
-          </div>
+          </motion.div>
         )}
-      </div>
+      </motion.div>
     </div>
   );
 }
