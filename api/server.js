@@ -481,10 +481,6 @@ app.use((err, req, res, next) => {
 
 // Vite Middleware & Static Asset Serving Setup
 async function start() {
-  if (process.env.VERCEL) {
-    return;
-  }
-
   if (!process.env.MONGODB_URI) {
     console.warn("WARNING: MONGODB_URI is not set. Database requests will fail.");
   }
@@ -492,19 +488,25 @@ async function start() {
     console.warn("WARNING: GEMINI_API_KEY is not set. AI features will be unavailable.");
   }
 
-  if (process.env.NODE_ENV !== "production") {
-    const { createServer: createViteServer } = await import("vite");
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: "spa",
-    });
-    app.use(vite.middlewares);
+  // Only skip app.listen if executing as a serverless handler without process.env.PORT
+  if (process.env.VERCEL && !process.env.PORT) {
+    return;
+  }
+
+  if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
+    try {
+      const { createServer: createViteServer } = await import("vite");
+      const vite = await createViteServer({
+        server: { middlewareMode: true },
+        appType: "spa",
+      });
+      app.use(vite.middlewares);
+    } catch {
+      // Ignore if Vite dev server isn't available
+    }
   } else {
     const distPath = path.join(process.cwd(), "dist");
     app.use(express.static(distPath));
-    app.get("*", (req, res) => {
-      res.sendFile(path.join(distPath, "index.html"));
-    });
   }
 
   app.listen(PORT, "0.0.0.0", () => {
