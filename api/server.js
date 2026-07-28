@@ -1,3 +1,28 @@
+// Global polyfills for PDF parsing in Node.js / Serverless environments
+if (typeof globalThis.DOMMatrix === "undefined") {
+  globalThis.DOMMatrix = class DOMMatrix {
+    constructor(init) {
+      this.a = 1; this.b = 0; this.c = 0; this.d = 1; this.e = 0; this.f = 0;
+      if (Array.isArray(init) && init.length >= 6) {
+        this.a = init[0]; this.b = init[1]; this.c = init[2];
+        this.d = init[3]; this.e = init[4]; this.f = init[5];
+      }
+    }
+    multiply() { return this; }
+    translate() { return this; }
+    scale() { return this; }
+    rotate() { return this; }
+    inverse() { return this; }
+  };
+}
+if (typeof globalThis.DOMPoint === "undefined") {
+  globalThis.DOMPoint = class DOMPoint {
+    constructor(x = 0, y = 0, z = 0, w = 1) {
+      this.x = x; this.y = y; this.z = z; this.w = w;
+    }
+  };
+}
+
 import express from "express";
 import path from "path";
 import { GoogleGenAI, Type } from "@google/genai";
@@ -237,13 +262,20 @@ app.post("/api/ingest", authenticateToken, async (req, res) => {
     let text = "";
     let pageCount = 1;
     try {
-      const pdfModule = await import("pdf-parse");
-      const pdf = pdfModule.default || pdfModule;
+      let pdf;
+      try {
+        const pdfLib = await import("pdf-parse/lib/pdf-parse.js");
+        pdf = pdfLib.default || pdfLib;
+      } catch {
+        const pdfModule = await import("pdf-parse");
+        pdf = pdfModule.default || pdfModule;
+      }
+
       if (typeof pdf === "function") {
         const parsed = await pdf(buffer);
         text = parsed.text || "";
         pageCount = parsed.numpages || 1;
-      } else if (pdf.PDFParse) {
+      } else if (pdf && pdf.PDFParse) {
         const parser = new pdf.PDFParse({ data: buffer });
         const parsedPdf = await parser.getText();
         text = parsedPdf.text || "";
