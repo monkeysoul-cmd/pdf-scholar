@@ -27,6 +27,28 @@ export function StateProvider({ children }) {
   });
   const [activeTab, setActiveTab] = useState("overview");
   const [isLoadingDocs, setIsLoadingDocs] = useState(false);
+  const [quizScores, setQuizScores] = useState(() => {
+    try {
+      const saved = localStorage.getItem("pdf_scholar_quiz_scores");
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
+
+  // Sync quiz scores to localStorage
+  useEffect(() => {
+    localStorage.setItem("pdf_scholar_quiz_scores", JSON.stringify(quizScores));
+  }, [quizScores]);
+
+  const saveQuizResult = (result) => {
+    const newEntry = {
+      id: `score_${Date.now()}`,
+      timestamp: new Date().toISOString(),
+      ...result
+    };
+    setQuizScores(prev => [newEntry, ...prev]);
+  };
 
   // Sync chat history to localStorage
   useEffect(() => {
@@ -196,6 +218,8 @@ export function StateProvider({ children }) {
         chatHistory,
         activeTab,
         isLoadingDocs,
+        quizScores,
+        saveQuizResult,
         setTab: setActiveTab,
         selectDocument,
         fetchDocuments,

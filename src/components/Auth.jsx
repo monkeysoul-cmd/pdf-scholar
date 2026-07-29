@@ -75,22 +75,22 @@ export default function Auth() {
         className="absolute inset-0 bg-[linear-gradient(to_right,#111_1px,transparent_1px),linear-gradient(to_bottom,#111_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] pointer-events-none opacity-40"
       />
 
-      {/* Main Glassmorphism Auth Card */}
+      {/* Main Glassmorphism Auth Card (Boxy Design) */}
       <motion.div
         initial={{ opacity: 0, y: 30, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-        className="max-w-md w-full bg-[#0F0F0F]/90 backdrop-blur-2xl border border-zinc-800/80 rounded-2xl p-8 md:p-10 shadow-[0_0_50px_rgba(0,0,0,0.8)] relative z-10 my-auto overflow-hidden"
+        className="max-w-md w-full bg-[#0F0F0F]/90 backdrop-blur-2xl border border-zinc-800/80 rounded-sm p-8 md:p-10 shadow-[0_0_50px_rgba(0,0,0,0.8)] relative z-10 my-auto overflow-hidden"
       >
-        {/* Glow border highlight */}
+        {/* Top border accent */}
         <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-[#00FF66]/50 to-transparent" />
 
         {/* Feature Badges */}
         <div className="flex items-center justify-center gap-2 mb-6">
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#00FF66]/10 border border-[#00FF66]/20 text-[#00FF66] text-[10px] font-mono font-medium uppercase tracking-wider">
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-sm bg-[#00FF66]/10 border border-[#00FF66]/20 text-[#00FF66] text-[10px] font-mono font-medium uppercase tracking-wider">
             <Sparkles className="w-3 h-3" /> AI Academic RAG
           </span>
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-zinc-800/60 border border-zinc-700/50 text-zinc-400 text-[10px] font-mono font-medium uppercase tracking-wider">
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-sm bg-zinc-800/60 border border-zinc-700/50 text-zinc-400 text-[10px] font-mono font-medium uppercase tracking-wider">
             <ShieldCheck className="w-3 h-3 text-emerald-400" /> Vector Secured
           </span>
         </div>
@@ -100,9 +100,9 @@ export default function Auth() {
           <motion.div
             whileHover={{ scale: 1.05, rotate: 3 }}
             whileTap={{ scale: 0.95 }}
-            className="w-16 h-16 bg-[#161616] border border-zinc-800 text-[#00FF66] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl relative group"
+            className="w-16 h-16 bg-[#161616] border border-zinc-800 text-[#00FF66] rounded-sm flex items-center justify-center mx-auto mb-4 shadow-xl relative group"
           >
-            <div className="absolute inset-0 bg-[#00FF66]/10 rounded-2xl blur-md group-hover:bg-[#00FF66]/20 transition-all" />
+            <div className="absolute inset-0 bg-[#00FF66]/10 rounded-sm blur-md group-hover:bg-[#00FF66]/20 transition-all" />
             <GraduationCap className="w-9 h-9 relative z-10" />
           </motion.div>
           
@@ -114,7 +114,7 @@ export default function Auth() {
           </p>
         </div>
 
-        {/* Form Container with Animated Tab Switch */}
+        {/* Form Container */}
         <AnimatePresence mode="wait">
           <motion.form
             key={isLogin ? "login" : "signup"}
@@ -130,7 +130,7 @@ export default function Auth() {
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-red-950/40 text-red-400 border border-red-800/40 rounded-xl p-3.5 text-xs font-mono uppercase text-center leading-relaxed backdrop-blur-sm"
+                className="bg-red-950/40 text-red-400 border border-red-800/40 rounded-sm p-3.5 text-xs font-mono uppercase text-center leading-relaxed backdrop-blur-sm"
               >
                 {error}
               </motion.div>
@@ -141,7 +141,7 @@ export default function Auth() {
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-[#00FF66]/10 text-[#00FF66] border border-[#00FF66]/30 rounded-xl p-3.5 text-xs font-mono uppercase text-center leading-relaxed backdrop-blur-sm"
+                className="bg-[#00FF66]/10 text-[#00FF66] border border-[#00FF66]/30 rounded-sm p-3.5 text-xs font-mono uppercase text-center leading-relaxed backdrop-blur-sm"
               >
                 {message}
               </motion.div>
@@ -161,7 +161,7 @@ export default function Auth() {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="e.g. ayush_scholar"
-                  className="w-full bg-[#141414] border border-zinc-800 focus:border-[#00FF66] focus:ring-1 focus:ring-[#00FF66]/30 hover:border-zinc-700 text-white text-xs px-4 py-3.5 pl-11 rounded-xl transition-all outline-none placeholder-zinc-600 font-medium"
+                  className="w-full bg-[#141414] border border-zinc-800 focus:border-[#00FF66] focus:ring-1 focus:ring-[#00FF66]/30 hover:border-zinc-700 text-white text-xs px-4 py-3.5 pl-11 rounded-sm transition-all outline-none placeholder-zinc-600 font-medium"
                   required
                 />
               </div>
@@ -181,7 +181,7 @@ export default function Auth() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full bg-[#141414] border border-zinc-800 focus:border-[#00FF66] focus:ring-1 focus:ring-[#00FF66]/30 hover:border-zinc-700 text-white text-xs px-4 py-3.5 pl-11 rounded-xl transition-all outline-none placeholder-zinc-600 font-medium"
+                  className="w-full bg-[#141414] border border-zinc-800 focus:border-[#00FF66] focus:ring-1 focus:ring-[#00FF66]/30 hover:border-zinc-700 text-white text-xs px-4 py-3.5 pl-11 rounded-sm transition-all outline-none placeholder-zinc-600 font-medium"
                   required
                 />
               </div>
@@ -207,7 +207,7 @@ export default function Auth() {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="••••••••"
-                    className="w-full bg-[#141414] border border-zinc-800 focus:border-[#00FF66] focus:ring-1 focus:ring-[#00FF66]/30 hover:border-zinc-700 text-white text-xs px-4 py-3.5 pl-11 rounded-xl transition-all outline-none placeholder-zinc-600 font-medium"
+                    className="w-full bg-[#141414] border border-zinc-800 focus:border-[#00FF66] focus:ring-1 focus:ring-[#00FF66]/30 hover:border-zinc-700 text-white text-xs px-4 py-3.5 pl-11 rounded-sm transition-all outline-none placeholder-zinc-600 font-medium"
                     required
                   />
                 </div>
@@ -220,7 +220,7 @@ export default function Auth() {
               whileTap={{ scale: 0.98 }}
               type="submit"
               disabled={loading}
-              className="w-full inline-flex items-center justify-center gap-2.5 px-5 py-4 bg-[#00FF66] hover:bg-[#00e55b] disabled:opacity-50 disabled:cursor-not-allowed text-black text-xs font-black uppercase tracking-wider rounded-xl transition-all shadow-[0_0_20px_rgba(0,255,102,0.2)] hover:shadow-[0_0_25px_rgba(0,255,102,0.4)] mt-2"
+              className="w-full inline-flex items-center justify-center gap-2.5 px-5 py-4 bg-[#00FF66] hover:bg-[#00e55b] disabled:opacity-50 disabled:cursor-not-allowed text-black text-xs font-black uppercase tracking-wider rounded-sm transition-all shadow-[0_0_20px_rgba(0,255,102,0.2)] hover:shadow-[0_0_25px_rgba(0,255,102,0.4)] mt-2"
             >
               {loading ? (
                 <>

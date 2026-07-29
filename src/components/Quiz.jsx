@@ -15,7 +15,7 @@ import {
 import { motion, AnimatePresence } from "motion/react";
 
 export default function Quiz() {
-  const { documents, selectedDocumentId, quizQuestions, setQuestions, authenticatedFetch } = useAppState();
+  const { documents, selectedDocumentId, quizQuestions, setQuestions, authenticatedFetch, saveQuizResult } = useAppState();
   const [questionCount, setQuestionCount] = useState(5);
   const [isGenerating, setIsGenerating] = useState(false);
   const [answers, setAnswers] = useState({});
@@ -114,9 +114,9 @@ export default function Quiz() {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="text-center max-w-sm border border-zinc-800 bg-[#101010] p-10 rounded-2xl shadow-2xl"
+          className="text-center max-w-sm border border-zinc-800 bg-[#101010] p-10 rounded-sm shadow-2xl"
         >
-          <div className="w-16 h-16 bg-zinc-900 border border-zinc-800 text-[#00FF66] rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg">
+          <div className="w-16 h-16 bg-zinc-900 border border-zinc-800 text-[#00FF66] rounded-sm flex items-center justify-center mx-auto mb-5 shadow-lg">
             <BrainCircuit className="w-8 h-8" />
           </div>
           <h3 className="font-extrabold text-white text-lg uppercase tracking-wider">No Active Target</h3>
@@ -153,7 +153,7 @@ export default function Quiz() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={generateQuiz}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-[#121212] hover:bg-zinc-800 text-white border border-zinc-700 text-xs font-bold uppercase tracking-wider rounded-xl transition-all"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-[#121212] hover:bg-zinc-800 text-white border border-zinc-700 text-xs font-bold uppercase tracking-wider rounded-sm transition-all"
           >
             <RotateCcw className="w-3.5 h-3.5" />
             <span>Regenerate Quiz</span>
@@ -166,7 +166,7 @@ export default function Quiz() {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="py-24 text-center max-w-md mx-auto bg-[#101010] border border-zinc-800 p-10 rounded-2xl shadow-2xl"
+          className="py-24 text-center max-w-md mx-auto bg-[#101010] border border-zinc-800 p-10 rounded-sm shadow-2xl"
           id="quiz-loader"
         >
           <Loader2 className="w-12 h-12 text-[#00FF66] animate-spin mx-auto mb-5" />
@@ -184,21 +184,21 @@ export default function Quiz() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center py-20 max-w-sm mx-auto"
         >
-          <div className="w-16 h-16 bg-zinc-900 border border-zinc-800 text-[#00FF66] rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-xl">
+          <div className="w-16 h-16 bg-zinc-900 border border-zinc-800 text-[#00FF66] rounded-sm flex items-center justify-center mx-auto mb-5 shadow-xl">
             <GraduationCap className="w-8 h-8" />
           </div>
           <h3 className="font-black text-white text-xl uppercase tracking-wide">Generate Quiz</h3>
           <p className="text-xs text-zinc-400 font-mono uppercase mt-2 mb-8 leading-relaxed">
             Synthesize interactive diagnostic questions based on <span className="text-[#00FF66]">"{activeDoc?.name}"</span>.
           </p>
-          <div className="flex items-center justify-center gap-3 bg-[#121212] border border-zinc-800 p-3.5 rounded-2xl shadow-xl">
+          <div className="flex items-center justify-center gap-3 bg-[#121212] border border-zinc-800 p-3.5 rounded-sm shadow-xl">
             <span className="text-[10px] font-bold text-zinc-400 font-mono uppercase">Questions:</span>
-            <div className="flex gap-1 bg-black p-1 rounded-xl border border-zinc-800">
+            <div className="flex gap-1 bg-black p-1 rounded-sm border border-zinc-800">
               {[3, 5, 8].map(num => (
                 <button
                   key={num}
                   onClick={() => setQuestionCount(num)}
-                  className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold transition-all ${
+                  className={`w-8 h-8 rounded-sm flex items-center justify-center text-xs font-bold transition-all ${
                     questionCount === num ? "bg-[#00FF66] text-black shadow-md" : "text-zinc-500 hover:text-white"
                   }`}
                 >
@@ -210,7 +210,7 @@ export default function Quiz() {
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
               onClick={generateQuiz}
-              className="ml-2 px-4 py-2 bg-[#00FF66] hover:bg-[#00e55b] text-black font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all shadow-[0_0_12px_rgba(0,255,102,0.2)]"
+              className="ml-2 px-4 py-2 bg-[#00FF66] hover:bg-[#00e55b] text-black font-extrabold text-xs uppercase tracking-wider rounded-sm transition-all shadow-[0_0_12px_rgba(0,255,102,0.2)]"
             >
               Generate Now
             </motion.button>
@@ -233,11 +233,11 @@ export default function Quiz() {
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
-                className="bg-[#101010] border border-zinc-800/80 rounded-2xl p-6 md:p-8 shadow-xl flex flex-col gap-4"
+                className="bg-[#101010] border border-zinc-800/80 rounded-sm p-6 md:p-8 shadow-xl flex flex-col gap-4"
               >
                 {/* Badge and question text */}
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-mono font-bold tracking-wider bg-black text-[#00FF66] border border-[#00FF66]/20 px-2.5 py-1 rounded-full uppercase">
+                  <span className="text-[10px] font-mono font-bold tracking-wider bg-black text-[#00FF66] border border-[#00FF66]/20 px-2.5 py-1 rounded-sm uppercase">
                     Q{index + 1} • {q.type === "multiple-choice" ? "Multiple Choice" : "Short Answer"}
                   </span>
                 </div>
@@ -259,7 +259,7 @@ export default function Quiz() {
                           whileTap={!hasAnsweredMC ? { scale: 0.99 } : {}}
                           disabled={hasAnsweredMC}
                           onClick={() => handleMultipleChoiceSelect(q.id, opt)}
-                          className={`w-full text-left p-4 rounded-xl border text-xs font-bold uppercase tracking-wide transition-all ${
+                          className={`w-full text-left p-4 rounded-sm border text-xs font-bold uppercase tracking-wide transition-all ${
                             shouldHighlightGreen
                               ? "bg-[#00FF66] border-[#00FF66] text-black shadow-[0_0_15px_rgba(0,255,102,0.2)]"
                               : shouldHighlightRed
@@ -291,21 +291,21 @@ export default function Quiz() {
                           value={shortAnswersText[q.id] || ""}
                           onChange={(e) => setShortAnswersText(prev => ({ ...prev, [q.id]: e.target.value }))}
                           rows={3}
-                          className="w-full text-xs p-3.5 px-4 border border-zinc-800 rounded-xl focus:outline-none focus:border-[#00FF66] bg-[#0A0A0A] text-white font-mono uppercase placeholder-zinc-600"
+                          className="w-full text-xs p-3.5 px-4 border border-zinc-800 rounded-sm focus:outline-none focus:border-[#00FF66] bg-[#0A0A0A] text-white font-mono uppercase placeholder-zinc-600"
                         />
                         <motion.button
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
                           onClick={() => submitShortAnswer(q.id)}
                           disabled={!(shortAnswersText[q.id] || "").trim()}
-                          className="self-end inline-flex items-center gap-1.5 px-4 py-2.5 bg-[#00FF66] hover:bg-[#00e55b] disabled:opacity-30 disabled:cursor-not-allowed text-black font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all"
+                          className="self-end inline-flex items-center gap-1.5 px-4 py-2.5 bg-[#00FF66] hover:bg-[#00e55b] disabled:opacity-30 disabled:cursor-not-allowed text-black font-extrabold text-xs uppercase tracking-wider rounded-sm transition-all"
                         >
                           <span>Check Answer</span>
                           <ChevronRight className="w-4 h-4" />
                         </motion.button>
                       </div>
                     ) : (
-                      <div className="bg-[#0A0A0A] border border-zinc-800 p-5 rounded-xl space-y-4 font-mono uppercase text-xs">
+                      <div className="bg-[#0A0A0A] border border-zinc-800 p-5 rounded-sm space-y-4 font-mono uppercase text-xs">
                         <div>
                           <div className="text-[10px] text-zinc-500 font-bold tracking-wider">YOUR RESPONSE:</div>
                           <div className="text-white italic mt-1 font-mono">"{shortAnswersText[q.id]}"</div>
@@ -322,7 +322,7 @@ export default function Quiz() {
                           <div className="flex gap-2">
                             <button
                               onClick={() => handleSelfGrade(q.id, "correct")}
-                              className={`px-3 py-1.5 text-[10px] font-bold rounded-lg border transition-all tracking-wider ${
+                              className={`px-3 py-1.5 text-[10px] font-bold rounded-sm border transition-all tracking-wider ${
                                 gradedSA === "correct"
                                   ? "bg-[#00FF66] border-[#00FF66] text-black"
                                   : "bg-transparent border-zinc-800 text-zinc-400 hover:text-white"
@@ -332,7 +332,7 @@ export default function Quiz() {
                             </button>
                             <button
                               onClick={() => handleSelfGrade(q.id, "needs-review")}
-                              className={`px-3 py-1.5 text-[10px] font-bold rounded-lg border transition-all tracking-wider ${
+                              className={`px-3 py-1.5 text-[10px] font-bold rounded-sm border transition-all tracking-wider ${
                                 gradedSA === "needs-review"
                                   ? "bg-amber-500 border-amber-500 text-black"
                                   : "bg-transparent border-zinc-800 text-zinc-400 hover:text-white"
@@ -352,7 +352,7 @@ export default function Quiz() {
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
-                    className="bg-[#0A0A0A] p-4 border border-zinc-800 rounded-xl flex items-start gap-3 mt-1 text-[11px] font-mono uppercase"
+                    className="bg-[#0A0A0A] p-4 border border-zinc-800 rounded-sm flex items-start gap-3 mt-1 text-[11px] font-mono uppercase"
                   >
                     <BookOpen className="w-4 h-4 text-[#00FF66] shrink-0 mt-0.5" />
                     <div>
@@ -371,8 +371,8 @@ export default function Quiz() {
               <motion.button
                 whileHover={{ scale: 1.04 }}
                 whileTap={{ scale: 0.96 }}
-                onClick={() => setShowResults(true)}
-                className="px-8 py-4 bg-[#00FF66] hover:bg-[#00e55b] text-black font-black text-xs uppercase tracking-wider rounded-xl shadow-[0_0_25px_rgba(0,255,102,0.3)] transition-all"
+                onClick={handleFinishQuiz}
+                className="px-8 py-4 bg-[#00FF66] hover:bg-[#00e55b] text-black font-black text-xs uppercase tracking-wider rounded-sm shadow-[0_0_25px_rgba(0,255,102,0.3)] transition-all"
               >
                 Finish and View Scorecard
               </motion.button>
@@ -386,10 +386,10 @@ export default function Quiz() {
         <motion.div
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
-          className="max-w-md mx-auto bg-[#101010] border border-zinc-800 rounded-2xl p-8 text-center shadow-2xl"
+          className="max-w-md mx-auto bg-[#101010] border border-zinc-800 rounded-sm p-8 text-center shadow-2xl"
           id="quiz-results"
         >
-          <div className="w-20 h-20 bg-[#00FF66]/10 border border-[#00FF66]/30 text-[#00FF66] rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-[0_0_30px_rgba(0,255,102,0.2)]">
+          <div className="w-20 h-20 bg-[#00FF66]/10 border border-[#00FF66]/30 text-[#00FF66] rounded-sm flex items-center justify-center mx-auto mb-6 shadow-[0_0_30px_rgba(0,255,102,0.2)]">
             <Award className="w-10 h-10" />
           </div>
           <h3 className="font-black text-white text-2xl uppercase tracking-tight">Quiz Scorecard</h3>
@@ -398,11 +398,11 @@ export default function Quiz() {
           </p>
 
           <div className="grid grid-cols-2 gap-4 my-8">
-            <div className="bg-[#0A0A0A] border border-zinc-800 p-4 rounded-xl text-center">
+            <div className="bg-[#0A0A0A] border border-zinc-800 p-4 rounded-sm text-center">
               <span className="text-[10px] font-mono text-zinc-400 block uppercase mb-1.5 tracking-wider">Multiple Choice</span>
               <span className="text-3xl font-black text-[#00FF66] tracking-tight">{mcCorrect} / {mcTotal}</span>
             </div>
-            <div className="bg-[#0A0A0A] border border-zinc-800 p-4 rounded-xl text-center">
+            <div className="bg-[#0A0A0A] border border-zinc-800 p-4 rounded-sm text-center">
               <span className="text-[10px] font-mono text-zinc-400 block uppercase mb-1.5 tracking-wider">Short Answer</span>
               <span className="text-3xl font-black text-[#00FF66] tracking-tight">{saCorrect} / {saTotal}</span>
             </div>
@@ -413,13 +413,13 @@ export default function Quiz() {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={resetQuiz}
-              className="w-full py-3.5 bg-[#00FF66] hover:bg-[#00e55b] text-black font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all shadow-[0_0_15px_rgba(0,255,102,0.2)]"
+              className="w-full py-3.5 bg-[#00FF66] hover:bg-[#00e55b] text-black font-extrabold text-xs uppercase tracking-wider rounded-sm transition-all shadow-[0_0_15px_rgba(0,255,102,0.2)]"
             >
               Retry Same Quiz
             </motion.button>
             <button
               onClick={generateQuiz}
-              className="w-full py-3.5 bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-800 font-bold text-xs uppercase tracking-wider rounded-xl transition-all"
+              className="w-full py-3.5 bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-800 font-bold text-xs uppercase tracking-wider rounded-sm transition-all"
             >
               Generate New Quiz
             </button>

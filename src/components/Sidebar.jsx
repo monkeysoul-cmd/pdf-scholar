@@ -42,8 +42,8 @@ export default function Sidebar() {
       <div className="p-7 border-b border-zinc-800/80 flex flex-col gap-1.5 bg-[#090909]">
         <div className="logo font-black text-xl tracking-tight text-[#00FF66] flex items-center gap-2.5">
           <motion.div
-            whileHover={{ rotate: 12, scale: 1.1 }}
-            className="w-8 h-8 rounded-lg bg-[#00FF66]/10 border border-[#00FF66]/20 flex items-center justify-center text-[#00FF66]"
+            whileHover={{ scale: 1.05 }}
+            className="w-8 h-8 rounded-sm bg-[#00FF66]/10 border border-[#00FF66]/20 flex items-center justify-center text-[#00FF66]"
           >
             <BookOpen className="w-4 h-4" />
           </motion.div>
@@ -52,8 +52,8 @@ export default function Sidebar() {
           </span>
         </div>
         <div className="flex items-center gap-1.5 text-[10px] font-mono tracking-wider text-zinc-500 uppercase mt-1">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#00FF66] animate-pulse" />
-          Cloud Vector Active
+          <span className="w-1.5 h-1.5 rounded-none bg-[#00FF66] animate-pulse" />
+          Vector AI Active
         </div>
       </div>
 
@@ -72,17 +72,17 @@ export default function Sidebar() {
             return (
               <motion.button
                 key={item.id}
-                whileHover={!isDisabled ? { x: 4 } : {}}
+                whileHover={!isDisabled ? { x: 3 } : {}}
                 whileTap={!isDisabled ? { scale: 0.98 } : {}}
                 onClick={() => !isDisabled && setTab(item.id)}
                 disabled={isDisabled}
                 id={`nav-btn-${item.id}`}
-                className={`w-full relative flex items-center justify-between px-3.5 py-3 rounded-xl text-xs font-bold uppercase tracking-wider text-left transition-all ${
+                className={`w-full relative flex items-center justify-between px-3.5 py-3 rounded-sm text-xs font-bold uppercase tracking-wider text-left transition-all ${
                   isActive
-                    ? "text-[#00FF66] bg-[#00FF66]/10 border border-[#00FF66]/30 shadow-[0_0_15px_rgba(0,255,102,0.15)]"
+                    ? "text-[#00FF66] bg-[#00FF66]/10 border border-[#00FF66]/40 shadow-[0_0_12px_rgba(0,255,102,0.15)]"
                     : isDisabled
                     ? "text-zinc-700 bg-transparent cursor-not-allowed opacity-50"
-                    : "text-zinc-400 hover:text-white hover:bg-zinc-900/60"
+                    : "text-zinc-400 hover:text-white hover:bg-zinc-900/80 border border-transparent hover:border-zinc-800"
                 }`}
               >
                 <div className="flex items-center gap-3 relative z-10">
@@ -94,7 +94,7 @@ export default function Sidebar() {
                   <motion.span
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    className="text-[9px] font-black bg-[#00FF66] text-black px-2 py-0.5 rounded-full relative z-10 shadow-sm"
+                    className="text-[9px] font-black bg-[#00FF66] text-black px-2 py-0.5 rounded-sm relative z-10 shadow-sm"
                   >
                     READY
                   </motion.span>
@@ -109,7 +109,7 @@ export default function Sidebar() {
           <div className="text-[10px] font-mono tracking-wider text-zinc-500 uppercase font-black mb-3 px-2 flex items-center justify-between">
             <span>Active Target</span>
             {selectedDocumentId && (
-              <span className="badge-local bg-[#FF5F00] text-black text-[9px] font-black px-2 py-0.5 rounded-full animate-pulse">
+              <span className="badge-local bg-[#FF5F00] text-black text-[9px] font-black px-2 py-0.5 rounded-sm animate-pulse">
                 ACTIVE
               </span>
             )}
@@ -122,12 +122,10 @@ export default function Sidebar() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                className="p-4 bg-[#141414] border border-zinc-800 rounded-xl flex flex-col gap-3 relative group/doc shadow-lg overflow-hidden"
+                className="p-4 bg-[#141414] border border-zinc-800 rounded-sm flex flex-col gap-3 relative group/doc shadow-lg overflow-hidden"
               >
-                <div className="absolute top-0 right-0 w-24 h-24 bg-[#00FF66]/5 rounded-full blur-xl pointer-events-none" />
-
                 <div className="flex items-start gap-3 relative z-10">
-                  <div className="w-8 h-8 rounded-lg bg-zinc-800/80 border border-zinc-700/50 flex items-center justify-center shrink-0 mt-0.5">
+                  <div className="w-8 h-8 rounded-sm bg-zinc-800/80 border border-zinc-700/50 flex items-center justify-center shrink-0 mt-0.5">
                     <FileText className="w-4 h-4 text-[#00FF66]" />
                   </div>
                   <div className="min-w-0 flex-1">
@@ -147,7 +145,7 @@ export default function Sidebar() {
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => setTab("chat")}
-                    className="flex-1 text-center bg-[#00FF66] hover:bg-[#00e55b] text-black font-extrabold text-[10px] uppercase tracking-wider py-2 rounded-lg transition-all shadow-[0_0_12px_rgba(0,255,102,0.2)]"
+                    className="flex-1 text-center bg-[#00FF66] hover:bg-[#00e55b] text-black font-extrabold text-[10px] uppercase tracking-wider py-2 rounded-sm transition-all shadow-[0_0_12px_rgba(0,255,102,0.2)]"
                   >
                     Start Chat
                   </motion.button>
@@ -156,14 +154,14 @@ export default function Sidebar() {
                     whileTap={{ scale: 0.95 }}
                     onClick={() => deleteDocument(activeDoc.id)}
                     title="Delete Document"
-                    className="p-2 bg-zinc-900 hover:bg-red-950/50 text-zinc-500 hover:text-red-400 border border-zinc-800 hover:border-red-900/40 rounded-lg transition-all"
+                    className="p-2 bg-zinc-900 hover:bg-red-950/50 text-zinc-500 hover:text-red-400 border border-zinc-800 hover:border-red-900/40 rounded-sm transition-all"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </motion.button>
                 </div>
               </motion.div>
             ) : (
-              <div className="text-[11px] font-mono text-zinc-500 p-4 border border-dashed border-zinc-800 rounded-xl text-center uppercase">
+              <div className="text-[11px] font-mono text-zinc-500 p-4 border border-dashed border-zinc-800 rounded-sm text-center uppercase">
                 No Document Activated
               </div>
             )}
@@ -184,7 +182,7 @@ export default function Sidebar() {
                     key={doc.id}
                     whileHover={{ x: 3 }}
                     onClick={() => selectDocument(doc.id)}
-                    className="w-full text-left p-2.5 bg-[#121212] hover:bg-[#181818] border border-zinc-800/60 hover:border-zinc-700 rounded-lg transition-all text-[11px] text-zinc-400 hover:text-white uppercase font-bold tracking-wide truncate flex items-center gap-2.5"
+                    className="w-full text-left p-2.5 bg-[#121212] hover:bg-[#181818] border border-zinc-800/60 hover:border-zinc-700 rounded-sm transition-all text-[11px] text-zinc-400 hover:text-white uppercase font-bold tracking-wide truncate flex items-center gap-2.5"
                   >
                     <FileText className="w-3.5 h-3.5 text-zinc-500 shrink-0" />
                     <span className="truncate flex-1">{doc.name}</span>
@@ -198,19 +196,19 @@ export default function Sidebar() {
 
       {/* User Info & Logout Footer */}
       <div className="p-5 border-t border-zinc-800/80 flex flex-col gap-3.5 text-xs font-mono uppercase tracking-wider shrink-0 bg-[#080808]">
-        <div className="flex items-center justify-between text-[11px] text-zinc-400 bg-[#121212] p-2.5 rounded-lg border border-zinc-800/60">
+        <div className="flex items-center justify-between text-[11px] text-zinc-400 bg-[#121212] p-2.5 rounded-sm border border-zinc-800/60">
           <div className="flex items-center gap-2 min-w-0">
             <Cloud className="w-3.5 h-3.5 text-[#00FF66] shrink-0" />
             <span className="truncate">User: <strong className="text-white">{user?.username}</strong></span>
           </div>
-          <div className="w-2 h-2 rounded-full bg-[#00FF66] shadow-[0_0_8px_#00FF66] animate-pulse shrink-0" />
+          <div className="w-2 h-2 rounded-none bg-[#00FF66] shadow-[0_0_8px_#00FF66] animate-pulse shrink-0" />
         </div>
         
         <motion.button
           whileHover={{ scale: 1.01 }}
           whileTap={{ scale: 0.98 }}
           onClick={logout}
-          className="w-full py-2.5 bg-transparent hover:bg-red-950/30 border border-zinc-800 hover:border-red-900/40 text-zinc-400 hover:text-red-400 rounded-lg text-[10px] font-extrabold uppercase tracking-wider transition-colors flex items-center justify-center gap-2"
+          className="w-full py-2.5 bg-transparent hover:bg-red-950/30 border border-zinc-800 hover:border-red-900/40 text-zinc-400 hover:text-red-400 rounded-sm text-[10px] font-extrabold uppercase tracking-wider transition-colors flex items-center justify-center gap-2"
         >
           <LogOut className="w-3.5 h-3.5" />
           <span>Sign Out</span>
