@@ -93,9 +93,9 @@ export default function Chat() {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="text-center max-w-sm border border-zinc-800 bg-[#101010] p-10 rounded-2xl shadow-2xl my-auto"
+          className="text-center max-w-sm border border-zinc-800 bg-[#101010] p-10 rounded-sm shadow-2xl my-auto"
         >
-          <div className="w-16 h-16 bg-zinc-900 border border-zinc-800 text-[#00FF66] rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-lg">
+          <div className="w-16 h-16 bg-zinc-900 border border-zinc-800 text-[#00FF66] rounded-sm flex items-center justify-center mx-auto mb-5 shadow-lg">
             <MessageSquare className="w-8 h-8" />
           </div>
           <h3 className="font-extrabold text-white text-lg uppercase tracking-wider">No Active Target</h3>
@@ -113,7 +113,7 @@ export default function Chat() {
       <div className="p-4 px-6 bg-[#0E0E0E] border-b border-zinc-800/80 flex items-center justify-between shadow-md shrink-0 z-10">
         <div>
           <div className="flex items-center gap-2.5">
-            <span className="w-2 h-2 rounded-full bg-[#00FF66] shadow-[0_0_8px_#00FF66] animate-pulse" />
+            <span className="w-2 h-2 rounded-none bg-[#00FF66] shadow-[0_0_8px_#00FF66] animate-pulse" />
             <h3 className="font-extrabold text-white text-xs uppercase tracking-wider">Interactive Q&A Session</h3>
           </div>
           <p className="text-[11px] text-zinc-400 font-mono mt-1 max-w-lg truncate uppercase" title={activeDoc?.name}>
@@ -126,7 +126,7 @@ export default function Chat() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => clearChat(selectedDocumentId)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 hover:bg-red-950/40 text-zinc-400 hover:text-red-400 border border-zinc-800 hover:border-red-900/40 rounded-xl text-[10px] font-extrabold uppercase tracking-wider transition-all"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 hover:bg-red-950/40 text-zinc-400 hover:text-red-400 border border-zinc-800 hover:border-red-900/40 rounded-sm text-[10px] font-extrabold uppercase tracking-wider transition-all"
           >
             <Trash2 className="w-3.5 h-3.5" />
             <span>Clear Chat</span>
@@ -141,7 +141,7 @@ export default function Chat() {
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className="w-16 h-16 bg-zinc-900 border border-zinc-800 text-[#00FF66] rounded-2xl flex items-center justify-center mb-5 shadow-xl"
+              className="w-16 h-16 bg-zinc-900 border border-zinc-800 text-[#00FF66] rounded-sm flex items-center justify-center mb-5 shadow-xl"
             >
               <Sparkles className="w-8 h-8" />
             </motion.div>
@@ -157,10 +157,10 @@ export default function Chat() {
               ].map((suggestion, i) => (
                 <motion.button
                   key={i}
-                  whileHover={{ scale: 1.01, x: 4, borderColor: "#00FF66" }}
+                  whileHover={{ scale: 1.01, x: 3, borderColor: "#00FF66" }}
                   whileTap={{ scale: 0.99 }}
                   onClick={() => setInputText(suggestion)}
-                  className="p-3.5 text-xs font-bold bg-[#121212] border border-zinc-800/80 text-zinc-300 hover:text-white rounded-xl transition-all uppercase tracking-wide text-left shadow-sm"
+                  className="p-3.5 text-xs font-bold bg-[#121212] border border-zinc-800/80 text-zinc-300 hover:text-white rounded-sm transition-all uppercase tracking-wide text-left shadow-sm"
                 >
                   {suggestion}
                 </motion.button>
@@ -192,9 +192,9 @@ export default function Chat() {
                       <span>{msg.timestamp}</span>
                     </div>
 
-                    {/* Message Bubble */}
+                    {/* Message Bubble (Boxy Design) */}
                     <div
-                      className={`max-w-[85%] rounded-2xl p-4.5 text-xs leading-relaxed shadow-xl border ${
+                      className={`max-w-[85%] rounded-sm p-4.5 text-xs leading-relaxed shadow-xl border ${
                         isUser
                           ? "bg-[#00FF66] border-[#00FF66] text-black font-extrabold shadow-[0_0_15px_rgba(0,255,102,0.15)]"
                           : "bg-[#121212] border-zinc-800 text-zinc-100"
@@ -219,7 +219,7 @@ export default function Chat() {
                               return (
                                 <div
                                   key={srcIdx}
-                                  className="w-full bg-[#0A0A0A] border border-zinc-800 rounded-xl overflow-hidden text-[10px]"
+                                  className="w-full bg-[#0A0A0A] border border-zinc-800 rounded-sm overflow-hidden text-[10px]"
                                 >
                                   <button
                                     type="button"
@@ -227,12 +227,12 @@ export default function Chat() {
                                     className="w-full flex items-center justify-between p-3 font-bold text-zinc-300 hover:text-white transition-colors uppercase font-mono"
                                   >
                                     <div className="flex items-center gap-2">
-                                      <span className="bg-[#141414] border border-zinc-800 text-[#00FF66] px-2 py-0.5 rounded-md font-mono text-[9px]">
+                                      <span className="bg-[#141414] border border-zinc-800 text-[#00FF66] px-2 py-0.5 rounded-sm font-mono text-[9px]">
                                         Section {srcIdx + 1}
                                       </span>
                                       <span>Page {src.chunk.pageIndex}</span>
                                       <span className="text-zinc-700">•</span>
-                                      <span className="font-mono text-[9px] text-[#00FF66] bg-[#00FF66]/10 border border-[#00FF66]/20 px-2 py-0.5 rounded-full">
+                                      <span className="font-mono text-[9px] text-[#00FF66] bg-[#00FF66]/10 border border-[#00FF66]/20 px-2 py-0.5 rounded-sm">
                                         Relevance: {scorePercent}%
                                       </span>
                                     </div>
@@ -264,7 +264,7 @@ export default function Chat() {
 
                       {/* Grounding Fallback Notice */}
                       {isGroundedFallback && (
-                        <div className="flex items-start gap-2.5 bg-amber-950/30 text-amber-400 border border-amber-800/40 rounded-xl p-3.5 mt-4 text-[10px] font-mono uppercase">
+                        <div className="flex items-start gap-2.5 bg-amber-950/30 text-amber-400 border border-amber-800/40 rounded-sm p-3.5 mt-4 text-[10px] font-mono uppercase">
                           <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
                           <div>
                             <strong className="font-extrabold text-white block mb-0.5 tracking-wider">Note on Source Content</strong>
@@ -293,7 +293,7 @@ export default function Chat() {
               <Bot className="w-3 h-3 text-[#00FF66]" />
               <span>Study Assistant Thinking...</span>
             </div>
-            <div className="bg-[#121212] border border-zinc-800 rounded-2xl p-4 text-zinc-300 flex items-center gap-3 text-xs shadow-xl font-mono uppercase">
+            <div className="bg-[#121212] border border-zinc-800 rounded-sm p-4 text-zinc-300 flex items-center gap-3 text-xs shadow-xl font-mono uppercase">
               <Loader2 className="w-4 h-4 text-[#00FF66] animate-spin" />
               <span>Searching document sections & crafting answer...</span>
             </div>
@@ -303,7 +303,7 @@ export default function Chat() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Message Area */}
+      {/* Input Message Area (Boxy Design) */}
       <div className="p-4 px-6 bg-[#0E0E0E] border-t border-zinc-800/80 shrink-0" id="chat-input-bar">
         <form onSubmit={handleSend} className="max-w-4xl mx-auto flex items-center gap-3">
           <input
@@ -312,14 +312,14 @@ export default function Chat() {
             onChange={(e) => setInputText(e.target.value)}
             disabled={isSending}
             placeholder={`Query document context... (e.g. "Summarize core findings")`}
-            className="flex-1 text-xs p-3.5 px-4 border border-zinc-800 focus:border-[#00FF66] focus:ring-1 focus:ring-[#00FF66]/30 rounded-xl transition-all bg-[#141414] text-white font-mono uppercase placeholder-zinc-600 outline-none"
+            className="flex-1 text-xs p-3.5 px-4 border border-zinc-800 focus:border-[#00FF66] focus:ring-1 focus:ring-[#00FF66]/30 rounded-sm transition-all bg-[#141414] text-white font-mono uppercase placeholder-zinc-600 outline-none"
           />
           <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
             type="submit"
             disabled={!inputText.trim() || isSending}
-            className="p-3.5 bg-[#00FF66] hover:bg-[#00e55b] disabled:opacity-30 disabled:cursor-not-allowed text-black rounded-xl shadow-lg transition-colors cursor-pointer"
+            className="p-3.5 bg-[#00FF66] hover:bg-[#00e55b] disabled:opacity-30 disabled:cursor-not-allowed text-black rounded-sm shadow-lg transition-colors cursor-pointer"
           >
             <Send className="w-4.5 h-4.5" />
           </motion.button>

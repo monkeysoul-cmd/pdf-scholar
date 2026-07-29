@@ -4,12 +4,15 @@ import {
   FileText,
   Trash2,
   Calendar,
-  Database,
-  Cloud,
   Layers,
   ArrowRight,
   Plus,
-  Sparkles
+  Sparkles,
+  Award,
+  GraduationCap,
+  TrendingUp,
+  CheckCircle2,
+  AlertCircle
 } from "lucide-react";
 import { motion } from "motion/react";
 
@@ -19,7 +22,8 @@ export default function Overview() {
     selectedDocumentId,
     selectDocument,
     deleteDocument,
-    setTab
+    setTab,
+    quizScores = []
   } = useAppState();
 
   const totalChunks = documents.reduce((acc, d) => acc + d.chunkCount, 0);
@@ -32,17 +36,27 @@ export default function Overview() {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
+  // Compute quiz stats
+  const totalQuizzes = quizScores.length;
+  const avgScore = totalQuizzes > 0
+    ? Math.round(quizScores.reduce((acc, q) => acc + q.scorePercent, 0) / totalQuizzes)
+    : 0;
+
   const stats = [
-    { label: "Total Reading Segments", value: totalChunks, icon: Layers, color: "#00FF66" },
-    { label: "Cloud Server Status", value: "ONLINE", icon: Cloud, color: "#3B82F6" },
-    { label: "Storage Location", value: "MONGODB ATLAS", icon: Database, color: "#10B981" },
+    { label: "Total Reading Segments", value: totalChunks, icon: Layers, subtitle: "Indexed sections" },
+    { label: "Average Quiz Score", value: totalQuizzes > 0 ? `${avgScore}%` : "N/A", icon: Award, subtitle: totalQuizzes > 0 ? "Based on test attempts" : "No quizzes taken" },
+    { label: "Quizzes Completed", value: `${totalQuizzes}`, icon: GraduationCap, subtitle: "Total test assessments" },
   ];
+
+  const getScoreBadge = (score) => {
+    if (score === 100) return { label: "PERFECT", bg: "bg-[#00FF66]/10", border: "border-[#00FF66]/30", text: "text-[#00FF66]" };
+    if (score >= 80) return { label: "EXCELLENT", bg: "bg-[#00FF66]/10", border: "border-[#00FF66]/30", text: "text-[#00FF66]" };
+    if (score >= 60) return { label: "PASSED", bg: "bg-amber-500/10", border: "border-amber-500/30", text: "text-amber-400" };
+    return { label: "NEEDS STUDY", bg: "bg-red-500/10", border: "border-red-500/30", text: "text-red-400" };
+  };
 
   return (
     <div className="flex-1 p-8 md:p-12 overflow-y-auto min-h-0 flex flex-col bg-[#080808] text-white select-none relative" id="overview-view">
-      {/* Background ambient lighting */}
-      <div className="absolute top-0 right-1/3 w-96 h-96 bg-[#00FF66]/5 rounded-full blur-[140px] pointer-events-none" />
-
       {/* Upper Header */}
       <motion.div
         initial={{ opacity: 0, y: -15 }}
@@ -51,21 +65,21 @@ export default function Overview() {
       >
         <div>
           <div className="flex items-center gap-2.5 mb-2">
-            <span className="text-[10px] font-mono tracking-wider uppercase text-zinc-400">Database Engine</span>
-            <span className="bg-[#00FF66]/10 text-[#00FF66] border border-[#00FF66]/20 text-[9px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#00FF66] animate-pulse" />
-              MongoDB Atlas Active
+            <span className="text-[10px] font-mono tracking-wider uppercase text-zinc-400">PDF Scholar Engine</span>
+            <span className="bg-[#00FF66]/10 text-[#00FF66] border border-[#00FF66]/20 text-[9px] font-black px-2.5 py-0.5 rounded-sm uppercase tracking-wider flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-none bg-[#00FF66] animate-pulse" />
+              Vector AI Ready
             </span>
           </div>
-          <h2 className="text-xs font-mono tracking-wider uppercase text-zinc-400">Study Hub Overview</h2>
+          <h2 className="text-xs font-mono tracking-wider uppercase text-zinc-400">Study Hub Dashboard</h2>
         </div>
         
         <div className="flex items-center gap-3">
           <motion.button
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => setTab("upload")}
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#00FF66] hover:bg-[#00e55b] text-black text-xs font-extrabold uppercase tracking-wider rounded-xl transition-all shadow-[0_0_20px_rgba(0,255,102,0.25)]"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#00FF66] hover:bg-[#00e55b] text-black text-xs font-extrabold uppercase tracking-wider rounded-sm transition-all shadow-[0_0_15px_rgba(0,255,102,0.2)]"
           >
             <Plus className="w-4 h-4 text-black" />
             <span>Upload PDF</span>
@@ -80,15 +94,15 @@ export default function Overview() {
         transition={{ delay: 0.1 }}
         className="mb-10 relative z-10"
       >
-        <h1 className="text-4xl md:text-7xl font-black tracking-tight leading-none uppercase text-white">
+        <h1 className="text-4xl md:text-6xl font-black tracking-tight leading-none uppercase text-white">
           Study Hub <br />
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-zinc-500 via-zinc-600 to-zinc-800">
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-zinc-400 via-zinc-500 to-zinc-700">
             Dashboard
           </span>
         </h1>
       </motion.section>
 
-      {/* Stats Cards */}
+      {/* Stats Cards (Boxy Design) */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -100,32 +114,128 @@ export default function Overview() {
           return (
             <motion.div
               key={i}
-              whileHover={{ y: -4, borderColor: "rgba(0, 255, 102, 0.4)" }}
-              className="bg-[#121212] p-6 rounded-2xl border border-zinc-800/80 flex flex-col justify-between shadow-xl relative overflow-hidden group transition-all"
+              whileHover={{ y: -2, borderColor: "#00FF66" }}
+              className="bg-[#101010] p-6 rounded-sm border border-zinc-800/80 flex flex-col justify-between shadow-xl relative overflow-hidden group transition-all"
             >
               <div className="flex items-center justify-between mb-4">
                 <span className="text-[10px] font-mono font-bold uppercase text-zinc-400 tracking-wider">
                   {stat.label}
                 </span>
-                <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 group-hover:text-[#00FF66] transition-colors">
+                <div className="w-8 h-8 rounded-sm bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 group-hover:text-[#00FF66] group-hover:border-[#00FF66]/40 transition-colors">
                   <Icon className="w-4 h-4" />
                 </div>
               </div>
 
-              <div className="text-4xl md:text-5xl font-black tracking-tight text-white leading-none">
-                {stat.value}
+              <div>
+                <div className="text-4xl md:text-5xl font-black tracking-tight text-white leading-none">
+                  {stat.value}
+                </div>
+                <div className="text-[10px] font-mono text-zinc-500 mt-2 uppercase tracking-wider">
+                  {stat.subtitle}
+                </div>
               </div>
             </motion.div>
           );
         })}
       </motion.div>
 
-      {/* Ingested Documents Grid */}
+      {/* Quiz Test Scores & Performance Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.25 }}
+        className="bg-[#101010] border border-zinc-800/80 rounded-sm mb-10 overflow-hidden shadow-2xl relative z-10"
+      >
+        <div className="p-6 border-b border-zinc-800/80 flex items-center justify-between bg-[#141414]/50">
+          <div>
+            <h3 className="font-extrabold text-white text-base uppercase tracking-wider flex items-center gap-2">
+              <Award className="w-4 h-4 text-[#00FF66]" />
+              PDF Quiz Test Scores
+            </h3>
+            <p className="text-[11px] text-zinc-400 mt-1 uppercase font-mono">
+              Diagnostic quiz test performance history across study materials.
+            </p>
+          </div>
+          <span className="text-[10px] font-mono font-bold bg-zinc-900 text-[#00FF66] px-3 py-1.5 rounded-sm border border-zinc-800 uppercase">
+            {totalQuizzes} QUIZZES LOGGED
+          </span>
+        </div>
+
+        {quizScores.length > 0 ? (
+          <div className="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {quizScores.map((item) => {
+              const badge = getScoreBadge(item.scorePercent);
+              return (
+                <div
+                  key={item.id}
+                  className="bg-[#0B0B0B] border border-zinc-800 hover:border-zinc-700 p-5 rounded-sm flex flex-col justify-between gap-4 transition-all"
+                >
+                  <div>
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                      <span className={`text-[9px] font-mono font-black px-2 py-0.5 rounded-sm uppercase border ${badge.bg} ${badge.border} ${badge.text}`}>
+                        {badge.label} • {item.scorePercent}%
+                      </span>
+                      <span className="text-[9px] font-mono text-zinc-500 uppercase">
+                        {new Date(item.timestamp).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                      </span>
+                    </div>
+
+                    <h4 className="font-extrabold text-xs uppercase text-zinc-200 truncate" title={item.documentName}>
+                      {item.documentName}
+                    </h4>
+                  </div>
+
+                  <div className="bg-[#121212] p-3 rounded-sm border border-zinc-800/60 font-mono text-[10px] flex items-center justify-between">
+                    <span className="text-zinc-400">MC: <strong className="text-white">{item.mcCorrect}/{item.mcTotal}</strong></span>
+                    <span className="text-zinc-600">•</span>
+                    <span className="text-zinc-400">SA: <strong className="text-white">{item.saCorrect}/{item.saTotal}</strong></span>
+                    <span className="text-zinc-600">•</span>
+                    <span className="text-[#00FF66] font-bold">{item.totalCorrect}/{item.totalQuestions}</span>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      if (item.documentId) selectDocument(item.documentId);
+                      setTab("quiz");
+                    }}
+                    className="w-full py-2 bg-zinc-900 hover:bg-[#00FF66] text-zinc-300 hover:text-black text-[10px] font-bold uppercase tracking-wider rounded-sm border border-zinc-800 transition-all flex items-center justify-center gap-1.5"
+                  >
+                    <span>Retake Quiz</span>
+                    <ArrowRight className="w-3 h-3" />
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="py-12 text-center p-6">
+            <div className="w-12 h-12 bg-zinc-900 border border-zinc-800 text-[#00FF66] rounded-sm flex items-center justify-center mx-auto mb-4">
+              <GraduationCap className="w-6 h-6" />
+            </div>
+            <h4 className="font-extrabold text-white text-sm uppercase tracking-wider">No Quiz Scores Recorded</h4>
+            <p className="text-zinc-500 text-xs max-w-sm mx-auto mt-1 mb-5 uppercase font-mono">
+              Take an AI diagnostic practice quiz on your active PDF to view test scores here.
+            </p>
+            {documents.length > 0 && (
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setTab("quiz")}
+                className="px-5 py-2.5 bg-[#00FF66] hover:bg-[#00e55b] text-black text-xs font-black uppercase tracking-wider rounded-sm transition-all"
+              >
+                Start Practice Quiz
+              </motion.button>
+            )}
+          </div>
+        )}
+      </motion.div>
+
+      {/* Ingested Documents Grid (Boxy Design) */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="bg-[#101010] border border-zinc-800/80 rounded-2xl mb-10 overflow-hidden shadow-2xl relative z-10"
+        className="bg-[#101010] border border-zinc-800/80 rounded-sm mb-10 overflow-hidden shadow-2xl relative z-10"
       >
         <div className="p-6 border-b border-zinc-800/80 flex items-center justify-between bg-[#141414]/50">
           <div>
@@ -137,7 +247,7 @@ export default function Overview() {
               Select a document to initiate interactive AI study sessions.
             </p>
           </div>
-          <span className="text-[10px] font-mono font-bold bg-zinc-900 text-[#00FF66] px-3 py-1.5 rounded-full border border-zinc-800">
+          <span className="text-[10px] font-mono font-bold bg-zinc-900 text-[#00FF66] px-3 py-1.5 rounded-sm border border-zinc-800 uppercase">
             {documents.length} DOCUMENTS LOADED
           </span>
         </div>
@@ -150,13 +260,16 @@ export default function Overview() {
                   <th className="py-4 px-6">Document Name</th>
                   <th className="py-4 px-6">Uploaded At</th>
                   <th className="py-4 px-6 text-center">Reading Details</th>
-                  <th className="py-4 px-6">File Size</th>
+                  <th className="py-4 px-6">Latest Quiz Score</th>
                   <th className="py-4 px-6 text-right">Options</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-800/60 text-xs">
                 {documents.map((doc) => {
                   const isSelected = doc.id === selectedDocumentId;
+                  const docScores = quizScores.filter(s => s.documentId === doc.id);
+                  const latestScore = docScores.length > 0 ? docScores[0] : null;
+
                   return (
                     <motion.tr
                       key={doc.id}
@@ -168,7 +281,7 @@ export default function Overview() {
                       {/* Doc name & active label */}
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-3 max-w-md">
-                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                          <div className={`w-8 h-8 rounded-sm flex items-center justify-center shrink-0 ${
                             isSelected ? "bg-[#00FF66]/10 text-[#00FF66] border border-[#00FF66]/30" : "bg-zinc-900 text-zinc-500"
                           }`}>
                             <FileText className="w-4 h-4" />
@@ -180,7 +293,7 @@ export default function Overview() {
                               {doc.name}
                             </span>
                             {isSelected && (
-                              <span className="inline-flex items-center gap-1 mt-1 text-[9px] font-mono font-bold text-[#00FF66] tracking-wider uppercase bg-[#00FF66]/10 px-2 py-0.5 rounded-full border border-[#00FF66]/20">
+                              <span className="inline-flex items-center gap-1 mt-1 text-[9px] font-mono font-bold text-[#00FF66] tracking-wider uppercase bg-[#00FF66]/10 px-2 py-0.5 rounded-sm border border-[#00FF66]/20">
                                 ACTIVE TARGET
                               </span>
                             )}
@@ -206,9 +319,15 @@ export default function Overview() {
                         <span className="text-zinc-400 text-[10px]"> SECTIONS</span>
                       </td>
 
-                      {/* size */}
-                      <td className="py-4 px-6 text-zinc-400 font-mono uppercase text-xs">
-                        {formatBytes(doc.size)}
+                      {/* Latest Quiz Score */}
+                      <td className="py-4 px-6 font-mono uppercase text-xs">
+                        {latestScore ? (
+                          <span className="inline-flex items-center gap-1.5 bg-[#00FF66]/10 text-[#00FF66] border border-[#00FF66]/30 px-2.5 py-1 rounded-sm font-bold text-[10px]">
+                            {latestScore.scorePercent}% Score ({latestScore.totalCorrect}/{latestScore.totalQuestions})
+                          </span>
+                        ) : (
+                          <span className="text-zinc-500 text-[10px]">No Quiz Taken</span>
+                        )}
                       </td>
 
                       {/* actions */}
@@ -216,20 +335,20 @@ export default function Overview() {
                         <div className="flex items-center justify-end gap-3">
                           {isSelected ? (
                             <motion.button
-                              whileHover={{ scale: 1.03 }}
-                              whileTap={{ scale: 0.97 }}
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
                               onClick={() => setTab("chat")}
-                              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#00FF66] hover:bg-[#00e55b] text-black text-[10px] font-extrabold uppercase tracking-wide rounded-lg transition-all shadow-[0_0_12px_rgba(0,255,102,0.2)]"
+                              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#00FF66] hover:bg-[#00e55b] text-black text-[10px] font-extrabold uppercase tracking-wide rounded-sm transition-all shadow-[0_0_12px_rgba(0,255,102,0.2)]"
                             >
                               <span>Open Chat</span>
                               <ArrowRight className="w-3 h-3" />
                             </motion.button>
                           ) : (
                             <motion.button
-                              whileHover={{ scale: 1.03 }}
-                              whileTap={{ scale: 0.97 }}
+                              whileHover={{ scale: 1.02 }}
+                              whileTap={{ scale: 0.98 }}
                               onClick={() => selectDocument(doc.id)}
-                              className="px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700/60 text-zinc-200 hover:text-white text-[10px] font-extrabold uppercase tracking-wide rounded-lg transition-colors"
+                              className="px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700/60 text-zinc-200 hover:text-white text-[10px] font-extrabold uppercase tracking-wide rounded-sm transition-colors"
                             >
                               Open
                             </motion.button>
@@ -253,7 +372,7 @@ export default function Overview() {
           </div>
         ) : (
           <div className="py-16 text-center">
-            <div className="w-14 h-14 bg-zinc-900 border border-zinc-800 text-[#00FF66] rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <div className="w-14 h-14 bg-zinc-900 border border-zinc-800 text-[#00FF66] rounded-sm flex items-center justify-center mx-auto mb-4 shadow-lg">
               <FileText className="w-7 h-7" />
             </div>
             <h4 className="font-extrabold text-white text-base uppercase tracking-wider">No Study Materials Yet</h4>
@@ -261,10 +380,10 @@ export default function Overview() {
               Upload textbook chapters, research papers, or notes to get started.
             </p>
             <motion.button
-              whileHover={{ scale: 1.04 }}
-              whileTap={{ scale: 0.96 }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               onClick={() => setTab("upload")}
-              className="px-6 py-3 bg-[#00FF66] hover:bg-[#00e55b] text-black text-xs font-black uppercase tracking-wider rounded-xl transition-all shadow-[0_0_20px_rgba(0,255,102,0.25)]"
+              className="px-6 py-3 bg-[#00FF66] hover:bg-[#00e55b] text-black text-xs font-black uppercase tracking-wider rounded-sm transition-all shadow-[0_0_20px_rgba(0,255,102,0.25)]"
             >
               Upload PDF File
             </motion.button>
@@ -282,7 +401,7 @@ export default function Overview() {
             <div className="step-label text-[10px] font-mono font-bold text-[#00FF66] uppercase tracking-wider">2. Process Sections</div>
           </div>
           <div className="step border-t-2 border-[#00FF66] pt-3">
-            <div className="step-label text-[10px] font-mono font-bold text-[#00FF66] uppercase tracking-wider">3. Vector Database</div>
+            <div className="step-label text-[10px] font-mono font-bold text-[#00FF66] uppercase tracking-wider">3. Vector Analysis</div>
           </div>
           <div className="step border-t-2 border-zinc-800 pt-3">
             <div className="step-label text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-wider">4. Ready to Study</div>
