@@ -440,6 +440,8 @@ app.post("/api/quiz", authenticateToken, async (req, res) => {
       return;
     }
 
+    const questionCount = Math.min(20, Math.max(1, parseInt(count) || 5));
+
     // Load document chunks
     const db = await LocalVectorDB.get(req.user.id);
     const doc = db.documents.find(d => d.id === documentId);
@@ -454,16 +456,17 @@ app.post("/api/quiz", authenticateToken, async (req, res) => {
       return;
     }
 
-    // Join a representative subset of chunks (e.g., first 6 chunks) to keep token size reasonable but comprehensive
+    // Join a representative subset of chunks to cover context for up to 20 questions
     const contentSample = docChunks
-      .slice(0, 10)
+      .slice(0, 20)
       .map(c => c.text)
       .join("\n\n");
 
-    const prompt = `Based strictly on the following excerpt from the document "${doc.name}", generate an interactive quiz of exactly ${count} questions.
+    const prompt = `Based strictly on the following excerpt from the document "${doc.name}", generate an interactive quiz of exactly ${questionCount} questions.
 Include a mix of multiple-choice (with 4 options) and short-answer questions.
-For multiple-choice: provide an options array, the correctAnswer (which MUST match one of the options exactly), and an explanation.
-For short-answer: leave options empty, provide the correctAnswer as the key criteria/rubric, and an explanation of the concept.
+Assign point values: 10 points for multiple-choice questions, and 15 points for short-answer questions.
+For multiple-choice: provide an options array, the correctAnswer (which MUST match one of the options exactly), points (10), and an explanation.
+For short-answer: leave options empty, provide the correctAnswer as the key criteria/rubric, points (15), and an explanation of the concept.
 
 Document Excerpt:
 ${contentSample}`;
@@ -479,6 +482,7 @@ ${contentSample}`;
               id: { type: Type.STRING, description: "A unique sequential ID, e.g. q1, q2" },
               type: { type: Type.STRING, description: "Must be exactly 'multiple-choice' or 'short-answer'" },
               question: { type: Type.STRING, description: "The quiz question text." },
+              points: { type: Type.INTEGER, description: "Points value for this question (10 for multiple choice, 15 for short answer)" },
               options: {
                 type: Type.ARRAY,
                 items: { type: Type.STRING },
