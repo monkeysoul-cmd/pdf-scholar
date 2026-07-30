@@ -91,4 +91,25 @@ body,
   animation: shimmer 3s infinite;
 }
 
+/* Ensure mouse cursor changes to hand pointer on interactive elements */
+button,
+a,
+[role="button"],
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+select,
+summary,
+label[for],
+.cursor-pointer {
+  cursor: pointer !important;
+}
+
+button:disabled,
+a:disabled,
+[disabled] {
+  cursor: not-allowed !important;
+}
+
+
 

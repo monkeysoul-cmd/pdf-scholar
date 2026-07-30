@@ -190,7 +190,9 @@ export default function Overview() {
                     <span className="text-zinc-600">•</span>
                     <span className="text-zinc-400">SA: <strong className="text-white">{item.saCorrect}/{item.saTotal}</strong></span>
                     <span className="text-zinc-600">•</span>
-                    <span className="text-[#00FF66] font-bold">{item.totalCorrect}/{item.totalQuestions}</span>
+                    <span className="text-[#00FF66] font-bold">
+                      {item.earnedPoints !== undefined ? `${item.earnedPoints}/${item.totalPoints} PTS` : `${item.totalCorrect}/${item.totalQuestions}`}
+                    </span>
                   </div>
 
                   <button
@@ -198,7 +200,7 @@ export default function Overview() {
                       if (item.documentId) selectDocument(item.documentId);
                       setTab("quiz");
                     }}
-                    className="w-full py-2 bg-zinc-900 hover:bg-[#00FF66] text-zinc-300 hover:text-black text-[10px] font-bold uppercase tracking-wider rounded-sm border border-zinc-800 transition-all flex items-center justify-center gap-1.5"
+                    className="w-full py-2 bg-zinc-900 hover:bg-[#00FF66] text-zinc-300 hover:text-black text-[10px] font-bold uppercase tracking-wider rounded-sm border border-zinc-800 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                   >
                     <span>Retake Quiz</span>
                     <ArrowRight className="w-3 h-3" />
@@ -323,7 +325,7 @@ export default function Overview() {
                       <td className="py-4 px-6 font-mono uppercase text-xs">
                         {latestScore ? (
                           <span className="inline-flex items-center gap-1.5 bg-[#00FF66]/10 text-[#00FF66] border border-[#00FF66]/30 px-2.5 py-1 rounded-sm font-bold text-[10px]">
-                            {latestScore.scorePercent}% Score ({latestScore.totalCorrect}/{latestScore.totalQuestions})
+                            {latestScore.scorePercent}% ({latestScore.earnedPoints !== undefined ? `${latestScore.earnedPoints}/${latestScore.totalPoints} PTS` : `${latestScore.totalCorrect}/${latestScore.totalQuestions}`})
                           </span>
                         ) : (
                           <span className="text-zinc-500 text-[10px]">No Quiz Taken</span>
