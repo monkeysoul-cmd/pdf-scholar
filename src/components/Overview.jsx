@@ -185,10 +185,12 @@ export default function Overview() {
                     </h4>
                   </div>
 
-                  <div className="bg-[#121212] p-3 rounded-sm border border-zinc-800/60 font-mono text-[10px] flex items-center justify-between">
+                  <div className="bg-[#121212] p-3 rounded-sm border border-zinc-800/60 font-mono text-[10px] flex items-center justify-between gap-1">
                     <span className="text-zinc-400">MC: <strong className="text-white">{item.mcCorrect}/{item.mcTotal}</strong></span>
                     <span className="text-zinc-600">•</span>
-                    <span className="text-zinc-400">SA: <strong className="text-white">{item.saCorrect}/{item.saTotal}</strong></span>
+                    <span className="text-zinc-400" title="Written Questions Credit">
+                      Written: <strong className="text-white">{item.saFull !== undefined ? `${item.saFull} Full${item.saPartial ? `, ${item.saPartial} Part` : ""}` : `${item.saCorrect}/${item.saTotal}`}</strong>
+                    </span>
                     <span className="text-zinc-600">•</span>
                     <span className="text-[#00FF66] font-bold">
                       {item.earnedPoints !== undefined ? `${item.earnedPoints}/${item.totalPoints} PTS` : `${item.totalCorrect}/${item.totalQuestions}`}

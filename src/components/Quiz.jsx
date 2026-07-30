@@ -13,7 +13,11 @@ import {
   XCircle,
   Trophy,
   Sliders,
-  ArrowRight
+  ArrowRight,
+  Check,
+  AlertTriangle,
+  Send,
+  HelpCircle
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -35,6 +39,7 @@ export default function Quiz() {
   const [shortAnswersText, setShortAnswersText] = useState({});
   const [shortAnswerSelfGrades, setShortAnswerSelfGrades] = useState({});
   const [showResults, setShowResults] = useState(false);
+  const [showConfirmSubmitModal, setShowConfirmSubmitModal] = useState(false);
 
   const activeDoc = documents.find(d => d.id === selectedDocumentId);
 
@@ -42,6 +47,7 @@ export default function Quiz() {
     if (!selectedDocumentId) return;
     setIsGenerating(true);
     setShowResults(false);
+    setShowConfirmSubmitModal(false);
     setAnswers({});
     setRevealedShortAnswers({});
     setShortAnswersText({});
@@ -93,7 +99,9 @@ export default function Quiz() {
     let mcTotal = 0;
     let mcCorrect = 0;
     let saTotal = 0;
-    let saCorrect = 0;
+    let saFull = 0;
+    let saPartial = 0;
+    let saIncorrect = 0;
 
     let mcPointsEarned = 0;
     let mcPointsTotal = 0;
@@ -113,11 +121,15 @@ export default function Quiz() {
       } else {
         saTotal++;
         saPointsTotal += qPoints;
-        if (shortAnswerSelfGrades[q.id] === "correct") {
-          saCorrect++;
+        const grade = shortAnswerSelfGrades[q.id];
+        if (grade === "full" || grade === "correct") {
+          saFull++;
           saPointsEarned += qPoints;
-        } else if (shortAnswerSelfGrades[q.id] === "needs-review") {
-          saPointsEarned += Math.round(qPoints / 3); // 5 points partial score for 15pt question
+        } else if (grade === "partial" || grade === "needs-review") {
+          saPartial++;
+          saPointsEarned += Math.round(qPoints * 0.5); // 50% credit for partial score
+        } else if (grade === "incorrect") {
+          saIncorrect++;
         }
       }
     });
@@ -129,7 +141,9 @@ export default function Quiz() {
     return {
       mcCorrect,
       mcTotal,
-      saCorrect,
+      saFull,
+      saPartial,
+      saIncorrect,
       saTotal,
       mcPointsEarned,
       mcPointsTotal,
@@ -138,19 +152,38 @@ export default function Quiz() {
       earnedPoints,
       totalPoints,
       scorePercent,
-      totalCorrect: mcCorrect + saCorrect,
+      totalCorrect: mcCorrect + saFull,
       totalQuestions: quizQuestions.length
     };
   };
 
+  const unansweredCount = quizQuestions.filter(q => {
+    if (q.type === "multiple-choice") {
+      return !answers[q.id];
+    } else {
+      return !shortAnswerSelfGrades[q.id];
+    }
+  }).length;
+
+  const handleSubmitClick = () => {
+    if (unansweredCount > 0) {
+      setShowConfirmSubmitModal(true);
+    } else {
+      handleFinishQuiz();
+    }
+  };
+
   const handleFinishQuiz = () => {
+    setShowConfirmSubmitModal(false);
     const scores = calculateScore();
     const result = {
       documentId: selectedDocumentId,
       documentName: activeDoc?.name || "Document",
       mcCorrect: scores.mcCorrect,
       mcTotal: scores.mcTotal,
-      saCorrect: scores.saCorrect,
+      saFull: scores.saFull,
+      saPartial: scores.saPartial,
+      saIncorrect: scores.saIncorrect,
       saTotal: scores.saTotal,
       totalCorrect: scores.totalCorrect,
       totalQuestions: scores.totalQuestions,
@@ -174,6 +207,7 @@ export default function Quiz() {
     setShortAnswersText({});
     setShortAnswerSelfGrades({});
     setShowResults(false);
+    setShowConfirmSubmitModal(false);
   };
 
   if (!selectedDocumentId) {
@@ -197,11 +231,7 @@ export default function Quiz() {
   }
 
   const scores = calculateScore();
-  const allMCAnswered = quizQuestions.filter(q => q.type === "multiple-choice").every(q => !!answers[q.id]);
-  const allSAAnswered = quizQuestions.filter(q => q.type === "short-answer").every(q => !!revealedShortAnswers[q.id] && !!shortAnswerSelfGrades[q.id]);
-  const showCompleteBtn = quizQuestions.length > 0 && allMCAnswered && allSAAnswered && !showResults;
-
-  const answeredCount = Object.keys(answers).length + Object.keys(shortAnswerSelfGrades).length;
+  const answeredCount = quizQuestions.length - unansweredCount;
 
   return (
     <div className="flex-1 p-8 bg-[#080808] overflow-y-auto min-h-0 select-none relative" id="quiz-view">
@@ -333,12 +363,12 @@ export default function Quiz() {
         </motion.div>
       )}
 
-      {/* Live Points Tracker Banner */}
+      {/* Live Points Tracker Banner with Submit Button */}
       {quizQuestions.length > 0 && !isGenerating && !showResults && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="max-w-3xl mx-auto mb-6 bg-[#101010] border border-zinc-800 p-4 rounded-sm flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl"
+          className="max-w-3xl mx-auto mb-6 bg-[#101010] border border-zinc-800 p-4 rounded-sm flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl sticky top-0 z-20"
         >
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-[#00FF66]/10 border border-[#00FF66]/30 text-[#00FF66] rounded-sm flex items-center justify-center">
@@ -357,19 +387,61 @@ export default function Quiz() {
             <div className="text-zinc-400">
               Progress: <strong className="text-white">{answeredCount}/{quizQuestions.length} Answered</strong>
             </div>
-            {showCompleteBtn && (
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={handleFinishQuiz}
-                className="px-4 py-2 bg-[#00FF66] hover:bg-[#00e55b] text-black font-extrabold text-xs uppercase tracking-wider rounded-sm shadow-[0_0_15px_rgba(0,255,102,0.3)] transition-all cursor-pointer"
-              >
-                Finish & Submit
-              </motion.button>
-            )}
+
+            {/* Always visible Submit Button */}
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleSubmitClick}
+              className="px-5 py-2.5 bg-[#00FF66] hover:bg-[#00e55b] text-black font-extrabold text-xs uppercase tracking-wider rounded-sm shadow-[0_0_15px_rgba(0,255,102,0.3)] transition-all cursor-pointer flex items-center gap-2"
+            >
+              <Send className="w-3.5 h-3.5 text-black fill-black" />
+              <span>Submit Quiz</span>
+            </motion.button>
           </div>
         </motion.div>
       )}
+
+      {/* Confirmation Modal if submitted with unanswered questions */}
+      <AnimatePresence>
+        {showConfirmSubmitModal && (
+          <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="bg-[#101010] border border-zinc-800 max-w-md w-full p-6 rounded-sm shadow-2xl text-center space-y-4"
+            >
+              <div className="w-12 h-12 bg-amber-500/10 border border-amber-500/30 text-amber-400 rounded-sm flex items-center justify-center mx-auto">
+                <AlertTriangle className="w-6 h-6" />
+              </div>
+
+              <h3 className="font-extrabold text-white text-lg uppercase tracking-wider">Unanswered Questions Remaining</h3>
+              
+              <p className="text-xs text-zinc-400 font-mono uppercase leading-relaxed">
+                You have <strong className="text-amber-400">{unansweredCount}</strong> unanswered or un-graded question(s) out of {quizQuestions.length}.
+                <br />
+                Submitting now will calculate your final score based on your current completed answers.
+              </p>
+
+              <div className="pt-2 flex flex-col sm:flex-row gap-3">
+                <button
+                  onClick={() => setShowConfirmSubmitModal(false)}
+                  className="flex-1 py-3 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-300 font-bold text-xs uppercase tracking-wider rounded-sm transition-all cursor-pointer"
+                >
+                  Continue Quiz
+                </button>
+                <button
+                  onClick={handleFinishQuiz}
+                  className="flex-1 py-3 bg-[#00FF66] hover:bg-[#00e55b] text-black font-extrabold text-xs uppercase tracking-wider rounded-sm shadow-[0_0_15px_rgba(0,255,102,0.3)] transition-all cursor-pointer"
+                >
+                  Submit & Calculate Score
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Questions List */}
       {quizQuestions.length > 0 && !isGenerating && !showResults && (
@@ -392,7 +464,7 @@ export default function Quiz() {
                 {/* Badge and question text with Points indicator */}
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <span className="text-[10px] font-mono font-bold tracking-wider bg-black text-[#00FF66] border border-[#00FF66]/20 px-2.5 py-1 rounded-sm uppercase">
-                    Q{index + 1} of {quizQuestions.length} • {q.type === "multiple-choice" ? "Multiple Choice" : "Short Answer"}
+                    Q{index + 1} of {quizQuestions.length} • {q.type === "multiple-choice" ? "Multiple Choice" : "Written Question (Short Answer)"}
                   </span>
                   
                   {/* Point Badge */}
@@ -404,15 +476,21 @@ export default function Quiz() {
                           : "bg-red-500/20 border-red-500 text-red-400"
                         : "bg-zinc-900 border-zinc-800 text-amber-400"
                       : revealedSA && gradedSA
-                        ? gradedSA === "correct"
+                        ? gradedSA === "full" || gradedSA === "correct"
                           ? "bg-[#00FF66]/20 border-[#00FF66] text-[#00FF66]"
-                          : "bg-amber-500/20 border-amber-500 text-amber-400"
+                          : gradedSA === "partial" || gradedSA === "needs-review"
+                          ? "bg-amber-500/20 border-amber-500 text-amber-400"
+                          : "bg-red-500/20 border-red-500 text-red-400"
                         : "bg-zinc-900 border-zinc-800 text-amber-400"
                   }`}>
                     {q.type === "multiple-choice" && hasAnsweredMC ? (
                       isCorrectMC ? `+${qPoints} PTS EARNED` : `0 / ${qPoints} PTS`
                     ) : q.type === "short-answer" && revealedSA && gradedSA ? (
-                      gradedSA === "correct" ? `+${qPoints} PTS EARNED` : `+5 PTS (PARTIAL)`
+                      gradedSA === "full" || gradedSA === "correct"
+                        ? `+${qPoints} PTS (FULL CREDIT)`
+                        : gradedSA === "partial" || gradedSA === "needs-review"
+                        ? `+${Math.round(qPoints * 0.5)} PTS (PARTIAL CREDIT)`
+                        : `0 / ${qPoints} PTS (NO CREDIT)`
                     ) : (
                       `WORTH ${qPoints} PTS`
                     )}
@@ -461,13 +539,13 @@ export default function Quiz() {
                   </div>
                 )}
 
-                {/* Short Answer Input */}
+                {/* Written Question Input & Scoring */}
                 {q.type === "short-answer" && (
                   <div className="space-y-4 mt-1">
                     {!revealedSA ? (
                       <div className="flex flex-col gap-3">
                         <textarea
-                          placeholder="Type your answer analysis here..."
+                          placeholder="Type your detailed written answer here..."
                           value={shortAnswersText[q.id] || ""}
                           onChange={(e) => setShortAnswersText(prev => ({ ...prev, [q.id]: e.target.value }))}
                           rows={3}
@@ -480,45 +558,70 @@ export default function Quiz() {
                           disabled={!(shortAnswersText[q.id] || "").trim()}
                           className="self-end inline-flex items-center gap-1.5 px-4 py-2.5 bg-[#00FF66] hover:bg-[#00e55b] disabled:opacity-30 disabled:cursor-not-allowed text-black font-extrabold text-xs uppercase tracking-wider rounded-sm transition-all cursor-pointer"
                         >
-                          <span>Check Answer & View Rubric</span>
+                          <span>Check Written Answer & Evaluate</span>
                           <ChevronRight className="w-4 h-4" />
                         </motion.button>
                       </div>
                     ) : (
                       <div className="bg-[#0A0A0A] border border-zinc-800 p-5 rounded-sm space-y-4 font-mono uppercase text-xs">
                         <div>
-                          <div className="text-[10px] text-zinc-500 font-bold tracking-wider">YOUR RESPONSE:</div>
-                          <div className="text-white italic mt-1 font-mono">"{shortAnswersText[q.id]}"</div>
+                          <div className="text-[10px] text-zinc-500 font-bold tracking-wider mb-1">YOUR WRITTEN RESPONSE:</div>
+                          <div className="text-white italic font-mono bg-black/50 p-3 border border-zinc-800/80 rounded-sm">
+                            "{shortAnswersText[q.id]}"
+                          </div>
                         </div>
                         
                         <div className="border-t border-zinc-800 pt-4">
-                           <span className="text-[10px] font-mono font-bold text-[#00FF66] tracking-widest block mb-1">Answer Key & Criteria:</span>
+                           <span className="text-[10px] font-mono font-bold text-[#00FF66] tracking-widest block mb-1">Answer Key & Grading Criteria:</span>
                            <p className="text-zinc-300 leading-relaxed font-sans normal-case">{q.correctAnswer}</p>
                         </div>
 
-                        {/* Self Grading buttons */}
-                        <div className="border-t border-zinc-800 pt-4 flex flex-wrap items-center justify-between gap-3">
-                           <span className="text-[10px] text-zinc-400 font-bold tracking-wider">Self Grade Points:</span>
-                          <div className="flex gap-2">
+                        {/* Self Grading buttons with Full Points, Partial Points, No Points */}
+                        <div className="border-t border-zinc-800 pt-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <span className="text-[10px] text-zinc-400 font-bold tracking-wider">Select Points Credit:</span>
+                            {gradedSA && (
+                              <span className="text-[10px] font-bold text-[#00FF66]">
+                                Selected: {gradedSA === "full" || gradedSA === "correct" ? "Full Credit (100%)" : gradedSA === "partial" || gradedSA === "needs-review" ? "Partial Credit (50%)" : "No Credit (0%)"}
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                             <button
-                              onClick={() => handleSelfGrade(q.id, "correct")}
-                              className={`px-3.5 py-2 text-[10px] font-bold rounded-sm border transition-all tracking-wider cursor-pointer ${
-                                gradedSA === "correct"
-                                  ? "bg-[#00FF66] border-[#00FF66] text-black shadow-md"
-                                  : "bg-transparent border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700"
+                              onClick={() => handleSelfGrade(q.id, "full")}
+                              className={`py-2.5 px-3 text-[10px] font-bold rounded-sm border transition-all tracking-wider flex items-center justify-center gap-1.5 cursor-pointer ${
+                                gradedSA === "full" || gradedSA === "correct"
+                                  ? "bg-[#00FF66] border-[#00FF66] text-black shadow-md font-black"
+                                  : "bg-zinc-900/60 border-zinc-800 text-zinc-300 hover:text-white hover:border-zinc-700"
                               }`}
                             >
-                              Correct (+15 PTS)
+                              <CheckCircle2 className="w-3.5 h-3.5" />
+                              <span>Full Points (+{qPoints} PTS)</span>
                             </button>
+
                             <button
-                              onClick={() => handleSelfGrade(q.id, "needs-review")}
-                              className={`px-3.5 py-2 text-[10px] font-bold rounded-sm border transition-all tracking-wider cursor-pointer ${
-                                gradedSA === "needs-review"
-                                  ? "bg-amber-500 border-amber-500 text-black shadow-md"
-                                  : "bg-transparent border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-700"
+                              onClick={() => handleSelfGrade(q.id, "partial")}
+                              className={`py-2.5 px-3 text-[10px] font-bold rounded-sm border transition-all tracking-wider flex items-center justify-center gap-1.5 cursor-pointer ${
+                                gradedSA === "partial" || gradedSA === "needs-review"
+                                  ? "bg-amber-500 border-amber-500 text-black shadow-md font-black"
+                                  : "bg-zinc-900/60 border-zinc-800 text-zinc-300 hover:text-white hover:border-zinc-700"
                               }`}
                             >
-                              Partial (+5 PTS)
+                              <HelpCircle className="w-3.5 h-3.5" />
+                              <span>Partial (+{Math.round(qPoints * 0.5)} PTS)</span>
+                            </button>
+
+                            <button
+                              onClick={() => handleSelfGrade(q.id, "incorrect")}
+                              className={`py-2.5 px-3 text-[10px] font-bold rounded-sm border transition-all tracking-wider flex items-center justify-center gap-1.5 cursor-pointer ${
+                                gradedSA === "incorrect"
+                                  ? "bg-red-600 border-red-600 text-white shadow-md font-black"
+                                  : "bg-zinc-900/60 border-zinc-800 text-zinc-300 hover:text-white hover:border-zinc-700"
+                              }`}
+                            >
+                              <XCircle className="w-3.5 h-3.5" />
+                              <span>No Points (0 PTS)</span>
                             </button>
                           </div>
                         </div>
@@ -536,7 +639,7 @@ export default function Quiz() {
                   >
                     <BookOpen className="w-4 h-4 text-[#00FF66] shrink-0 mt-0.5" />
                     <div>
-                      <span className="font-bold text-white block mb-1 tracking-wider">Explanation:</span>
+                      <span className="font-bold text-white block mb-1 tracking-wider">Explanation & Concept:</span>
                       <p className="text-zinc-400 leading-relaxed font-sans normal-case">{q.explanation}</p>
                     </div>
                   </motion.div>
@@ -545,20 +648,21 @@ export default function Quiz() {
             );
           })}
 
-          {/* Complete quiz CTA */}
-          {showCompleteBtn && (
-            <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="flex justify-center pt-4 pb-12">
-              <motion.button
-                whileHover={{ scale: 1.04 }}
-                whileTap={{ scale: 0.96 }}
-                onClick={handleFinishQuiz}
-                className="px-10 py-5 bg-[#00FF66] hover:bg-[#00e55b] text-black font-black text-sm uppercase tracking-wider rounded-sm shadow-[0_0_25px_rgba(0,255,102,0.4)] transition-all cursor-pointer flex items-center gap-3"
-              >
-                <Trophy className="w-5 h-5" />
-                <span>Finish Quiz and View Scorecard</span>
-              </motion.button>
-            </motion.div>
-          )}
+          {/* Bottom Submit Quiz CTA */}
+          <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center pt-4 pb-12">
+            <motion.button
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.96 }}
+              onClick={handleSubmitClick}
+              className="px-10 py-5 bg-[#00FF66] hover:bg-[#00e55b] text-black font-black text-sm uppercase tracking-wider rounded-sm shadow-[0_0_25px_rgba(0,255,102,0.4)] transition-all cursor-pointer flex items-center gap-3"
+            >
+              <Trophy className="w-5 h-5" />
+              <span>Submit Quiz & Calculate Final Score</span>
+            </motion.button>
+            <span className="text-[10px] font-mono text-zinc-500 uppercase mt-2">
+              Calculates scores and saves scorecard directly to your Study Hub Dashboard
+            </span>
+          </motion.div>
         </div>
       )}
 
@@ -580,7 +684,7 @@ export default function Quiz() {
           </p>
 
           {/* Total Points Badge */}
-          <div className="my-6 p-6 bg-[#0A0A0A] border border-zinc-800 rounded-sm">
+          <div className="my-6 p-6 bg-[#0A0A0A] border border-zinc-800 rounded-sm relative overflow-hidden">
             <div className="text-[10px] font-mono text-zinc-400 uppercase tracking-wider font-bold mb-1">
               Final Earned Score
             </div>
@@ -599,8 +703,10 @@ export default function Quiz() {
               <span className="text-[10px] font-mono text-zinc-500 block mt-1">{scores.mcPointsEarned} / {scores.mcPointsTotal} PTS</span>
             </div>
             <div className="bg-[#0A0A0A] border border-zinc-800 p-4 rounded-sm text-center">
-              <span className="text-[10px] font-mono text-zinc-400 block uppercase mb-1.5 tracking-wider font-bold">Short Answer</span>
-              <div className="text-2xl font-black text-[#00FF66] tracking-tight">{scores.saCorrect} / {scores.saTotal}</div>
+              <span className="text-[10px] font-mono text-zinc-400 block uppercase mb-1.5 tracking-wider font-bold">Written Questions</span>
+              <div className="text-xl font-black text-[#00FF66] tracking-tight">
+                {scores.saFull} Full • {scores.saPartial} Partial
+              </div>
               <span className="text-[10px] font-mono text-zinc-500 block mt-1">{scores.saPointsEarned} / {scores.saPointsTotal} PTS</span>
             </div>
           </div>
@@ -626,7 +732,7 @@ export default function Quiz() {
               onClick={() => setTab("overview")}
               className="w-full py-3 bg-transparent hover:bg-zinc-900 text-zinc-400 hover:text-white font-bold text-xs uppercase tracking-wider rounded-sm transition-all cursor-pointer flex items-center justify-center gap-2"
             >
-              <span>View Scores on Dashboard</span>
+              <span>View Scores & Completed Count on Dashboard</span>
               <ArrowRight className="w-4 h-4 text-[#00FF66]" />
             </button>
           </div>
