@@ -55,6 +55,27 @@ export default function Overview() {
   const totalMcAnswered = quizScores.reduce((acc, q) => acc + (q.mcTotal || 0), 0);
   const totalSaAnswered = quizScores.reduce((acc, q) => acc + (q.saTotal || 0), 0);
 
+  // Calculate Academic Grading based on test scores and questions answered
+  const getOverallGrade = () => {
+    if (totalQuizzes === 0) {
+      return { grade: "N/A", label: "NO TESTS TAKEN", color: "text-zinc-500", badge: "NO DATA" };
+    }
+    if (avgScore >= 90) {
+      return { grade: "GRADE A+", label: "MASTERY EXCELLENT", color: "text-[#00FF66]", badge: "TOP TIER" };
+    }
+    if (avgScore >= 80) {
+      return { grade: "GRADE A", label: "EXCELLENT PERFORMANCE", color: "text-[#00FF66]", badge: "EXCELLENT" };
+    }
+    if (avgScore >= 70) {
+      return { grade: "GRADE B", label: "GOOD STANDING", color: "text-[#00FF66]", badge: "GOOD" };
+    }
+    if (avgScore >= 60) {
+      return { grade: "GRADE C", label: "SATISFACTORY", color: "text-amber-400", badge: "PASSED" };
+    }
+    return { grade: "GRADE F", label: "NEEDS STUDY", color: "text-red-400", badge: "NEEDS PRACTICE" };
+  };
+  const overallGrade = getOverallGrade();
+
   // Chat history metrics
   const chatEntries = Object.entries(chatHistory || {});
   const totalChatMessages = chatEntries.reduce((acc, [_, msgs]) => acc + (msgs?.length || 0), 0);
@@ -81,11 +102,11 @@ export default function Overview() {
     },
     {
       id: "avg-scores",
-      label: "Average Quiz Score",
-      value: totalQuizzes > 0 ? `${avgScore}%` : "N/A",
+      label: "Grading & Performance",
+      value: overallGrade.grade,
       icon: Award,
-      subtitle: totalQuizzes > 0 ? "Based on diagnostic attempts" : "No quizzes taken",
-      badge: "PROGRESS GRAPH",
+      subtitle: totalQuizzes > 0 ? `${avgScore}% Avg Score • ${totalQuestionsAnswered} Qs Solved` : "No tests taken",
+      badge: "GRADING GRAPH",
       badgeGreen: true
     },
     {
@@ -99,15 +120,15 @@ export default function Overview() {
     }
   ];
 
-  // Secondary Row Stat Cards (The 3 requested tiles below top 3)
+  // Secondary Row Stat Cards (The 3 tiles below top 3)
   const secondaryStats = [
     {
       id: "avg-scores",
-      label: "Average Test Scores",
-      value: totalQuizzes > 0 ? `${avgScore}%` : "0%",
+      label: "Grading Based on Test Scores",
+      value: overallGrade.grade,
       icon: TrendingUp,
-      subtitle: `${totalQuizzes} Test attempt${totalQuizzes === 1 ? "" : "s"} recorded`,
-      badge: "SCORE HEATMAP",
+      subtitle: `${avgScore}% Score • ${totalQuestionsAnswered} Solved Qs`,
+      badge: overallGrade.badge,
       badgeGreen: true
     },
     {
@@ -125,7 +146,7 @@ export default function Overview() {
       value: `${totalChatMessages}`,
       icon: MessageSquare,
       subtitle: `${docChatCount} Document chat session${docChatCount === 1 ? "" : "s"}`,
-      badge: "CHAT LOGS",
+      badge: "PAST CHAT LOGS",
       badgeGreen: true
     }
   ];
@@ -183,34 +204,65 @@ export default function Overview() {
                 </div>
                 <div>
                   <h3 className="font-extrabold text-lg uppercase text-white tracking-wide">
-                    Average Test Scores Analytics
+                    Grading Based on Test Scores & Questions Answered
                   </h3>
                   <p className="text-xs text-zinc-400 font-mono">
-                    Progress graph and score intensity heatmap across test attempts.
+                    Overall student academic grading computed from test scores and total questions answered.
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* Quick Stat Summary Cards */}
+            {/* Academic Grade & Performance Summary */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 font-mono">
-              <div className="bg-[#141414] p-3 rounded-sm border border-zinc-800">
+              <div className="bg-[#141414] p-3.5 rounded-sm border border-zinc-800">
+                <span className="text-[9px] text-zinc-500 uppercase font-bold block">Academic Grade</span>
+                <span className={`text-xl font-black ${overallGrade.color}`}>{overallGrade.grade}</span>
+                <span className="text-[9px] text-zinc-400 block mt-0.5 font-bold uppercase">{overallGrade.label}</span>
+              </div>
+              <div className="bg-[#141414] p-3.5 rounded-sm border border-zinc-800">
                 <span className="text-[9px] text-zinc-500 uppercase font-bold block">Average Score</span>
                 <span className="text-xl font-black text-[#00FF66]">{avgScore}%</span>
+                <span className="text-[9px] text-zinc-400 block mt-0.5 font-bold uppercase">Peak: {maxScoreVal}%</span>
               </div>
-              <div className="bg-[#141414] p-3 rounded-sm border border-zinc-800">
-                <span className="text-[9px] text-zinc-500 uppercase font-bold block">Peak Score</span>
-                <span className="text-xl font-black text-white">{totalQuizzes > 0 ? `${maxScoreVal}%` : "N/A"}</span>
+              <div className="bg-[#141414] p-3.5 rounded-sm border border-zinc-800">
+                <span className="text-[9px] text-zinc-500 uppercase font-bold block">Questions Solved</span>
+                <span className="text-xl font-black text-white">{totalQuestionsAnswered}</span>
+                <span className="text-[9px] text-zinc-400 block mt-0.5 font-bold uppercase">{totalMcAnswered} MC • {totalSaAnswered} SA</span>
               </div>
-              <div className="bg-[#141414] p-3 rounded-sm border border-zinc-800">
-                <span className="text-[9px] text-zinc-500 uppercase font-bold block">Total Tests</span>
+              <div className="bg-[#141414] p-3.5 rounded-sm border border-zinc-800">
+                <span className="text-[9px] text-zinc-500 uppercase font-bold block">Tests Attempted</span>
                 <span className="text-xl font-black text-white">{totalQuizzes}</span>
+                <span className="text-[9px] text-zinc-400 block mt-0.5 font-bold uppercase">Assessed</span>
               </div>
-              <div className="bg-[#141414] p-3 rounded-sm border border-zinc-800">
-                <span className="text-[9px] text-zinc-500 uppercase font-bold block">Mastery Rating</span>
-                <span className="text-xs font-black text-[#00FF66] uppercase mt-1 block">
-                  {avgScore >= 80 ? "EXCELLENT" : avgScore >= 60 ? "STABLE" : "NEEDS STUDY"}
-                </span>
+            </div>
+
+            {/* Grading System Criteria Box */}
+            <div className="bg-[#0B0B0B] p-4 rounded-sm border border-zinc-800 font-mono text-xs">
+              <span className="text-[10px] font-extrabold uppercase text-zinc-400 block mb-2 tracking-wider">
+                Academic Grading Scale Breakdown:
+              </span>
+              <div className="grid grid-cols-2 md:grid-cols-5 gap-2 text-[10px]">
+                <div className={`p-2 rounded-sm border ${avgScore >= 90 ? "bg-[#00FF66]/20 border-[#00FF66] text-[#00FF66]" : "bg-zinc-900/60 border-zinc-800 text-zinc-500"}`}>
+                  <strong className="block text-white">Grade A+ (90-100%)</strong>
+                  <span>Mastery Level</span>
+                </div>
+                <div className={`p-2 rounded-sm border ${avgScore >= 80 && avgScore < 90 ? "bg-[#00FF66]/20 border-[#00FF66] text-[#00FF66]" : "bg-zinc-900/60 border-zinc-800 text-zinc-500"}`}>
+                  <strong className="block text-white">Grade A (80-89%)</strong>
+                  <span>Excellent</span>
+                </div>
+                <div className={`p-2 rounded-sm border ${avgScore >= 70 && avgScore < 80 ? "bg-[#00FF66]/20 border-[#00FF66] text-[#00FF66]" : "bg-zinc-900/60 border-zinc-800 text-zinc-500"}`}>
+                  <strong className="block text-white">Grade B (70-79%)</strong>
+                  <span>Good Standing</span>
+                </div>
+                <div className={`p-2 rounded-sm border ${avgScore >= 60 && avgScore < 70 ? "bg-amber-500/20 border-amber-500 text-amber-400" : "bg-zinc-900/60 border-zinc-800 text-zinc-500"}`}>
+                  <strong className="block text-white">Grade C (60-69%)</strong>
+                  <span>Satisfactory</span>
+                </div>
+                <div className={`p-2 rounded-sm border ${avgScore < 60 && totalQuizzes > 0 ? "bg-red-500/20 border-red-500 text-red-400" : "bg-zinc-900/60 border-zinc-800 text-zinc-500"}`}>
+                  <strong className="block text-white">Grade F (&lt;60%)</strong>
+                  <span>Needs Practice</span>
+                </div>
               </div>
             </div>
 
@@ -441,10 +493,10 @@ export default function Overview() {
                 </div>
                 <div>
                   <h3 className="font-extrabold text-lg uppercase text-white tracking-wide">
-                    Chat History & Q&A Interactions
+                    Chat History & Past Conversation Logs
                   </h3>
                   <p className="text-xs text-zinc-400 font-mono">
-                    Chat message analytics and interaction logs obtained from Chat with PDF.
+                    View past chat history, message analytics, and Q&A interactions obtained from Chat with PDF.
                   </p>
                 </div>
               </div>
@@ -468,6 +520,85 @@ export default function Overview() {
                 <span className="text-[9px] text-zinc-500 uppercase font-bold block">Active Doc Chats</span>
                 <span className="text-xl font-black text-[#00FF66]">{docChatCount}</span>
               </div>
+            </div>
+
+            {/* Past Chat Conversation History Logs Viewer */}
+            <div className="bg-[#0B0B0B] p-5 rounded-sm border border-zinc-800">
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-xs font-mono font-extrabold uppercase text-zinc-300 flex items-center gap-2">
+                  <MessageSquare className="w-4 h-4 text-[#00FF66]" />
+                  Past Chat History Logs Obtained from Chat with PDF
+                </span>
+                <span className="text-[10px] font-mono text-zinc-500 uppercase font-bold">
+                  {totalChatMessages} MESSAGES LOGGED
+                </span>
+              </div>
+
+              {chatEntries.length > 0 && totalChatMessages > 0 ? (
+                <div className="space-y-6 max-h-[380px] overflow-y-auto pr-2 font-mono text-xs">
+                  {chatEntries.map(([docId, msgs]) => {
+                    if (!msgs || msgs.length === 0) return null;
+                    const doc = documents.find((d) => d.id === docId);
+                    const docName = doc ? doc.name : `Document #${docId.slice(0, 8)}`;
+
+                    return (
+                      <div key={docId} className="bg-[#141414] p-4 rounded-sm border border-zinc-800 flex flex-col gap-3">
+                        <div className="flex items-center justify-between border-b border-zinc-800 pb-2">
+                          <div className="flex items-center gap-2 min-w-0">
+                            <FileText className="w-4 h-4 text-[#00FF66] shrink-0" />
+                            <span className="font-extrabold text-white uppercase truncate text-xs" title={docName}>
+                              {docName}
+                            </span>
+                            <span className="text-[9px] bg-[#00FF66]/10 text-[#00FF66] border border-[#00FF66]/30 px-2 py-0.5 rounded-sm font-bold">
+                              {msgs.length} MSGS
+                            </span>
+                          </div>
+                          <button
+                            onClick={() => {
+                              selectDocument(docId);
+                              setActiveModal(null);
+                              setTab("chat");
+                            }}
+                            className="px-3 py-1 bg-zinc-900 hover:bg-[#00FF66] text-zinc-300 hover:text-black text-[10px] font-bold uppercase tracking-wider rounded-sm border border-zinc-800 transition-all flex items-center gap-1 cursor-pointer shrink-0"
+                          >
+                            <span>Continue Chat</span>
+                            <ArrowRight className="w-3 h-3" />
+                          </button>
+                        </div>
+
+                        {/* Conversation Messages */}
+                        <div className="space-y-2.5 max-h-52 overflow-y-auto pr-1">
+                          {msgs.map((m) => {
+                            const isUserMsg = m.role === "user";
+                            return (
+                              <div
+                                key={m.id || Math.random()}
+                                className={`p-3 rounded-sm border text-[11px] leading-relaxed ${
+                                  isUserMsg
+                                    ? "bg-[#090909] border-zinc-800 text-zinc-200"
+                                    : "bg-[#0F1D15] border-[#00FF66]/20 text-zinc-100"
+                                }`}
+                              >
+                                <div className="flex items-center justify-between text-[9px] text-zinc-500 uppercase mb-1 font-bold">
+                                  <span className={isUserMsg ? "text-zinc-400" : "text-[#00FF66]"}>
+                                    {isUserMsg ? "User Question:" : "PDF Scholar AI Answer:"}
+                                  </span>
+                                  <span>{m.timestamp || ""}</span>
+                                </div>
+                                <p className="whitespace-pre-wrap">{m.text}</p>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="py-8 text-center text-zinc-500 font-mono text-xs uppercase border border-dashed border-zinc-800 rounded-sm">
+                  No past chat history logs found. Select a PDF document and open chat to start a conversation!
+                </div>
+              )}
             </div>
 
             {/* Chat Document Distribution */}
@@ -506,35 +637,6 @@ export default function Overview() {
                   No active chat history records yet. Start chatting with a PDF document!
                 </div>
               )}
-            </div>
-
-            {/* Chat Interaction Activity Heatmap */}
-            <div className="bg-[#0B0B0B] p-5 rounded-sm border border-zinc-800">
-              <span className="text-xs font-mono font-extrabold uppercase text-zinc-300 block mb-3 flex items-center gap-2">
-                <Activity className="w-4 h-4 text-[#00FF66]" />
-                Chat Session Activity Heatmap
-              </span>
-              <div className="grid grid-cols-7 gap-2">
-                {Array.from({ length: 28 }).map((_, i) => {
-                  const entry = chatEntries[i];
-                  const count = entry ? entry[1]?.length || 0 : 0;
-                  return (
-                    <div
-                      key={i}
-                      title={entry ? `${count} Messages` : `Empty Slot ${i + 1}`}
-                      className={`h-10 rounded-sm border flex items-center justify-center font-mono text-[10px] font-bold ${
-                        count > 10
-                          ? "bg-[#00FF66]/35 border-[#00FF66] text-[#00FF66]"
-                          : count > 0
-                          ? "bg-[#00FF66]/15 border-[#00FF66]/40 text-[#00FF66]"
-                          : "bg-zinc-900/60 border-zinc-800/40 text-zinc-700"
-                      }`}
-                    >
-                      {count > 0 ? `${count} Msgs` : ""}
-                    </div>
-                  );
-                })}
-              </div>
             </div>
           </div>
         );
