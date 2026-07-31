@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useAppState } from "../lib/state-context";
 import {
   FileText,
@@ -13,11 +13,17 @@ import {
   TrendingUp,
   CheckCircle2,
   AlertCircle,
+  MessageSquare,
+  HelpCircle,
+  X,
+  BarChart2,
+  Activity,
+  ChevronRight,
   BookOpen,
   Zap,
   Target
 } from "lucide-react";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 
 export default function Overview() {
   const {
@@ -26,73 +32,100 @@ export default function Overview() {
     selectDocument,
     deleteDocument,
     setTab,
-    quizScores = []
+    quizScores = [],
+    chatHistory = {}
   } = useAppState();
+
+  const [activeModal, setActiveModal] = useState(null);
 
   const totalChunks = documents.reduce((acc, d) => acc + (d.chunkCount || 0), 0);
   const totalPages = documents.reduce((acc, d) => acc + (d.pageCount || 0), 0);
-
-  const selectedDoc = documents.find((d) => d.id === selectedDocumentId);
-
-  // Compute quiz stats
   const totalQuizzes = quizScores.length;
+
   const avgScore =
     totalQuizzes > 0
       ? Math.round(quizScores.reduce((acc, q) => acc + q.scorePercent, 0) / totalQuizzes)
       : 0;
 
+  // Questions answered breakdown
+  const totalQuestionsAnswered = quizScores.reduce((acc, q) => {
+    if (q.totalQuestions) return acc + q.totalQuestions;
+    return acc + (q.mcTotal || 0) + (q.saTotal || 0);
+  }, 0);
+  const totalMcAnswered = quizScores.reduce((acc, q) => acc + (q.mcTotal || 0), 0);
+  const totalSaAnswered = quizScores.reduce((acc, q) => acc + (q.saTotal || 0), 0);
+
+  // Chat history metrics
+  const chatEntries = Object.entries(chatHistory || {});
+  const totalChatMessages = chatEntries.reduce((acc, [_, msgs]) => acc + (msgs?.length || 0), 0);
+  const userMessageCount = chatEntries.reduce(
+    (acc, [_, msgs]) => acc + (msgs?.filter((m) => m.role === "user").length || 0),
+    0
+  );
+  const aiMessageCount = chatEntries.reduce(
+    (acc, [_, msgs]) => acc + (msgs?.filter((m) => m.role === "assistant" || m.role === "ai").length || 0),
+    0
+  );
+  const docChatCount = chatEntries.filter(([_, msgs]) => msgs && msgs.length > 0).length;
+
   // Primary Row Stat Cards (Top 3)
   const primaryStats = [
     {
+      id: "chunks",
       label: "Total Reading Segments",
       value: totalChunks,
       icon: Layers,
       subtitle: "Indexed vector sections",
-      accent: "#00FF66"
+      badge: "SEGMENT GRAPH",
+      badgeGreen: true
     },
     {
+      id: "avg-scores",
       label: "Average Quiz Score",
       value: totalQuizzes > 0 ? `${avgScore}%` : "N/A",
       icon: Award,
       subtitle: totalQuizzes > 0 ? "Based on diagnostic attempts" : "No quizzes taken",
-      accent: avgScore >= 80 ? "#00FF66" : avgScore >= 60 ? "#fbbf24" : "#f87171"
+      badge: "PROGRESS GRAPH",
+      badgeGreen: true
     },
     {
+      id: "quizzes",
       label: "Quizzes Completed",
       value: `${totalQuizzes}`,
       icon: GraduationCap,
       subtitle: "Total test assessments",
-      accent: "#00FF66"
+      badge: "TEST HEATMAP",
+      badgeGreen: true
     }
   ];
 
-  // Secondary Row Stat Cards (Added 3 tiles below top 3)
+  // Secondary Row Stat Cards (The 3 requested tiles below top 3)
   const secondaryStats = [
     {
-      label: "Active Study Target",
-      value: selectedDoc ? selectedDoc.name : "None Selected",
-      isTruncate: true,
-      icon: Target,
-      subtitle: selectedDoc
-        ? `${selectedDoc.pageCount} Pages • ${selectedDoc.chunkCount} Chunks`
-        : "Select a document below",
-      badge: selectedDoc ? "ACTIVE TARGET" : "IDLE",
-      badgeGreen: !!selectedDoc
-    },
-    {
-      label: "Ingested Study Library",
-      value: `${documents.length} File${documents.length === 1 ? "" : "s"}`,
-      icon: BookOpen,
-      subtitle: `${totalPages} Total pages indexed`,
-      badge: `${totalPages} PAGES`,
+      id: "avg-scores",
+      label: "Average Test Scores",
+      value: totalQuizzes > 0 ? `${avgScore}%` : "0%",
+      icon: TrendingUp,
+      subtitle: `${totalQuizzes} Test attempt${totalQuizzes === 1 ? "" : "s"} recorded`,
+      badge: "SCORE HEATMAP",
       badgeGreen: true
     },
     {
-      label: "AI Vector Engine",
-      value: "100% READY",
-      icon: Zap,
-      subtitle: "RAG Semantic Retrieval Active",
-      badge: "ONLINE",
+      id: "questions",
+      label: "Questions Answered",
+      value: `${totalQuestionsAnswered}`,
+      icon: CheckCircle2,
+      subtitle: `${totalMcAnswered} MC • ${totalSaAnswered} Written solved`,
+      badge: "QUESTION GRAPH",
+      badgeGreen: true
+    },
+    {
+      id: "chat-history",
+      label: "Chat History Interactions",
+      value: `${totalChatMessages}`,
+      icon: MessageSquare,
+      subtitle: `${docChatCount} Document chat session${docChatCount === 1 ? "" : "s"}`,
+      badge: "CHAT LOGS",
       badgeGreen: true
     }
   ];
@@ -105,6 +138,531 @@ export default function Overview() {
     if (score >= 60)
       return { label: "PASSED", bg: "bg-amber-500/10", border: "border-amber-500/30", text: "text-amber-400" };
     return { label: "NEEDS STUDY", bg: "bg-red-500/10", border: "border-red-500/30", text: "text-red-400" };
+  };
+
+  // Helper to render modal content for graph / heatmap view
+  const renderModalContent = (modalId) => {
+    switch (modalId) {
+      case "avg-scores": {
+        const sortedScores = quizScores.slice().reverse();
+        const maxScoreVal = Math.max(...quizScores.map((q) => q.scorePercent), 0);
+
+        // Prepare SVG line graph data points
+        const graphWidth = 500;
+        const graphHeight = 140;
+        const points = sortedScores.map((q, i) => {
+          const x = sortedScores.length > 1 ? (i / (sortedScores.length - 1)) * (graphWidth - 40) + 20 : graphWidth / 2;
+          const y = graphHeight - 20 - (q.scorePercent / 100) * (graphHeight - 40);
+          return { x, y, score: q.scorePercent, doc: q.documentName, date: q.timestamp };
+        });
+
+        const pathD =
+          points.length > 0
+            ? points.map((p, i) => `${i === 0 ? "M" : "L"} ${p.x} ${p.y}`).join(" ")
+            : "";
+        const areaD =
+          points.length > 0
+            ? `${pathD} L ${points[points.length - 1].x} ${graphHeight - 10} L ${points[0].x} ${graphHeight - 10} Z`
+            : "";
+
+        // Build 28-cell heatmap array (4 rows x 7 cols)
+        const heatmapCells = Array.from({ length: 28 }).map((_, idx) => {
+          const item = sortedScores[idx];
+          if (!item) return { status: "empty" };
+          if (item.scorePercent >= 80) return { status: "high", score: item.scorePercent, doc: item.documentName };
+          if (item.scorePercent >= 60) return { status: "mid", score: item.scorePercent, doc: item.documentName };
+          return { status: "low", score: item.scorePercent, doc: item.documentName };
+        });
+
+        return (
+          <div className="flex flex-col gap-6">
+            <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-sm bg-[#00FF66]/10 border border-[#00FF66]/30 flex items-center justify-center text-[#00FF66]">
+                  <TrendingUp className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-lg uppercase text-white tracking-wide">
+                    Average Test Scores Analytics
+                  </h3>
+                  <p className="text-xs text-zinc-400 font-mono">
+                    Progress graph and score intensity heatmap across test attempts.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Stat Summary Cards */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 font-mono">
+              <div className="bg-[#141414] p-3 rounded-sm border border-zinc-800">
+                <span className="text-[9px] text-zinc-500 uppercase font-bold block">Average Score</span>
+                <span className="text-xl font-black text-[#00FF66]">{avgScore}%</span>
+              </div>
+              <div className="bg-[#141414] p-3 rounded-sm border border-zinc-800">
+                <span className="text-[9px] text-zinc-500 uppercase font-bold block">Peak Score</span>
+                <span className="text-xl font-black text-white">{totalQuizzes > 0 ? `${maxScoreVal}%` : "N/A"}</span>
+              </div>
+              <div className="bg-[#141414] p-3 rounded-sm border border-zinc-800">
+                <span className="text-[9px] text-zinc-500 uppercase font-bold block">Total Tests</span>
+                <span className="text-xl font-black text-white">{totalQuizzes}</span>
+              </div>
+              <div className="bg-[#141414] p-3 rounded-sm border border-zinc-800">
+                <span className="text-[9px] text-zinc-500 uppercase font-bold block">Mastery Rating</span>
+                <span className="text-xs font-black text-[#00FF66] uppercase mt-1 block">
+                  {avgScore >= 80 ? "EXCELLENT" : avgScore >= 60 ? "STABLE" : "NEEDS STUDY"}
+                </span>
+              </div>
+            </div>
+
+            {/* Progress SVG Line Graph */}
+            <div className="bg-[#0B0B0B] p-5 rounded-sm border border-zinc-800">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-mono font-extrabold uppercase text-zinc-300 flex items-center gap-2">
+                  <BarChart2 className="w-4 h-4 text-[#00FF66]" />
+                  Score Performance Trend Line Graph
+                </span>
+                <span className="text-[10px] font-mono text-zinc-500 uppercase">
+                  {quizScores.length} Data Points
+                </span>
+              </div>
+
+              {points.length > 0 ? (
+                <div className="w-full overflow-x-auto">
+                  <svg className="w-full h-44" viewBox={`0 0 ${graphWidth} ${graphHeight}`}>
+                    <defs>
+                      <linearGradient id="scoreGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#00FF66" stopOpacity="0.35" />
+                        <stop offset="100%" stopColor="#00FF66" stopOpacity="0.0" />
+                      </linearGradient>
+                    </defs>
+
+                    {/* Threshold Grid Lines */}
+                    <line x1="0" y1="28" x2={graphWidth} y2="28" stroke="#00FF66" strokeOpacity="0.2" strokeDasharray="4 4" />
+                    <line x1="0" y1="68" x2={graphWidth} y2="68" stroke="#ffffff" strokeOpacity="0.1" strokeDasharray="3 3" />
+                    <line x1="0" y1="120" x2={graphWidth} y2="120" stroke="#ffffff" strokeOpacity="0.05" />
+
+                    {/* Area Fill */}
+                    {points.length > 1 && <path d={areaD} fill="url(#scoreGrad)" />}
+
+                    {/* Path Line */}
+                    {points.length > 1 && (
+                      <path d={pathD} fill="none" stroke="#00FF66" strokeWidth="2.5" strokeLinecap="round" />
+                    )}
+
+                    {/* Data Circles */}
+                    {points.map((p, i) => (
+                      <g key={i} className="group/pt cursor-pointer">
+                        <circle cx={p.x} cy={p.y} r="5" fill="#080808" stroke="#00FF66" strokeWidth="2.5" />
+                        <circle cx={p.x} cy={p.y} r="8" fill="#00FF66" fillOpacity="0.2" className="animate-ping" />
+                        <text x={p.x} y={p.y - 10} textAnchor="middle" fill="#00FF66" fontSize="10" fontWeight="bold">
+                          {p.score}%
+                        </text>
+                      </g>
+                    ))}
+                  </svg>
+                </div>
+              ) : (
+                <div className="py-8 text-center text-zinc-500 font-mono text-xs uppercase">
+                  No quiz scores logged yet. Complete a quiz to view performance graphs.
+                </div>
+              )}
+            </div>
+
+            {/* Performance Activity Heatmap */}
+            <div className="bg-[#0B0B0B] p-5 rounded-sm border border-zinc-800">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs font-mono font-extrabold uppercase text-zinc-300 flex items-center gap-2">
+                  <Activity className="w-4 h-4 text-[#00FF66]" />
+                  Diagnostic Score Intensity Heatmap
+                </span>
+                <div className="flex items-center gap-2 text-[9px] font-mono text-zinc-400">
+                  <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 bg-[#00FF66] rounded-xs" /> 80%+</span>
+                  <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 bg-amber-400 rounded-xs" /> 60-79%</span>
+                  <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 bg-red-500 rounded-xs" /> &lt;60%</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-7 gap-2">
+                {heatmapCells.map((cell, i) => (
+                  <div
+                    key={i}
+                    title={cell.doc ? `${cell.doc}: ${cell.score}%` : `Slot #${i + 1}`}
+                    className={`h-10 rounded-sm border flex items-center justify-center font-mono text-[10px] font-bold transition-all ${
+                      cell.status === "high"
+                        ? "bg-[#00FF66]/20 border-[#00FF66]/50 text-[#00FF66] shadow-[0_0_8px_rgba(0,255,102,0.2)]"
+                        : cell.status === "mid"
+                        ? "bg-amber-400/20 border-amber-400/50 text-amber-400"
+                        : cell.status === "low"
+                        ? "bg-red-500/20 border-red-500/50 text-red-400"
+                        : "bg-zinc-900/60 border-zinc-800/40 text-zinc-700"
+                    }`}
+                  >
+                    {cell.score ? `${cell.score}%` : ""}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      case "questions": {
+        const sortedScores = quizScores.slice().reverse();
+        return (
+          <div className="flex flex-col gap-6">
+            <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-sm bg-[#00FF66]/10 border border-[#00FF66]/30 flex items-center justify-center text-[#00FF66]">
+                  <CheckCircle2 className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-lg uppercase text-white tracking-wide">
+                    Questions Answered Analytics
+                  </h3>
+                  <p className="text-xs text-zinc-400 font-mono">
+                    Breakdown of Multiple Choice and Written questions answered across practice quizzes.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Stat Cards */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 font-mono">
+              <div className="bg-[#141414] p-3 rounded-sm border border-zinc-800">
+                <span className="text-[9px] text-zinc-500 uppercase font-bold block">Total Solved</span>
+                <span className="text-xl font-black text-[#00FF66]">{totalQuestionsAnswered}</span>
+              </div>
+              <div className="bg-[#141414] p-3 rounded-sm border border-zinc-800">
+                <span className="text-[9px] text-zinc-500 uppercase font-bold block">Multiple Choice</span>
+                <span className="text-xl font-black text-white">{totalMcAnswered}</span>
+              </div>
+              <div className="bg-[#141414] p-3 rounded-sm border border-zinc-800">
+                <span className="text-[9px] text-zinc-500 uppercase font-bold block">Written Questions</span>
+                <span className="text-xl font-black text-white">{totalSaAnswered}</span>
+              </div>
+              <div className="bg-[#141414] p-3 rounded-sm border border-zinc-800">
+                <span className="text-[9px] text-zinc-500 uppercase font-bold block">Accuracy Rate</span>
+                <span className="text-xl font-black text-[#00FF66]">{totalQuizzes > 0 ? `${avgScore}%` : "0%"}</span>
+              </div>
+            </div>
+
+            {/* Questions Breakdown Bar Chart */}
+            <div className="bg-[#0B0B0B] p-5 rounded-sm border border-zinc-800">
+              <span className="text-xs font-mono font-extrabold uppercase text-zinc-300 block mb-4 flex items-center gap-2">
+                <BarChart2 className="w-4 h-4 text-[#00FF66]" />
+                Questions Solved Breakdown Per Test Attempt
+              </span>
+
+              {sortedScores.length > 0 ? (
+                <div className="space-y-3 font-mono text-xs">
+                  {sortedScores.map((item, idx) => {
+                    const mc = item.mcTotal || 0;
+                    const sa = item.saTotal || 0;
+                    const total = mc + sa || 1;
+                    const mcWidth = Math.round((mc / total) * 100);
+                    const saWidth = Math.round((sa / total) * 100);
+
+                    return (
+                      <div key={item.id || idx} className="bg-[#141414] p-3 rounded-sm border border-zinc-800/80">
+                        <div className="flex items-center justify-between mb-1.5 text-[11px]">
+                          <span className="font-bold text-zinc-200 truncate max-w-[200px]" title={item.documentName}>
+                            {item.documentName}
+                          </span>
+                          <span className="text-zinc-400">
+                            {item.totalQuestions || total} Questions ({item.scorePercent}%)
+                          </span>
+                        </div>
+                        <div className="h-3 w-full bg-zinc-900 rounded-xs overflow-hidden flex">
+                          <div
+                            style={{ width: `${mcWidth}%` }}
+                            className="bg-[#00FF66] h-full"
+                            title={`MC: ${mc}`}
+                          />
+                          <div
+                            style={{ width: `${saWidth}%` }}
+                            className="bg-cyan-400 h-full"
+                            title={`Written: ${sa}`}
+                          />
+                        </div>
+                        <div className="flex items-center justify-between text-[9px] text-zinc-500 mt-1">
+                          <span>MC: <strong className="text-[#00FF66]">{item.mcCorrect}/{mc}</strong></span>
+                          <span>Written: <strong className="text-cyan-400">{item.saFull !== undefined ? item.saFull : item.saCorrect}/{sa}</strong></span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="py-8 text-center text-zinc-500 font-mono text-xs uppercase">
+                  No question logs recorded yet. Take a quiz to record stats.
+                </div>
+              )}
+            </div>
+
+            {/* Questions Solving Frequency Heatmap Grid */}
+            <div className="bg-[#0B0B0B] p-5 rounded-sm border border-zinc-800">
+              <span className="text-xs font-mono font-extrabold uppercase text-zinc-300 block mb-3 flex items-center gap-2">
+                <Activity className="w-4 h-4 text-[#00FF66]" />
+                Questions Solved Activity Heatmap
+              </span>
+              <div className="grid grid-cols-7 gap-2">
+                {Array.from({ length: 28 }).map((_, i) => {
+                  const item = sortedScores[i];
+                  const qCount = item ? item.totalQuestions || (item.mcTotal + item.saTotal) : 0;
+                  return (
+                    <div
+                      key={i}
+                      title={item ? `${item.documentName}: ${qCount} Questions` : `Empty Slot ${i + 1}`}
+                      className={`h-10 rounded-sm border flex items-center justify-center font-mono text-[10px] font-bold ${
+                        qCount > 8
+                          ? "bg-[#00FF66]/30 border-[#00FF66] text-[#00FF66]"
+                          : qCount > 0
+                          ? "bg-[#00FF66]/15 border-[#00FF66]/40 text-[#00FF66]"
+                          : "bg-zinc-900/60 border-zinc-800/40 text-zinc-700"
+                      }`}
+                    >
+                      {qCount > 0 ? `${qCount} Qs` : ""}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      case "chat-history": {
+        return (
+          <div className="flex flex-col gap-6">
+            <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-sm bg-[#00FF66]/10 border border-[#00FF66]/30 flex items-center justify-center text-[#00FF66]">
+                  <MessageSquare className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-lg uppercase text-white tracking-wide">
+                    Chat History & Q&A Interactions
+                  </h3>
+                  <p className="text-xs text-zinc-400 font-mono">
+                    Chat message analytics and interaction logs obtained from Chat with PDF.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Stat Summary Cards */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 font-mono">
+              <div className="bg-[#141414] p-3 rounded-sm border border-zinc-800">
+                <span className="text-[9px] text-zinc-500 uppercase font-bold block">Total Messages</span>
+                <span className="text-xl font-black text-[#00FF66]">{totalChatMessages}</span>
+              </div>
+              <div className="bg-[#141414] p-3 rounded-sm border border-zinc-800">
+                <span className="text-[9px] text-zinc-500 uppercase font-bold block">User Queries</span>
+                <span className="text-xl font-black text-white">{userMessageCount}</span>
+              </div>
+              <div className="bg-[#141414] p-3 rounded-sm border border-zinc-800">
+                <span className="text-[9px] text-zinc-500 uppercase font-bold block">AI Responses</span>
+                <span className="text-xl font-black text-white">{aiMessageCount}</span>
+              </div>
+              <div className="bg-[#141414] p-3 rounded-sm border border-zinc-800">
+                <span className="text-[9px] text-zinc-500 uppercase font-bold block">Active Doc Chats</span>
+                <span className="text-xl font-black text-[#00FF66]">{docChatCount}</span>
+              </div>
+            </div>
+
+            {/* Chat Document Distribution */}
+            <div className="bg-[#0B0B0B] p-5 rounded-sm border border-zinc-800">
+              <span className="text-xs font-mono font-extrabold uppercase text-zinc-300 block mb-4 flex items-center gap-2">
+                <BarChart2 className="w-4 h-4 text-[#00FF66]" />
+                Chat Messages Volume per Document
+              </span>
+
+              {chatEntries.length > 0 ? (
+                <div className="space-y-3 font-mono text-xs">
+                  {chatEntries.map(([docId, msgs]) => {
+                    const doc = documents.find((d) => d.id === docId);
+                    const docName = doc ? doc.name : `Document #${docId.slice(0, 6)}`;
+                    const msgLen = msgs?.length || 0;
+                    const maxMsgs = Math.max(...chatEntries.map(([_, m]) => m?.length || 0), 1);
+                    const widthPct = Math.round((msgLen / maxMsgs) * 100);
+
+                    return (
+                      <div key={docId} className="bg-[#141414] p-3 rounded-sm border border-zinc-800">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className="font-bold text-zinc-200 truncate max-w-[240px]" title={docName}>
+                            {docName}
+                          </span>
+                          <span className="text-[#00FF66] font-extrabold">{msgLen} Messages</span>
+                        </div>
+                        <div className="h-2.5 w-full bg-zinc-900 rounded-xs overflow-hidden">
+                          <div style={{ width: `${widthPct}%` }} className="bg-[#00FF66] h-full" />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="py-8 text-center text-zinc-500 font-mono text-xs uppercase">
+                  No active chat history records yet. Start chatting with a PDF document!
+                </div>
+              )}
+            </div>
+
+            {/* Chat Interaction Activity Heatmap */}
+            <div className="bg-[#0B0B0B] p-5 rounded-sm border border-zinc-800">
+              <span className="text-xs font-mono font-extrabold uppercase text-zinc-300 block mb-3 flex items-center gap-2">
+                <Activity className="w-4 h-4 text-[#00FF66]" />
+                Chat Session Activity Heatmap
+              </span>
+              <div className="grid grid-cols-7 gap-2">
+                {Array.from({ length: 28 }).map((_, i) => {
+                  const entry = chatEntries[i];
+                  const count = entry ? entry[1]?.length || 0 : 0;
+                  return (
+                    <div
+                      key={i}
+                      title={entry ? `${count} Messages` : `Empty Slot ${i + 1}`}
+                      className={`h-10 rounded-sm border flex items-center justify-center font-mono text-[10px] font-bold ${
+                        count > 10
+                          ? "bg-[#00FF66]/35 border-[#00FF66] text-[#00FF66]"
+                          : count > 0
+                          ? "bg-[#00FF66]/15 border-[#00FF66]/40 text-[#00FF66]"
+                          : "bg-zinc-900/60 border-zinc-800/40 text-zinc-700"
+                      }`}
+                    >
+                      {count > 0 ? `${count} Msgs` : ""}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      case "chunks": {
+        return (
+          <div className="flex flex-col gap-6">
+            <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-sm bg-[#00FF66]/10 border border-[#00FF66]/30 flex items-center justify-center text-[#00FF66]">
+                  <Layers className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-lg uppercase text-white tracking-wide">
+                    Reading Segments & Vector Index
+                  </h3>
+                  <p className="text-xs text-zinc-400 font-mono">
+                    Distribution of indexed document sections and pages across study materials.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-3 font-mono">
+              <div className="bg-[#141414] p-3 rounded-sm border border-zinc-800">
+                <span className="text-[9px] text-zinc-500 uppercase font-bold block">Total Chunks</span>
+                <span className="text-xl font-black text-[#00FF66]">{totalChunks}</span>
+              </div>
+              <div className="bg-[#141414] p-3 rounded-sm border border-zinc-800">
+                <span className="text-[9px] text-zinc-500 uppercase font-bold block">Total Pages</span>
+                <span className="text-xl font-black text-white">{totalPages}</span>
+              </div>
+              <div className="bg-[#141414] p-3 rounded-sm border border-zinc-800">
+                <span className="text-[9px] text-zinc-500 uppercase font-bold block">Documents</span>
+                <span className="text-xl font-black text-white">{documents.length}</span>
+              </div>
+            </div>
+
+            <div className="bg-[#0B0B0B] p-5 rounded-sm border border-zinc-800">
+              <span className="text-xs font-mono font-extrabold uppercase text-zinc-300 block mb-4 flex items-center gap-2">
+                <BarChart2 className="w-4 h-4 text-[#00FF66]" />
+                Vector Chunks per Document
+              </span>
+              <div className="space-y-3 font-mono text-xs">
+                {documents.map((doc) => {
+                  const maxChunks = Math.max(...documents.map((d) => d.chunkCount || 0), 1);
+                  const widthPct = Math.round(((doc.chunkCount || 0) / maxChunks) * 100);
+                  return (
+                    <div key={doc.id} className="bg-[#141414] p-3 rounded-sm border border-zinc-800">
+                      <div className="flex items-center justify-between mb-1.5">
+                        <span className="font-bold text-zinc-200 truncate max-w-[240px]" title={doc.name}>
+                          {doc.name}
+                        </span>
+                        <span className="text-[#00FF66] font-bold">{doc.chunkCount} Chunks</span>
+                      </div>
+                      <div className="h-2.5 w-full bg-zinc-900 rounded-xs overflow-hidden">
+                        <div style={{ width: `${widthPct}%` }} className="bg-[#00FF66] h-full" />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      case "quizzes": {
+        return (
+          <div className="flex flex-col gap-6">
+            <div className="flex items-center justify-between border-b border-zinc-800 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-sm bg-[#00FF66]/10 border border-[#00FF66]/30 flex items-center justify-center text-[#00FF66]">
+                  <GraduationCap className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-lg uppercase text-white tracking-wide">
+                    Quiz Assessments & Attempt History
+                  </h3>
+                  <p className="text-xs text-zinc-400 font-mono">
+                    Log of completed test assessments and practice quiz frequency.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 font-mono">
+              <div className="bg-[#141414] p-3 rounded-sm border border-zinc-800">
+                <span className="text-[9px] text-zinc-500 uppercase font-bold block">Quizzes Completed</span>
+                <span className="text-xl font-black text-[#00FF66]">{totalQuizzes}</span>
+              </div>
+              <div className="bg-[#141414] p-3 rounded-sm border border-zinc-800">
+                <span className="text-[9px] text-zinc-500 uppercase font-bold block">Average Score</span>
+                <span className="text-xl font-black text-white">{avgScore}%</span>
+              </div>
+            </div>
+
+            <div className="bg-[#0B0B0B] p-5 rounded-sm border border-zinc-800">
+              <span className="text-xs font-mono font-extrabold uppercase text-zinc-300 block mb-4 flex items-center gap-2">
+                <Activity className="w-4 h-4 text-[#00FF66]" />
+                Attempt Frequency & Recent Results
+              </span>
+              <div className="space-y-3 font-mono text-xs">
+                {quizScores.map((scoreItem) => (
+                  <div key={scoreItem.id} className="bg-[#141414] p-3 rounded-sm border border-zinc-800 flex items-center justify-between">
+                    <div>
+                      <span className="font-bold text-zinc-200 block text-xs" title={scoreItem.documentName}>
+                        {scoreItem.documentName}
+                      </span>
+                      <span className="text-[10px] text-zinc-500">
+                        {new Date(scoreItem.timestamp).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <span className="text-sm font-black text-[#00FF66] bg-[#00FF66]/10 border border-[#00FF66]/30 px-3 py-1 rounded-sm">
+                      {scoreItem.scorePercent}%
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      default:
+        return null;
+    }
   };
 
   return (
@@ -120,7 +678,9 @@ export default function Overview() {
       >
         <div>
           <div className="flex items-center gap-2.5 mb-2">
-            <span className="text-[10px] font-mono tracking-wider uppercase text-zinc-400">PDF Scholar Engine</span>
+            <span className="text-[10px] font-mono tracking-wider uppercase text-zinc-400">
+              <span className="text-[#00FF66] font-bold">PDF</span> Scholar Engine
+            </span>
             <span className="bg-[#00FF66]/10 text-[#00FF66] border border-[#00FF66]/20 text-[9px] font-black px-2.5 py-0.5 rounded-sm uppercase tracking-wider flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-none bg-[#00FF66] animate-pulse" />
               Vector AI Ready
@@ -128,7 +688,7 @@ export default function Overview() {
           </div>
           <h2 className="text-xs font-mono tracking-wider uppercase text-zinc-400">Study Hub Dashboard</h2>
         </div>
-        
+
         <div className="flex items-center gap-3">
           <motion.button
             whileHover={{ scale: 1.02 }}
@@ -157,54 +717,24 @@ export default function Overview() {
         </h1>
       </motion.section>
 
-      {/* Grid of Stats Cards: 3 Top Tiles + 3 Added Tiles Below */}
+      {/* Grid of Stats Cards: 3 Top Tiles + 3 Clickable Tiles Below */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
         className="space-y-5 mb-10 relative z-10"
       >
-        {/* Row 1: Primary 3 Tiles */}
+        {/* Row 1: Primary 3 Clickable Tiles */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {primaryStats.map((stat, i) => {
+          {primaryStats.map((stat) => {
             const Icon = stat.icon;
             return (
               <motion.div
-                key={`primary-${i}`}
-                whileHover={{ y: -2, borderColor: "#00FF66" }}
-                className="bg-[#101010] p-6 rounded-sm border border-zinc-800/80 flex flex-col justify-between shadow-xl relative overflow-hidden group transition-all h-36"
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-[10px] font-mono font-bold uppercase text-zinc-400 tracking-wider">
-                    {stat.label}
-                  </span>
-                  <div className="w-8 h-8 rounded-sm bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 group-hover:text-[#00FF66] group-hover:border-[#00FF66]/40 transition-colors">
-                    <Icon className="w-4 h-4" />
-                  </div>
-                </div>
-
-                <div>
-                  <div className="text-3xl md:text-4xl font-black tracking-tight text-white leading-none">
-                    {stat.value}
-                  </div>
-                  <div className="text-[10px] font-mono text-zinc-500 mt-2 uppercase tracking-wider">
-                    {stat.subtitle}
-                  </div>
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
-
-        {/* Row 2: Added 3 Tiles Below Three Tiles */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {secondaryStats.map((stat, i) => {
-            const Icon = stat.icon;
-            return (
-              <motion.div
-                key={`secondary-${i}`}
-                whileHover={{ y: -2, borderColor: "#00FF66" }}
-                className="bg-[#101010] p-6 rounded-sm border border-zinc-800/80 flex flex-col justify-between shadow-xl relative overflow-hidden group transition-all h-36"
+                key={`primary-${stat.id}`}
+                whileHover={{ y: -3, borderColor: "#00FF66" }}
+                whileTap={{ scale: 0.99 }}
+                onClick={() => setActiveModal(stat.id)}
+                className="bg-[#101010] p-6 rounded-sm border border-zinc-800/80 flex flex-col justify-between shadow-xl relative overflow-hidden group transition-all h-36 cursor-pointer"
               >
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-[10px] font-mono font-bold uppercase text-zinc-400 tracking-wider">
@@ -212,13 +742,7 @@ export default function Overview() {
                   </span>
                   <div className="flex items-center gap-2">
                     {stat.badge && (
-                      <span
-                        className={`text-[9px] font-mono font-bold px-2 py-0.5 rounded-sm uppercase tracking-wider border ${
-                          stat.badgeGreen
-                            ? "bg-[#00FF66]/10 text-[#00FF66] border-[#00FF66]/30"
-                            : "bg-zinc-900 text-zinc-400 border-zinc-800"
-                        }`}
-                      >
+                      <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-sm uppercase tracking-wider border bg-[#00FF66]/10 text-[#00FF66] border-[#00FF66]/30">
                         {stat.badge}
                       </span>
                     )}
@@ -229,16 +753,58 @@ export default function Overview() {
                 </div>
 
                 <div>
-                  <div
-                    className={`text-xl md:text-2xl font-black tracking-tight text-white leading-none ${
-                      stat.isTruncate ? "truncate" : ""
-                    }`}
-                    title={typeof stat.value === "string" ? stat.value : undefined}
-                  >
+                  <div className="text-3xl md:text-4xl font-black tracking-tight text-white leading-none">
                     {stat.value}
                   </div>
-                  <div className="text-[10px] font-mono text-zinc-500 mt-2 uppercase tracking-wider truncate">
-                    {stat.subtitle}
+                  <div className="text-[10px] font-mono text-zinc-500 mt-2 uppercase tracking-wider flex items-center justify-between">
+                    <span>{stat.subtitle}</span>
+                    <span className="text-[#00FF66] font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5">
+                      View Graph <ChevronRight className="w-3 h-3" />
+                    </span>
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        {/* Row 2: Added 3 Requested Clickable Tiles Below Three Tiles */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {secondaryStats.map((stat) => {
+            const Icon = stat.icon;
+            return (
+              <motion.div
+                key={`secondary-${stat.id}`}
+                whileHover={{ y: -3, borderColor: "#00FF66" }}
+                whileTap={{ scale: 0.99 }}
+                onClick={() => setActiveModal(stat.id)}
+                className="bg-[#101010] p-6 rounded-sm border border-zinc-800/80 flex flex-col justify-between shadow-xl relative overflow-hidden group transition-all h-36 cursor-pointer"
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[10px] font-mono font-bold uppercase text-zinc-400 tracking-wider">
+                    {stat.label}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    {stat.badge && (
+                      <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-sm uppercase tracking-wider border bg-[#00FF66]/10 text-[#00FF66] border-[#00FF66]/30">
+                        {stat.badge}
+                      </span>
+                    )}
+                    <div className="w-8 h-8 rounded-sm bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 group-hover:text-[#00FF66] group-hover:border-[#00FF66]/40 transition-colors">
+                      <Icon className="w-4 h-4" />
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="text-2xl md:text-3xl font-black tracking-tight text-white leading-none">
+                    {stat.value}
+                  </div>
+                  <div className="text-[10px] font-mono text-zinc-500 mt-2 uppercase tracking-wider flex items-center justify-between truncate">
+                    <span className="truncate">{stat.subtitle}</span>
+                    <span className="text-[#00FF66] font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5 shrink-0 ml-2">
+                      View Graph <ChevronRight className="w-3 h-3" />
+                    </span>
                   </div>
                 </div>
               </motion.div>
@@ -555,6 +1121,38 @@ export default function Overview() {
           </div>
         </div>
       </section>
+
+      {/* Interactive Analytics Graph & Heatmap Modal */}
+      <AnimatePresence>
+        {activeModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setActiveModal(null)}
+            className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 md:p-8"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-[#101010] border border-zinc-800 rounded-sm w-full max-w-3xl max-h-[85vh] overflow-y-auto shadow-2xl p-6 md:p-8 relative text-white flex flex-col gap-6"
+            >
+              {/* Close Button */}
+              <button
+                onClick={() => setActiveModal(null)}
+                className="absolute top-6 right-6 p-2 text-zinc-400 hover:text-white bg-zinc-900 border border-zinc-800 hover:border-zinc-700 rounded-sm transition-colors cursor-pointer"
+                title="Close Window"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              {renderModalContent(activeModal)}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

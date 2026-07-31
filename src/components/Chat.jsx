@@ -187,7 +187,7 @@ export default function Chat() {
                     {/* Speaker Label */}
                     <div className="flex items-center gap-2 text-[10px] font-mono text-zinc-500 uppercase px-1 tracking-wider">
                       {isUser ? <User className="w-3 h-3 text-zinc-400" /> : <Bot className="w-3 h-3 text-[#00FF66]" />}
-                      <span>{isUser ? "You" : "PDF Scholar AI"}</span>
+                      <span>{isUser ? "You" : <span><strong className="text-[#00FF66]">PDF</strong> Scholar AI</span>}</span>
                       <span>•</span>
                       <span>{msg.timestamp}</span>
                     </div>

@@ -107,7 +107,7 @@ export default function Auth() {
           </motion.div>
           
           <h1 className="text-3xl font-black tracking-tight text-white leading-none">
-            PDF Scholar <span className="text-[#00FF66] drop-shadow-[0_0_15px_rgba(0,255,102,0.4)]">Hub</span>
+            <span className="text-[#00FF66] drop-shadow-[0_0_15px_rgba(0,255,102,0.4)]">PDF</span> Scholar <span className="text-[#00FF66] drop-shadow-[0_0_15px_rgba(0,255,102,0.4)]">Hub</span>
           </h1>
           <p className="text-xs text-zinc-400 font-mono uppercase tracking-wider mt-2.5">
             Your AI Research Companion
@@ -250,7 +250,7 @@ export default function Auth() {
             className="text-xs font-bold text-zinc-400 hover:text-[#00FF66] uppercase tracking-wider transition-colors inline-flex items-center gap-1.5"
           >
             <Zap className="w-3.5 h-3.5 text-[#00FF66]" />
-            {isLogin ? "New to PDF Scholar? Create an account" : "Already have an account? Sign In"}
+            {isLogin ? <span>New to <strong className="text-[#00FF66]">PDF</strong> Scholar? Create an account</span> : <span>Already have an account? Sign In</span>}
           </motion.button>
         </div>
       </motion.div>
