@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useAppState } from "../lib/state-context";
-import { GraduationCap, BookOpen, Loader2, Lock, User, Key, ArrowRight, ShieldCheck, Zap } from "lucide-react";
+import { GraduationCap, Loader2, Lock, User, Key, ArrowRight, ShieldCheck, Zap } from "lucide-react";
 import VectorAIIcon from "./VectorAIIcon";
+import PDFScholarLogo from "./PDFScholarLogo";
 import { motion, AnimatePresence } from "motion/react";
 
 export default function Auth() {
@@ -102,7 +103,7 @@ export default function Auth() {
             whileHover={{ scale: 1.05 }}
             className="w-14 h-14 rounded-sm bg-[#00FF66]/10 border border-[#00FF66]/20 flex items-center justify-center text-[#00FF66] mb-4 shadow-[0_0_20px_rgba(0,255,102,0.15)]"
           >
-            <BookOpen className="w-7 h-7" />
+            <PDFScholarLogo className="w-7 h-7 text-[#00FF66]" />
           </motion.div>
           
           <h1 className="flex items-center justify-center gap-2 font-black text-3xl tracking-tight leading-none">

@@ -10,9 +10,9 @@ import {
   Cloud,
   LogOut,
   ChevronLeft,
-  ChevronRight,
-  Sparkles
+  ChevronRight
 } from "lucide-react";
+import PDFScholarLogo from "./PDFScholarLogo";
 import { motion, AnimatePresence } from "motion/react";
 
 export default function Sidebar() {
@@ -46,46 +46,71 @@ export default function Sidebar() {
       id="sidebar-container"
     >
       {/* Brand Header & Collapse Toggle */}
-      <div className={`p-4 ${isCollapsed ? "py-6" : "p-6"} border-b border-zinc-800/80 flex items-center justify-between bg-[#090909]`}>
-        <div className="flex items-center gap-3 min-w-0">
-          <motion.div
-            whileHover={{ scale: 1.05 }}
-            onClick={() => isCollapsed && setIsCollapsed(false)}
-            className="w-9 h-9 rounded-sm bg-[#00FF66]/10 border border-[#00FF66]/20 flex items-center justify-center text-[#00FF66] shrink-0 cursor-pointer shadow-[0_0_12px_rgba(0,255,102,0.15)]"
-            title="PDF Scholar Hub"
-          >
-            <BookOpen className="w-4 h-4" />
-          </motion.div>
-
-          {!isCollapsed && (
+      <div
+        className={`border-b border-zinc-800/80 bg-[#090909] ${
+          isCollapsed ? "py-5 px-2 flex flex-col items-center gap-3" : "p-6 flex items-center justify-between"
+        }`}
+      >
+        {isCollapsed ? (
+          <>
+            {/* Collapsed Logo */}
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="min-w-0"
+              whileHover={{ scale: 1.05 }}
+              onClick={() => setIsCollapsed(false)}
+              className="w-10 h-10 rounded-sm bg-[#00FF66]/10 border border-[#00FF66]/20 flex items-center justify-center text-[#00FF66] shrink-0 cursor-pointer shadow-[0_0_12px_rgba(0,255,102,0.15)]"
+              title="Expand PDF Scholar Hub"
             >
-              <div className="flex items-center gap-1.5 font-black text-xl tracking-tight leading-none">
-                <span className="text-[#00FF66] drop-shadow-[0_0_12px_rgba(0,255,102,0.35)]">PDF</span>
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-zinc-100 to-zinc-400">
-                  Scholar Hub
-                </span>
-              </div>
-              <div className="flex items-center gap-1.5 text-[9px] font-mono tracking-wider text-zinc-500 uppercase mt-1">
-                <span className="w-1.5 h-1.5 rounded-none bg-[#00FF66] animate-pulse" />
-                Vector AI Active
-              </div>
+              <PDFScholarLogo className="w-5 h-5 text-[#00FF66]" />
             </motion.div>
-          )}
-        </div>
 
-        {/* Collapse Toggle Button */}
-        <button
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="p-1.5 bg-zinc-900 hover:bg-[#00FF66] text-zinc-400 hover:text-black border border-zinc-800 hover:border-[#00FF66] rounded-sm transition-all cursor-pointer shrink-0"
-          title={isCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
-        >
-          {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-        </button>
+            {/* Collapsed Expand Toggle Button */}
+            <button
+              onClick={() => setIsCollapsed(false)}
+              className="w-8 h-8 bg-zinc-900 hover:bg-[#00FF66] text-zinc-400 hover:text-black border border-zinc-800 hover:border-[#00FF66] rounded-sm transition-all flex items-center justify-center cursor-pointer shrink-0"
+              title="Expand Sidebar"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </>
+        ) : (
+          <>
+            <div className="flex items-center gap-3 min-w-0">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                className="w-9 h-9 rounded-sm bg-[#00FF66]/10 border border-[#00FF66]/20 flex items-center justify-center text-[#00FF66] shrink-0 shadow-[0_0_12px_rgba(0,255,102,0.15)]"
+              >
+                <PDFScholarLogo className="w-5 h-5 text-[#00FF66]" />
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="min-w-0"
+              >
+                <div className="flex items-center gap-1.5 font-black text-xl tracking-tight leading-none">
+                  <span className="text-[#00FF66] drop-shadow-[0_0_12px_rgba(0,255,102,0.35)]">PDF</span>
+                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-zinc-100 to-zinc-400">
+                    Scholar Hub
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5 text-[9px] font-mono tracking-wider text-zinc-500 uppercase mt-1">
+                  <span className="w-1.5 h-1.5 rounded-none bg-[#00FF66] animate-pulse" />
+                  Vector AI Active
+                </div>
+              </motion.div>
+            </div>
+
+            {/* Expanded Collapse Toggle Button */}
+            <button
+              onClick={() => setIsCollapsed(true)}
+              className="p-1.5 bg-zinc-900 hover:bg-[#00FF66] text-zinc-400 hover:text-black border border-zinc-800 hover:border-[#00FF66] rounded-sm transition-all cursor-pointer shrink-0"
+              title="Collapse Sidebar"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+          </>
+        )}
       </div>
 
       {/* Main Navigation */}
