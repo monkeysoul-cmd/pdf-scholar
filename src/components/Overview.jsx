@@ -102,11 +102,11 @@ export default function Overview() {
     },
     {
       id: "avg-scores",
-      label: "Grading & Performance",
-      value: overallGrade.grade,
+      label: "Average Quiz Score",
+      value: totalQuizzes > 0 ? `${avgScore}%` : "N/A",
       icon: Award,
-      subtitle: totalQuizzes > 0 ? `${avgScore}% Avg Score • ${totalQuestionsAnswered} Qs Solved` : "No tests taken",
-      badge: "GRADING GRAPH",
+      subtitle: totalQuizzes > 0 ? "Based on diagnostic attempts" : "No quizzes taken",
+      badge: "SCORE GRAPH",
       badgeGreen: true
     },
     {

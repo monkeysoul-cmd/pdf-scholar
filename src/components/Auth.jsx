@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useAppState } from "../lib/state-context";
-import { GraduationCap, Loader2, Lock, User, Key, ArrowRight, Sparkles, ShieldCheck, Zap } from "lucide-react";
+import { GraduationCap, BookOpen, Loader2, Lock, User, Key, ArrowRight, Sparkles, ShieldCheck, Zap } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 
 export default function Auth() {
