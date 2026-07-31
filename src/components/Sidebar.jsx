@@ -5,7 +5,6 @@ import {
   UploadCloud,
   GraduationCap,
   MessageSquare,
-  HelpCircle,
   FileText,
   Trash2,
   Cloud,
@@ -31,7 +30,6 @@ export default function Sidebar() {
     { id: "upload", label: "Upload PDF", icon: UploadCloud },
     { id: "quiz", label: "Practice Quiz", icon: GraduationCap, disabled: !selectedDocumentId },
     { id: "chat", label: "Chat with PDF", icon: MessageSquare, disabled: !selectedDocumentId },
-    { id: "guide", label: "How to Use", icon: HelpCircle },
   ];
 
   const activeDoc = documents.find(d => d.id === selectedDocumentId);

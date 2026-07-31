@@ -96,20 +96,21 @@ export default function Auth() {
         </div>
 
         {/* Brand Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-8 flex flex-col items-center">
           <motion.div
-            whileHover={{ scale: 1.05, rotate: 3 }}
-            whileTap={{ scale: 0.95 }}
-            className="w-16 h-16 bg-[#161616] border border-zinc-800 text-[#00FF66] rounded-sm flex items-center justify-center mx-auto mb-4 shadow-xl relative group"
+            whileHover={{ scale: 1.05 }}
+            className="w-14 h-14 rounded-sm bg-[#00FF66]/10 border border-[#00FF66]/20 flex items-center justify-center text-[#00FF66] mb-4 shadow-[0_0_20px_rgba(0,255,102,0.15)]"
           >
-            <div className="absolute inset-0 bg-[#00FF66]/10 rounded-sm blur-md group-hover:bg-[#00FF66]/20 transition-all" />
-            <GraduationCap className="w-9 h-9 relative z-10" />
+            <BookOpen className="w-7 h-7" />
           </motion.div>
           
-          <h1 className="text-3xl font-black tracking-tight text-white leading-none">
-            <span className="text-[#00FF66] drop-shadow-[0_0_15px_rgba(0,255,102,0.4)]">PDF</span> Scholar <span className="text-[#00FF66] drop-shadow-[0_0_15px_rgba(0,255,102,0.4)]">Hub</span>
+          <h1 className="flex items-center justify-center gap-2 font-black text-3xl tracking-tight leading-none">
+            <span className="text-[#00FF66] drop-shadow-[0_0_15px_rgba(0,255,102,0.4)]">PDF</span>
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-zinc-100 to-zinc-400">
+              Scholar Hub
+            </span>
           </h1>
-          <p className="text-xs text-zinc-400 font-mono uppercase tracking-wider mt-2.5">
+          <p className="text-xs text-zinc-400 font-mono uppercase tracking-wider mt-3">
             Your AI Research Companion
           </p>
         </div>
