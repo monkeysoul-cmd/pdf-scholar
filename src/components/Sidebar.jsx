@@ -40,15 +40,18 @@ export default function Sidebar() {
     <aside className="w-80 bg-[#0B0B0B] text-white border-r border-zinc-800/80 flex flex-col h-full select-none relative z-20 shadow-2xl" id="sidebar-container">
       {/* Brand Header */}
       <div className="p-7 border-b border-zinc-800/80 flex flex-col gap-1.5 bg-[#090909]">
-        <div className="logo font-black text-xl tracking-tight text-[#00FF66] flex items-center gap-2.5">
+        <div className="logo font-black text-xl tracking-tight flex items-center gap-2.5">
           <motion.div
             whileHover={{ scale: 1.05 }}
             className="w-8 h-8 rounded-sm bg-[#00FF66]/10 border border-[#00FF66]/20 flex items-center justify-center text-[#00FF66]"
           >
             <BookOpen className="w-4 h-4" />
           </motion.div>
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-zinc-100 to-zinc-400">
-            PDF Scholar Hub
+          <span className="flex items-center gap-1.5 font-black text-xl tracking-tight">
+            <span className="text-[#00FF66] drop-shadow-[0_0_12px_rgba(0,255,102,0.35)]">PDF</span>
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-zinc-100 to-zinc-400">
+              Scholar Hub
+            </span>
           </span>
         </div>
         <div className="flex items-center gap-1.5 text-[10px] font-mono tracking-wider text-zinc-500 uppercase mt-1">
