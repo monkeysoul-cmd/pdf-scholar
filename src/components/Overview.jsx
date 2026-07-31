@@ -58,21 +58,69 @@ export default function Overview() {
   // Calculate Academic Grading based on test scores and questions answered
   const getOverallGrade = () => {
     if (totalQuizzes === 0) {
-      return { grade: "N/A", label: "NO TESTS TAKEN", color: "text-zinc-500", badge: "NO DATA" };
+      return {
+        grade: "N/A",
+        label: "NO TESTS TAKEN",
+        color: "text-zinc-500",
+        badge: "NO DATA",
+        bg: "bg-zinc-900/60",
+        border: "border-zinc-800",
+        shadow: ""
+      };
     }
     if (avgScore >= 90) {
-      return { grade: "GRADE A+", label: "MASTERY EXCELLENT", color: "text-[#00FF66]", badge: "TOP TIER" };
+      return {
+        grade: "GRADE A+",
+        label: "MASTERY EXCELLENT",
+        color: "text-[#00FF66]",
+        badge: "TOP TIER",
+        bg: "bg-[#00FF66]/15",
+        border: "border-[#00FF66]/40",
+        shadow: "shadow-[0_0_15px_rgba(0,255,102,0.25)]"
+      };
     }
     if (avgScore >= 80) {
-      return { grade: "GRADE A", label: "EXCELLENT PERFORMANCE", color: "text-[#00FF66]", badge: "EXCELLENT" };
+      return {
+        grade: "GRADE A",
+        label: "EXCELLENT PERFORMANCE",
+        color: "text-[#00FF66]",
+        badge: "EXCELLENT",
+        bg: "bg-[#00FF66]/10",
+        border: "border-[#00FF66]/30",
+        shadow: "shadow-[0_0_10px_rgba(0,255,102,0.2)]"
+      };
     }
     if (avgScore >= 70) {
-      return { grade: "GRADE B", label: "GOOD STANDING", color: "text-[#00FF66]", badge: "GOOD" };
+      return {
+        grade: "GRADE B",
+        label: "GOOD STANDING",
+        color: "text-emerald-400",
+        badge: "GOOD",
+        bg: "bg-emerald-500/10",
+        border: "border-emerald-500/30",
+        shadow: "shadow-[0_0_10px_rgba(16,185,129,0.2)]"
+      };
     }
     if (avgScore >= 60) {
-      return { grade: "GRADE C", label: "SATISFACTORY", color: "text-amber-400", badge: "PASSED" };
+      return {
+        grade: "GRADE C",
+        label: "SATISFACTORY",
+        color: "text-amber-400",
+        badge: "PASSED",
+        bg: "bg-amber-500/10",
+        border: "border-amber-500/30",
+        shadow: "shadow-[0_0_10px_rgba(245,158,11,0.2)]"
+      };
     }
-    return { grade: "GRADE F", label: "NEEDS STUDY", color: "text-red-400", badge: "NEEDS PRACTICE" };
+    return {
+      grade: "GRADE F",
+      label: "NEEDS STUDY",
+      color: "text-red-400",
+      badge: "NEEDS PRACTICE",
+      bg: "bg-red-500/10",
+      border: "border-red-500/30",
+      shadow: "shadow-[0_0_10px_rgba(239,68,68,0.2)]"
+    };
   };
   const overallGrade = getOverallGrade();
 
@@ -126,6 +174,7 @@ export default function Overview() {
       id: "avg-scores",
       label: "Grading Based on Test Scores",
       value: overallGrade.grade,
+      isGrade: true,
       icon: TrendingUp,
       subtitle: `${avgScore}% Score • ${totalQuestionsAnswered} Solved Qs`,
       badge: overallGrade.badge,
@@ -899,9 +948,18 @@ export default function Overview() {
                 </div>
 
                 <div>
-                  <div className="text-2xl md:text-3xl font-black tracking-tight text-white leading-none">
-                    {stat.value}
-                  </div>
+                  {stat.isGrade ? (
+                    <div className="flex items-center gap-2">
+                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-sm text-lg md:text-xl font-black uppercase tracking-wide border ${overallGrade.bg} ${overallGrade.border} ${overallGrade.color} ${overallGrade.shadow}`}>
+                        <span className="w-2 h-2 rounded-full bg-current animate-pulse" />
+                        {stat.value}
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="text-2xl md:text-3xl font-black tracking-tight text-white leading-none">
+                      {stat.value}
+                    </div>
+                  )}
                   <div className="text-[10px] font-mono text-zinc-500 mt-2 uppercase tracking-wider flex items-center justify-between truncate">
                     <span className="truncate">{stat.subtitle}</span>
                     <span className="text-[#00FF66] font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5 shrink-0 ml-2">
