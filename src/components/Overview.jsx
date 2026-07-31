@@ -12,7 +12,10 @@ import {
   GraduationCap,
   TrendingUp,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  BookOpen,
+  Zap,
+  Target
 } from "lucide-react";
 import { motion } from "motion/react";
 
@@ -26,37 +29,89 @@ export default function Overview() {
     quizScores = []
   } = useAppState();
 
-  const totalChunks = documents.reduce((acc, d) => acc + d.chunkCount, 0);
+  const totalChunks = documents.reduce((acc, d) => acc + (d.chunkCount || 0), 0);
+  const totalPages = documents.reduce((acc, d) => acc + (d.pageCount || 0), 0);
 
-  const formatBytes = (bytes) => {
-    if (bytes === 0) return "0 Bytes";
-    const k = 1024;
-    const sizes = ["Bytes", "KB", "MB"];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
-  };
+  const selectedDoc = documents.find((d) => d.id === selectedDocumentId);
 
   // Compute quiz stats
   const totalQuizzes = quizScores.length;
-  const avgScore = totalQuizzes > 0
-    ? Math.round(quizScores.reduce((acc, q) => acc + q.scorePercent, 0) / totalQuizzes)
-    : 0;
+  const avgScore =
+    totalQuizzes > 0
+      ? Math.round(quizScores.reduce((acc, q) => acc + q.scorePercent, 0) / totalQuizzes)
+      : 0;
 
-  const stats = [
-    { label: "Total Reading Segments", value: totalChunks, icon: Layers, subtitle: "Indexed sections" },
-    { label: "Average Quiz Score", value: totalQuizzes > 0 ? `${avgScore}%` : "N/A", icon: Award, subtitle: totalQuizzes > 0 ? "Based on test attempts" : "No quizzes taken" },
-    { label: "Quizzes Completed", value: `${totalQuizzes}`, icon: GraduationCap, subtitle: "Total test assessments" },
+  // Primary Row Stat Cards (Top 3)
+  const primaryStats = [
+    {
+      label: "Total Reading Segments",
+      value: totalChunks,
+      icon: Layers,
+      subtitle: "Indexed vector sections",
+      accent: "#00FF66"
+    },
+    {
+      label: "Average Quiz Score",
+      value: totalQuizzes > 0 ? `${avgScore}%` : "N/A",
+      icon: Award,
+      subtitle: totalQuizzes > 0 ? "Based on diagnostic attempts" : "No quizzes taken",
+      accent: avgScore >= 80 ? "#00FF66" : avgScore >= 60 ? "#fbbf24" : "#f87171"
+    },
+    {
+      label: "Quizzes Completed",
+      value: `${totalQuizzes}`,
+      icon: GraduationCap,
+      subtitle: "Total test assessments",
+      accent: "#00FF66"
+    }
+  ];
+
+  // Secondary Row Stat Cards (Added 3 tiles below top 3)
+  const secondaryStats = [
+    {
+      label: "Active Study Target",
+      value: selectedDoc ? selectedDoc.name : "None Selected",
+      isTruncate: true,
+      icon: Target,
+      subtitle: selectedDoc
+        ? `${selectedDoc.pageCount} Pages • ${selectedDoc.chunkCount} Chunks`
+        : "Select a document below",
+      badge: selectedDoc ? "ACTIVE TARGET" : "IDLE",
+      badgeGreen: !!selectedDoc
+    },
+    {
+      label: "Ingested Study Library",
+      value: `${documents.length} File${documents.length === 1 ? "" : "s"}`,
+      icon: BookOpen,
+      subtitle: `${totalPages} Total pages indexed`,
+      badge: `${totalPages} PAGES`,
+      badgeGreen: true
+    },
+    {
+      label: "AI Vector Engine",
+      value: "100% READY",
+      icon: Zap,
+      subtitle: "RAG Semantic Retrieval Active",
+      badge: "ONLINE",
+      badgeGreen: true
+    }
   ];
 
   const getScoreBadge = (score) => {
-    if (score === 100) return { label: "PERFECT", bg: "bg-[#00FF66]/10", border: "border-[#00FF66]/30", text: "text-[#00FF66]" };
-    if (score >= 80) return { label: "EXCELLENT", bg: "bg-[#00FF66]/10", border: "border-[#00FF66]/30", text: "text-[#00FF66]" };
-    if (score >= 60) return { label: "PASSED", bg: "bg-amber-500/10", border: "border-amber-500/30", text: "text-amber-400" };
+    if (score === 100)
+      return { label: "PERFECT", bg: "bg-[#00FF66]/10", border: "border-[#00FF66]/30", text: "text-[#00FF66]" };
+    if (score >= 80)
+      return { label: "EXCELLENT", bg: "bg-[#00FF66]/10", border: "border-[#00FF66]/30", text: "text-[#00FF66]" };
+    if (score >= 60)
+      return { label: "PASSED", bg: "bg-amber-500/10", border: "border-amber-500/30", text: "text-amber-400" };
     return { label: "NEEDS STUDY", bg: "bg-red-500/10", border: "border-red-500/30", text: "text-red-400" };
   };
 
   return (
-    <div className="flex-1 p-8 md:p-12 overflow-y-auto min-h-0 flex flex-col bg-[#080808] text-white select-none relative" id="overview-view">
+    <div
+      className="flex-1 p-8 md:p-12 overflow-y-auto min-h-0 flex flex-col bg-[#080808] text-white select-none relative"
+      id="overview-view"
+    >
       {/* Upper Header */}
       <motion.div
         initial={{ opacity: 0, y: -15 }}
@@ -79,7 +134,7 @@ export default function Overview() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => setTab("upload")}
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#00FF66] hover:bg-[#00e55b] text-black text-xs font-extrabold uppercase tracking-wider rounded-sm transition-all shadow-[0_0_15px_rgba(0,255,102,0.2)]"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#00FF66] hover:bg-[#00e55b] text-black text-xs font-extrabold uppercase tracking-wider rounded-sm transition-all shadow-[0_0_15px_rgba(0,255,102,0.2)] cursor-pointer"
           >
             <Plus className="w-4 h-4 text-black" />
             <span>Upload PDF</span>
@@ -92,51 +147,104 @@ export default function Overview() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="mb-10 relative z-10"
+        className="mb-8 relative z-10"
       >
-        <h1 className="text-4xl md:text-6xl font-black tracking-tight leading-none uppercase text-white">
+        <h1 className="text-4xl md:text-5xl font-black tracking-tight leading-none uppercase text-white">
           Study Hub <br />
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-zinc-400 via-zinc-500 to-zinc-700">
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-zinc-300 via-zinc-400 to-zinc-600">
             Dashboard
           </span>
         </h1>
       </motion.section>
 
-      {/* Stats Cards (Boxy Design) */}
+      {/* Grid of Stats Cards: 3 Top Tiles + 3 Added Tiles Below */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
-        className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-10 relative z-10"
+        className="space-y-5 mb-10 relative z-10"
       >
-        {stats.map((stat, i) => {
-          const Icon = stat.icon;
-          return (
-            <motion.div
-              key={i}
-              whileHover={{ y: -2, borderColor: "#00FF66" }}
-              className="bg-[#101010] p-6 rounded-sm border border-zinc-800/80 flex flex-col justify-between shadow-xl relative overflow-hidden group transition-all"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-[10px] font-mono font-bold uppercase text-zinc-400 tracking-wider">
-                  {stat.label}
-                </span>
-                <div className="w-8 h-8 rounded-sm bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 group-hover:text-[#00FF66] group-hover:border-[#00FF66]/40 transition-colors">
-                  <Icon className="w-4 h-4" />
+        {/* Row 1: Primary 3 Tiles */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {primaryStats.map((stat, i) => {
+            const Icon = stat.icon;
+            return (
+              <motion.div
+                key={`primary-${i}`}
+                whileHover={{ y: -2, borderColor: "#00FF66" }}
+                className="bg-[#101010] p-6 rounded-sm border border-zinc-800/80 flex flex-col justify-between shadow-xl relative overflow-hidden group transition-all h-36"
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[10px] font-mono font-bold uppercase text-zinc-400 tracking-wider">
+                    {stat.label}
+                  </span>
+                  <div className="w-8 h-8 rounded-sm bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 group-hover:text-[#00FF66] group-hover:border-[#00FF66]/40 transition-colors">
+                    <Icon className="w-4 h-4" />
+                  </div>
                 </div>
-              </div>
 
-              <div>
-                <div className="text-4xl md:text-5xl font-black tracking-tight text-white leading-none">
-                  {stat.value}
+                <div>
+                  <div className="text-3xl md:text-4xl font-black tracking-tight text-white leading-none">
+                    {stat.value}
+                  </div>
+                  <div className="text-[10px] font-mono text-zinc-500 mt-2 uppercase tracking-wider">
+                    {stat.subtitle}
+                  </div>
                 </div>
-                <div className="text-[10px] font-mono text-zinc-500 mt-2 uppercase tracking-wider">
-                  {stat.subtitle}
+              </motion.div>
+            );
+          })}
+        </div>
+
+        {/* Row 2: Added 3 Tiles Below Three Tiles */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+          {secondaryStats.map((stat, i) => {
+            const Icon = stat.icon;
+            return (
+              <motion.div
+                key={`secondary-${i}`}
+                whileHover={{ y: -2, borderColor: "#00FF66" }}
+                className="bg-[#101010] p-6 rounded-sm border border-zinc-800/80 flex flex-col justify-between shadow-xl relative overflow-hidden group transition-all h-36"
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[10px] font-mono font-bold uppercase text-zinc-400 tracking-wider">
+                    {stat.label}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    {stat.badge && (
+                      <span
+                        className={`text-[9px] font-mono font-bold px-2 py-0.5 rounded-sm uppercase tracking-wider border ${
+                          stat.badgeGreen
+                            ? "bg-[#00FF66]/10 text-[#00FF66] border-[#00FF66]/30"
+                            : "bg-zinc-900 text-zinc-400 border-zinc-800"
+                        }`}
+                      >
+                        {stat.badge}
+                      </span>
+                    )}
+                    <div className="w-8 h-8 rounded-sm bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-400 group-hover:text-[#00FF66] group-hover:border-[#00FF66]/40 transition-colors">
+                      <Icon className="w-4 h-4" />
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </motion.div>
-          );
-        })}
+
+                <div>
+                  <div
+                    className={`text-xl md:text-2xl font-black tracking-tight text-white leading-none ${
+                      stat.isTruncate ? "truncate" : ""
+                    }`}
+                    title={typeof stat.value === "string" ? stat.value : undefined}
+                  >
+                    {stat.value}
+                  </div>
+                  <div className="text-[10px] font-mono text-zinc-500 mt-2 uppercase tracking-wider truncate">
+                    {stat.subtitle}
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
       </motion.div>
 
       {/* Quiz Test Scores & Performance Section */}
@@ -172,11 +280,16 @@ export default function Overview() {
                 >
                   <div>
                     <div className="flex items-center justify-between gap-2 mb-2">
-                      <span className={`text-[9px] font-mono font-black px-2 py-0.5 rounded-sm uppercase border ${badge.bg} ${badge.border} ${badge.text}`}>
+                      <span
+                        className={`text-[9px] font-mono font-black px-2 py-0.5 rounded-sm uppercase border ${badge.bg} ${badge.border} ${badge.text}`}
+                      >
                         {badge.label} • {item.scorePercent}%
                       </span>
                       <span className="text-[9px] font-mono text-zinc-500 uppercase">
-                        {new Date(item.timestamp).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                        {new Date(item.timestamp).toLocaleDateString(undefined, {
+                          month: "short",
+                          day: "numeric"
+                        })}
                       </span>
                     </div>
 
@@ -186,14 +299,23 @@ export default function Overview() {
                   </div>
 
                   <div className="bg-[#121212] p-3 rounded-sm border border-zinc-800/60 font-mono text-[10px] flex items-center justify-between gap-1">
-                    <span className="text-zinc-400">MC: <strong className="text-white">{item.mcCorrect}/{item.mcTotal}</strong></span>
+                    <span className="text-zinc-400">
+                      MC: <strong className="text-white">{item.mcCorrect}/{item.mcTotal}</strong>
+                    </span>
                     <span className="text-zinc-600">•</span>
                     <span className="text-zinc-400" title="Written Questions Credit">
-                      Written: <strong className="text-white">{item.saFull !== undefined ? `${item.saFull} Full${item.saPartial ? `, ${item.saPartial} Part` : ""}` : `${item.saCorrect}/${item.saTotal}`}</strong>
+                      Written:{" "}
+                      <strong className="text-white">
+                        {item.saFull !== undefined
+                          ? `${item.saFull} Full${item.saPartial ? `, ${item.saPartial} Part` : ""}`
+                          : `${item.saCorrect}/${item.saTotal}`}
+                      </strong>
                     </span>
                     <span className="text-zinc-600">•</span>
                     <span className="text-[#00FF66] font-bold">
-                      {item.earnedPoints !== undefined ? `${item.earnedPoints}/${item.totalPoints} PTS` : `${item.totalCorrect}/${item.totalQuestions}`}
+                      {item.earnedPoints !== undefined
+                        ? `${item.earnedPoints}/${item.totalPoints} PTS`
+                        : `${item.totalCorrect}/${item.totalQuestions}`}
                     </span>
                   </div>
 
@@ -225,7 +347,7 @@ export default function Overview() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={() => setTab("quiz")}
-                className="px-5 py-2.5 bg-[#00FF66] hover:bg-[#00e55b] text-black text-xs font-black uppercase tracking-wider rounded-sm transition-all"
+                className="px-5 py-2.5 bg-[#00FF66] hover:bg-[#00e55b] text-black text-xs font-black uppercase tracking-wider rounded-sm transition-all cursor-pointer"
               >
                 Start Practice Quiz
               </motion.button>
@@ -271,29 +393,34 @@ export default function Overview() {
               <tbody className="divide-y divide-zinc-800/60 text-xs">
                 {documents.map((doc) => {
                   const isSelected = doc.id === selectedDocumentId;
-                  const docScores = quizScores.filter(s => s.documentId === doc.id);
+                  const docScores = quizScores.filter((s) => s.documentId === doc.id);
                   const latestScore = docScores.length > 0 ? docScores[0] : null;
 
                   return (
                     <motion.tr
                       key={doc.id}
                       whileHover={{ backgroundColor: "rgba(255, 255, 255, 0.02)" }}
-                      className={`transition-colors ${
-                        isSelected ? "bg-[#00FF66]/5" : ""
-                      }`}
+                      className={`transition-colors ${isSelected ? "bg-[#00FF66]/5" : ""}`}
                     >
                       {/* Doc name & active label */}
                       <td className="py-4 px-6">
                         <div className="flex items-center gap-3 max-w-md">
-                          <div className={`w-8 h-8 rounded-sm flex items-center justify-center shrink-0 ${
-                            isSelected ? "bg-[#00FF66]/10 text-[#00FF66] border border-[#00FF66]/30" : "bg-zinc-900 text-zinc-500"
-                          }`}>
+                          <div
+                            className={`w-8 h-8 rounded-sm flex items-center justify-center shrink-0 ${
+                              isSelected
+                                ? "bg-[#00FF66]/10 text-[#00FF66] border border-[#00FF66]/30"
+                                : "bg-zinc-900 text-zinc-500"
+                            }`}
+                          >
                             <FileText className="w-4 h-4" />
                           </div>
                           <div className="min-w-0">
-                            <span className={`font-bold uppercase tracking-wide truncate block text-xs ${
-                              isSelected ? "text-[#00FF66]" : "text-zinc-200"
-                            }`} title={doc.name}>
+                            <span
+                              className={`font-bold uppercase tracking-wide truncate block text-xs ${
+                                isSelected ? "text-[#00FF66]" : "text-zinc-200"
+                              }`}
+                              title={doc.name}
+                            >
                               {doc.name}
                             </span>
                             {isSelected && (
@@ -327,7 +454,11 @@ export default function Overview() {
                       <td className="py-4 px-6 font-mono uppercase text-xs">
                         {latestScore ? (
                           <span className="inline-flex items-center gap-1.5 bg-[#00FF66]/10 text-[#00FF66] border border-[#00FF66]/30 px-2.5 py-1 rounded-sm font-bold text-[10px]">
-                            {latestScore.scorePercent}% ({latestScore.earnedPoints !== undefined ? `${latestScore.earnedPoints}/${latestScore.totalPoints} PTS` : `${latestScore.totalCorrect}/${latestScore.totalQuestions}`})
+                            {latestScore.scorePercent}% (
+                            {latestScore.earnedPoints !== undefined
+                              ? `${latestScore.earnedPoints}/${latestScore.totalPoints} PTS`
+                              : `${latestScore.totalCorrect}/${latestScore.totalQuestions}`}
+                            )
                           </span>
                         ) : (
                           <span className="text-zinc-500 text-[10px]">No Quiz Taken</span>
@@ -342,7 +473,7 @@ export default function Overview() {
                               whileHover={{ scale: 1.02 }}
                               whileTap={{ scale: 0.98 }}
                               onClick={() => setTab("chat")}
-                              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#00FF66] hover:bg-[#00e55b] text-black text-[10px] font-extrabold uppercase tracking-wide rounded-sm transition-all shadow-[0_0_12px_rgba(0,255,102,0.2)]"
+                              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#00FF66] hover:bg-[#00e55b] text-black text-[10px] font-extrabold uppercase tracking-wide rounded-sm transition-all shadow-[0_0_12px_rgba(0,255,102,0.2)] cursor-pointer"
                             >
                               <span>Open Chat</span>
                               <ArrowRight className="w-3 h-3" />
@@ -352,7 +483,7 @@ export default function Overview() {
                               whileHover={{ scale: 1.02 }}
                               whileTap={{ scale: 0.98 }}
                               onClick={() => selectDocument(doc.id)}
-                              className="px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700/60 text-zinc-200 hover:text-white text-[10px] font-extrabold uppercase tracking-wide rounded-sm transition-colors"
+                              className="px-3.5 py-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700/60 text-zinc-200 hover:text-white text-[10px] font-extrabold uppercase tracking-wide rounded-sm transition-colors cursor-pointer"
                             >
                               Open
                             </motion.button>
@@ -361,7 +492,7 @@ export default function Overview() {
                             whileHover={{ scale: 1.1, color: "#ef4444" }}
                             whileTap={{ scale: 0.9 }}
                             onClick={() => deleteDocument(doc.id)}
-                            className="p-1.5 text-zinc-500 hover:text-red-400 transition-colors"
+                            className="p-1.5 text-zinc-500 hover:text-red-400 transition-colors cursor-pointer"
                             title="Delete Target"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -387,7 +518,7 @@ export default function Overview() {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => setTab("upload")}
-              className="px-6 py-3 bg-[#00FF66] hover:bg-[#00e55b] text-black text-xs font-black uppercase tracking-wider rounded-sm transition-all shadow-[0_0_20px_rgba(0,255,102,0.25)]"
+              className="px-6 py-3 bg-[#00FF66] hover:bg-[#00e55b] text-black text-xs font-black uppercase tracking-wider rounded-sm transition-all shadow-[0_0_20px_rgba(0,255,102,0.25)] cursor-pointer"
             >
               Upload PDF File
             </motion.button>
@@ -395,20 +526,32 @@ export default function Overview() {
         )}
       </motion.div>
 
-      {/* Stepper Process Footer */}
+      {/* Stepper Process Footer with Green "4. Ready to Study" */}
       <section className="mt-auto border-t border-zinc-800/80 pt-8 relative z-10">
         <div className="stepper grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
           <div className="step border-t-2 border-[#00FF66] pt-3">
-            <div className="step-label text-[10px] font-mono font-bold text-[#00FF66] uppercase tracking-wider">1. Read Document</div>
+            <div className="step-label text-[10px] font-mono font-bold text-[#00FF66] uppercase tracking-wider flex items-center gap-1.5">
+              <CheckCircle2 className="w-3.5 h-3.5 text-[#00FF66]" />
+              1. Read Document
+            </div>
           </div>
           <div className="step border-t-2 border-[#00FF66] pt-3">
-            <div className="step-label text-[10px] font-mono font-bold text-[#00FF66] uppercase tracking-wider">2. Process Sections</div>
+            <div className="step-label text-[10px] font-mono font-bold text-[#00FF66] uppercase tracking-wider flex items-center gap-1.5">
+              <CheckCircle2 className="w-3.5 h-3.5 text-[#00FF66]" />
+              2. Process Sections
+            </div>
           </div>
           <div className="step border-t-2 border-[#00FF66] pt-3">
-            <div className="step-label text-[10px] font-mono font-bold text-[#00FF66] uppercase tracking-wider">3. Vector Analysis</div>
+            <div className="step-label text-[10px] font-mono font-bold text-[#00FF66] uppercase tracking-wider flex items-center gap-1.5">
+              <CheckCircle2 className="w-3.5 h-3.5 text-[#00FF66]" />
+              3. Vector Analysis
+            </div>
           </div>
-          <div className="step border-t-2 border-zinc-800 pt-3">
-            <div className="step-label text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-wider">4. Ready to Study</div>
+          <div className="step border-t-2 border-[#00FF66] pt-3">
+            <div className="step-label text-[10px] font-mono font-bold text-[#00FF66] uppercase tracking-wider flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-none bg-[#00FF66] animate-pulse shadow-[0_0_8px_#00FF66]" />
+              4. Ready to Study
+            </div>
           </div>
         </div>
       </section>
