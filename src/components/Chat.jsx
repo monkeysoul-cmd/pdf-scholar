@@ -10,10 +10,9 @@ import {
   ChevronUp,
   AlertTriangle,
   Info,
-  Sparkles,
-  Bot,
   User
 } from "lucide-react";
+import VectorAIIcon from "./VectorAIIcon";
 import { motion, AnimatePresence } from "motion/react";
 
 export default function Chat() {
@@ -143,7 +142,7 @@ export default function Chat() {
               animate={{ scale: 1, opacity: 1 }}
               className="w-16 h-16 bg-zinc-900 border border-zinc-800 text-[#00FF66] rounded-sm flex items-center justify-center mb-5 shadow-xl"
             >
-              <Sparkles className="w-8 h-8" />
+              <VectorAIIcon className="w-8 h-8 text-[#00FF66]" />
             </motion.div>
             <h4 className="font-extrabold text-white text-base uppercase tracking-wider">Discuss Your Document</h4>
             <p className="text-zinc-400 text-xs mt-2 max-w-xs font-mono uppercase leading-relaxed">
@@ -186,7 +185,7 @@ export default function Chat() {
                   >
                     {/* Speaker Label */}
                     <div className="flex items-center gap-2 text-[10px] font-mono text-zinc-500 uppercase px-1 tracking-wider">
-                      {isUser ? <User className="w-3 h-3 text-zinc-400" /> : <Bot className="w-3 h-3 text-[#00FF66]" />}
+                      {isUser ? <User className="w-3 h-3 text-zinc-400" /> : <VectorAIIcon className="w-3.5 h-3.5 text-[#00FF66]" />}
                       <span>{isUser ? "You" : <span><strong className="text-[#00FF66]">PDF</strong> Scholar AI</span>}</span>
                       <span>•</span>
                       <span>{msg.timestamp}</span>

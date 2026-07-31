@@ -9,9 +9,9 @@ import {
   Layers,
   Cloud,
   Smile,
-  Sparkles,
   ArrowRight
 } from "lucide-react";
+import VectorAIIcon from "./VectorAIIcon";
 import { motion, AnimatePresence } from "motion/react";
 
 export default function Upload() {
@@ -144,7 +144,7 @@ export default function Upload() {
         {/* Header */}
         <div className="text-center mb-9">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-sm bg-[#00FF66]/10 border border-[#00FF66]/20 text-[#00FF66] text-[10px] font-mono font-bold uppercase tracking-wider mb-3">
-            <Sparkles className="w-3 h-3" /> Vector Ingestion Engine
+            <VectorAIIcon className="w-3 h-3 text-[#00FF66]" /> Vector Ingestion Engine
           </div>
           <h2 className="text-2xl md:text-3xl font-black tracking-tight text-white uppercase">
             Add Study Document

@@ -7,7 +7,6 @@ import {
   Layers,
   ArrowRight,
   Plus,
-  Sparkles,
   Award,
   GraduationCap,
   TrendingUp,
@@ -23,6 +22,7 @@ import {
   Zap,
   Target
 } from "lucide-react";
+import VectorAIIcon from "./VectorAIIcon";
 import { motion, AnimatePresence } from "motion/react";
 
 export default function Overview() {
@@ -1092,7 +1092,7 @@ export default function Overview() {
         <div className="p-6 border-b border-zinc-800/80 flex items-center justify-between bg-[#141414]/50">
           <div>
             <h3 className="font-extrabold text-white text-base uppercase tracking-wider flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-[#00FF66]" />
+              <VectorAIIcon className="w-4 h-4 text-[#00FF66]" />
               My Study Materials
             </h3>
             <p className="text-[11px] text-zinc-400 mt-1 uppercase font-mono">

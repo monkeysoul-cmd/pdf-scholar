@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useAppState } from "../lib/state-context";
-import { GraduationCap, BookOpen, Loader2, Lock, User, Key, ArrowRight, Sparkles, ShieldCheck, Zap } from "lucide-react";
+import { GraduationCap, BookOpen, Loader2, Lock, User, Key, ArrowRight, ShieldCheck, Zap } from "lucide-react";
+import VectorAIIcon from "./VectorAIIcon";
 import { motion, AnimatePresence } from "motion/react";
 
 export default function Auth() {
@@ -87,8 +88,8 @@ export default function Auth() {
 
         {/* Feature Badges */}
         <div className="flex items-center justify-center gap-2 mb-6">
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-sm bg-[#00FF66]/10 border border-[#00FF66]/20 text-[#00FF66] text-[10px] font-mono font-medium uppercase tracking-wider">
-            <Sparkles className="w-3 h-3" /> AI Academic RAG
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-sm bg-[#00FF66]/10 border border-[#00FF66]/20 text-[#00FF66] text-[10px] font-mono font-medium uppercase tracking-wider">
+            <VectorAIIcon className="w-3 h-3 text-[#00FF66]" /> Vector Academic RAG
           </span>
           <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-sm bg-zinc-800/60 border border-zinc-700/50 text-zinc-400 text-[10px] font-mono font-medium uppercase tracking-wider">
             <ShieldCheck className="w-3 h-3 text-emerald-400" /> Vector Secured
