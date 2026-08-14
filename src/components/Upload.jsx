@@ -9,9 +9,9 @@ import {
   Layers,
   Cloud,
   Smile,
-  Sparkles,
   ArrowRight
 } from "lucide-react";
+import VectorAIIcon from "./VectorAIIcon";
 import { motion, AnimatePresence } from "motion/react";
 
 export default function Upload() {
@@ -135,18 +135,18 @@ export default function Upload() {
   };
 
   return (
-    <div className="flex-1 p-8 bg-[#080808] overflow-y-auto min-h-0 flex flex-col items-center justify-center relative select-none" id="upload-view">
+    <div className="flex-1 pt-16 md:pt-0 px-4 sm:px-8 pb-8 bg-[#080808] overflow-y-auto min-h-0 flex flex-col items-center justify-center relative select-none" id="upload-view">
       <motion.div
         initial={{ opacity: 0, y: 25, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
-        className="max-w-2xl w-full bg-[#101010] border border-zinc-800/80 rounded-sm p-8 md:p-12 shadow-2xl relative z-10 my-auto overflow-hidden"
+        className="max-w-2xl w-full bg-[#101010] border border-zinc-800/80 rounded-sm p-6 sm:p-8 md:p-12 shadow-2xl relative z-10 my-auto overflow-hidden"
       >
         {/* Header */}
         <div className="text-center mb-9">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-sm bg-[#00FF66]/10 border border-[#00FF66]/20 text-[#00FF66] text-[10px] font-mono font-bold uppercase tracking-wider mb-3">
-            <Sparkles className="w-3 h-3" /> Vector Ingestion Engine
+            <VectorAIIcon className="w-3 h-3 text-[#00FF66]" /> Vector Ingestion Engine
           </div>
-          <h2 className="text-2xl md:text-3xl font-black tracking-tight text-white uppercase">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-white uppercase">
             Add Study Document
           </h2>
           <p className="text-xs text-zinc-400 max-w-md mx-auto uppercase font-mono mt-2">
@@ -164,7 +164,7 @@ export default function Upload() {
             onDragLeave={handleDrag}
             onDrop={handleDrop}
             onClick={triggerFileSelect}
-            className={`border-2 border-dashed rounded-sm p-12 text-center cursor-pointer transition-all ${
+            className={`border-2 border-dashed rounded-sm p-6 sm:p-10 md:p-12 text-center cursor-pointer transition-all ${
               dragActive
                 ? "border-[#00FF66] bg-[#00FF66]/10 shadow-[0_0_30px_rgba(0,255,102,0.15)]"
                 : "border-zinc-800 hover:border-[#00FF66]/60 hover:bg-zinc-900/60"

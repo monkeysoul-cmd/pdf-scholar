@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useAppState } from "../lib/state-context";
-import { GraduationCap, Loader2, Lock, User, Key, ArrowRight, Sparkles, ShieldCheck, Zap } from "lucide-react";
+import { GraduationCap, Loader2, Lock, User, Key, ArrowRight, ShieldCheck, Zap } from "lucide-react";
+import VectorAIIcon from "./VectorAIIcon";
+import PDFScholarLogo from "./PDFScholarLogo";
 import { motion, AnimatePresence } from "motion/react";
 
 export default function Auth() {
@@ -57,7 +59,7 @@ export default function Auth() {
           y: [-20, 20, -20],
         }}
         transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute top-1/4 left-1/4 w-[450px] h-[450px] bg-[#00FF66]/10 rounded-full blur-[120px] pointer-events-none"
+        className="absolute top-1/4 left-1/4 w-[200px] h-[200px] sm:w-[350px] sm:h-[350px] md:w-[450px] md:h-[450px] bg-[#00FF66]/10 rounded-full blur-[80px] sm:blur-[120px] pointer-events-none"
       />
       <motion.div
         animate={{
@@ -67,7 +69,7 @@ export default function Auth() {
           y: [20, -20, 20],
         }}
         transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[140px] pointer-events-none"
+        className="absolute bottom-1/4 right-1/4 w-[200px] h-[200px] sm:w-[350px] sm:h-[350px] md:w-[500px] md:h-[500px] bg-emerald-600/10 rounded-full blur-[80px] sm:blur-[140px] pointer-events-none"
       />
 
       {/* Subtle Background Mesh Grid */}
@@ -80,15 +82,15 @@ export default function Auth() {
         initial={{ opacity: 0, y: 30, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-        className="max-w-md w-full bg-[#0F0F0F]/90 backdrop-blur-2xl border border-zinc-800/80 rounded-sm p-8 md:p-10 shadow-[0_0_50px_rgba(0,0,0,0.8)] relative z-10 my-auto overflow-hidden"
+        className="max-w-md w-full bg-[#0F0F0F]/90 backdrop-blur-2xl border border-zinc-800/80 rounded-sm p-6 sm:p-8 md:p-10 shadow-[0_0_50px_rgba(0,0,0,0.8)] relative z-10 my-auto overflow-hidden"
       >
         {/* Top border accent */}
         <div className="absolute inset-x-0 top-0 h-[1px] bg-gradient-to-r from-transparent via-[#00FF66]/50 to-transparent" />
 
         {/* Feature Badges */}
         <div className="flex items-center justify-center gap-2 mb-6">
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-sm bg-[#00FF66]/10 border border-[#00FF66]/20 text-[#00FF66] text-[10px] font-mono font-medium uppercase tracking-wider">
-            <Sparkles className="w-3 h-3" /> AI Academic RAG
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-sm bg-[#00FF66]/10 border border-[#00FF66]/20 text-[#00FF66] text-[10px] font-mono font-medium uppercase tracking-wider">
+            <VectorAIIcon className="w-3 h-3 text-[#00FF66]" /> Vector Academic RAG
           </span>
           <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-sm bg-zinc-800/60 border border-zinc-700/50 text-zinc-400 text-[10px] font-mono font-medium uppercase tracking-wider">
             <ShieldCheck className="w-3 h-3 text-emerald-400" /> Vector Secured
@@ -96,20 +98,21 @@ export default function Auth() {
         </div>
 
         {/* Brand Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-8 flex flex-col items-center">
           <motion.div
-            whileHover={{ scale: 1.05, rotate: 3 }}
-            whileTap={{ scale: 0.95 }}
-            className="w-16 h-16 bg-[#161616] border border-zinc-800 text-[#00FF66] rounded-sm flex items-center justify-center mx-auto mb-4 shadow-xl relative group"
+            whileHover={{ scale: 1.05 }}
+            className="w-14 h-14 rounded-sm bg-[#00FF66]/10 border border-[#00FF66]/20 flex items-center justify-center text-[#00FF66] mb-4 shadow-[0_0_20px_rgba(0,255,102,0.15)]"
           >
-            <div className="absolute inset-0 bg-[#00FF66]/10 rounded-sm blur-md group-hover:bg-[#00FF66]/20 transition-all" />
-            <GraduationCap className="w-9 h-9 relative z-10" />
+            <PDFScholarLogo className="w-7 h-7 text-[#00FF66]" />
           </motion.div>
           
-          <h1 className="text-3xl font-black tracking-tight text-white leading-none">
-            PDF Scholar <span className="text-[#00FF66] drop-shadow-[0_0_15px_rgba(0,255,102,0.4)]">Hub</span>
+          <h1 className="flex items-center justify-center gap-2 font-black text-3xl tracking-tight leading-none">
+            <span className="text-[#00FF66] drop-shadow-[0_0_15px_rgba(0,255,102,0.4)]">PDF</span>
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-zinc-100 to-zinc-400">
+              Scholar Hub
+            </span>
           </h1>
-          <p className="text-xs text-zinc-400 font-mono uppercase tracking-wider mt-2.5">
+          <p className="text-xs text-zinc-400 font-mono uppercase tracking-wider mt-3">
             Your AI Research Companion
           </p>
         </div>
@@ -250,7 +253,7 @@ export default function Auth() {
             className="text-xs font-bold text-zinc-400 hover:text-[#00FF66] uppercase tracking-wider transition-colors inline-flex items-center gap-1.5"
           >
             <Zap className="w-3.5 h-3.5 text-[#00FF66]" />
-            {isLogin ? "New to PDF Scholar? Create an account" : "Already have an account? Sign In"}
+            {isLogin ? <span>New to <strong className="text-[#00FF66]">PDF</strong> Scholar? Create an account</span> : <span>Already have an account? Sign In</span>}
           </motion.button>
         </div>
       </motion.div>

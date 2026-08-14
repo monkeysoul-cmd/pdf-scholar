@@ -5,7 +5,6 @@ import Overview from "./components/Overview";
 import Upload from "./components/Upload";
 import Quiz from "./components/Quiz";
 import Chat from "./components/Chat";
-import Guide from "./components/Guide";
 import Auth from "./components/Auth";
 import { motion, AnimatePresence } from "motion/react";
 
@@ -36,7 +35,6 @@ function AppContent() {
             {activeTab === "upload" && <Upload />}
             {activeTab === "quiz" && <Quiz />}
             {activeTab === "chat" && <Chat />}
-            {activeTab === "guide" && <Guide />}
           </motion.div>
         </AnimatePresence>
       </main>

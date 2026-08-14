@@ -8,7 +8,6 @@ import {
   RotateCcw,
   BookOpen,
   BrainCircuit,
-  Sparkles,
   CheckCircle2,
   XCircle,
   Trophy,
@@ -19,6 +18,7 @@ import {
   Send,
   HelpCircle
 } from "lucide-react";
+import VectorAIIcon from "./VectorAIIcon";
 import { motion, AnimatePresence } from "motion/react";
 
 export default function Quiz() {
@@ -212,7 +212,7 @@ export default function Quiz() {
 
   if (!selectedDocumentId) {
     return (
-      <div className="flex-1 p-8 bg-[#080808] flex flex-col justify-center items-center min-h-0 select-none" id="quiz-view">
+      <div className="flex-1 pt-16 md:pt-0 px-4 sm:px-8 bg-[#080808] flex flex-col justify-center items-center min-h-0 select-none" id="quiz-view">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -234,12 +234,12 @@ export default function Quiz() {
   const answeredCount = quizQuestions.length - unansweredCount;
 
   return (
-    <div className="flex-1 p-8 bg-[#080808] overflow-y-auto min-h-0 select-none relative" id="quiz-view">
+    <div className="flex-1 pt-14 md:pt-0 px-4 sm:px-6 md:px-8 pb-8 bg-[#080808] overflow-y-auto min-h-0 select-none relative" id="quiz-view">
       {/* Header */}
       <div className="mb-8 border-b border-zinc-800/80 pb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-black tracking-tight text-white uppercase flex items-center gap-2.5">
-            <Sparkles className="w-5 h-5 text-[#00FF66]" />
+          <h2 className="text-lg sm:text-2xl font-black tracking-tight text-white uppercase flex items-center gap-2.5">
+            <VectorAIIcon className="w-5 h-5 text-[#00FF66]" />
             Practice Quiz & Evaluation
           </h2>
           <p className="text-xs text-[#00FF66] font-mono uppercase mt-1">
@@ -357,7 +357,7 @@ export default function Quiz() {
               className="w-full py-4 bg-[#00FF66] hover:bg-[#00e55b] text-black font-black text-xs uppercase tracking-wider rounded-sm transition-all shadow-[0_0_20px_rgba(0,255,102,0.25)] flex items-center justify-center gap-2 cursor-pointer"
             >
               <span>Generate {questionCount} Question Quiz</span>
-              <Sparkles className="w-4 h-4 text-black" />
+              <VectorAIIcon className="w-4 h-4 text-black" />
             </motion.button>
           </div>
         </motion.div>

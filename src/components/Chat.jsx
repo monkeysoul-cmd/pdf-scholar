@@ -10,10 +10,9 @@ import {
   ChevronUp,
   AlertTriangle,
   Info,
-  Sparkles,
-  Bot,
   User
 } from "lucide-react";
+import VectorAIIcon from "./VectorAIIcon";
 import { motion, AnimatePresence } from "motion/react";
 
 export default function Chat() {
@@ -89,7 +88,7 @@ export default function Chat() {
 
   if (!selectedDocumentId) {
     return (
-      <div className="flex-1 p-8 bg-[#080808] flex flex-col items-center justify-center min-h-0 relative select-none" id="chat-view">
+      <div className="flex-1 pt-16 md:pt-0 px-4 sm:px-8 bg-[#080808] flex flex-col items-center justify-center min-h-0 relative select-none" id="chat-view">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -108,15 +107,15 @@ export default function Chat() {
   }
 
   return (
-    <div className="flex-1 bg-[#080808] flex flex-col min-h-0 h-full select-none relative" id="chat-view">
+    <div className="flex-1 bg-[#080808] flex flex-col min-h-0 h-full select-none relative pt-14 md:pt-0" id="chat-view">
       {/* Thread Header */}
-      <div className="p-4 px-6 bg-[#0E0E0E] border-b border-zinc-800/80 flex items-center justify-between shadow-md shrink-0 z-10">
+      <div className="p-3 sm:p-4 px-4 sm:px-6 bg-[#0E0E0E] border-b border-zinc-800/80 flex items-center justify-between shadow-md shrink-0 z-10">
         <div>
           <div className="flex items-center gap-2.5">
             <span className="w-2 h-2 rounded-none bg-[#00FF66] shadow-[0_0_8px_#00FF66] animate-pulse" />
             <h3 className="font-extrabold text-white text-xs uppercase tracking-wider">Interactive Q&A Session</h3>
           </div>
-          <p className="text-[11px] text-zinc-400 font-mono mt-1 max-w-lg truncate uppercase" title={activeDoc?.name}>
+          <p className="text-[11px] text-zinc-400 font-mono mt-1 max-w-[200px] sm:max-w-lg truncate uppercase" title={activeDoc?.name}>
             Active Document: <strong className="text-[#00FF66]">"{activeDoc?.name}"</strong>
           </p>
         </div>
@@ -143,7 +142,7 @@ export default function Chat() {
               animate={{ scale: 1, opacity: 1 }}
               className="w-16 h-16 bg-zinc-900 border border-zinc-800 text-[#00FF66] rounded-sm flex items-center justify-center mb-5 shadow-xl"
             >
-              <Sparkles className="w-8 h-8" />
+              <VectorAIIcon className="w-8 h-8 text-[#00FF66]" />
             </motion.div>
             <h4 className="font-extrabold text-white text-base uppercase tracking-wider">Discuss Your Document</h4>
             <p className="text-zinc-400 text-xs mt-2 max-w-xs font-mono uppercase leading-relaxed">
@@ -186,8 +185,8 @@ export default function Chat() {
                   >
                     {/* Speaker Label */}
                     <div className="flex items-center gap-2 text-[10px] font-mono text-zinc-500 uppercase px-1 tracking-wider">
-                      {isUser ? <User className="w-3 h-3 text-zinc-400" /> : <Bot className="w-3 h-3 text-[#00FF66]" />}
-                      <span>{isUser ? "You" : "PDF Scholar AI"}</span>
+                      {isUser ? <User className="w-3 h-3 text-zinc-400" /> : <VectorAIIcon className="w-3.5 h-3.5 text-[#00FF66]" />}
+                      <span>{isUser ? "You" : <span><strong className="text-[#00FF66]">PDF</strong> Scholar AI</span>}</span>
                       <span>•</span>
                       <span>{msg.timestamp}</span>
                     </div>
@@ -304,7 +303,7 @@ export default function Chat() {
       </div>
 
       {/* Input Message Area (Boxy Design) */}
-      <div className="p-4 px-6 bg-[#0E0E0E] border-t border-zinc-800/80 shrink-0" id="chat-input-bar">
+      <div className="p-3 sm:p-4 px-4 sm:px-6 bg-[#0E0E0E] border-t border-zinc-800/80 shrink-0" id="chat-input-bar">
         <form onSubmit={handleSend} className="max-w-4xl mx-auto flex items-center gap-3">
           <input
             type="text"
