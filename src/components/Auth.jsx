@@ -55,33 +55,33 @@ export default function Auth() {
       <div className="ambient-glow ambient-glow-cyan w-[350px] h-[350px] sm:w-[480px] sm:h-[480px] bottom-[-80px] right-[-80px] sm:bottom-[10%] sm:right-[15%] animate-pulse-glow opacity-20" />
       <div className="ambient-glow ambient-glow-amber w-[300px] h-[300px] top-[40%] right-[10%] opacity-15" />
 
-      {/* Main Glassmorphism Auth Card */}
+      {/* Main Glassmorphism Auth Card - Slightly Taller Vertical Silhouette & Sleek Curves */}
       <motion.div
         initial={{ opacity: 0, y: 20, scale: 0.97 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-        className="max-w-[430px] w-full glass-card bg-noise rounded-md p-6 sm:p-8 relative z-10 my-auto overflow-hidden shadow-2xl border border-white/10"
+        className="max-w-[430px] w-full glass-card bg-noise rounded-2xl p-7 sm:p-9 py-9 sm:py-11 relative z-10 my-auto overflow-hidden shadow-2xl border border-white/10"
       >
         {/* Top border accent */}
         <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-[#00FF66] to-transparent shadow-[0_0_15px_rgba(0,255,102,0.6)]" />
 
         {/* Feature Badges */}
-        <div className="flex items-center justify-center gap-2 mb-6">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-sm bg-white/5 border border-white/10 text-white/80 text-[10px] font-mono font-medium uppercase tracking-wider shadow-inner">
+        <div className="flex items-center justify-center gap-2 mb-7">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-white/80 text-[10px] font-mono font-medium uppercase tracking-wider shadow-inner">
             <VectorAIIcon className="w-3 h-3 text-[#00FF66] drop-shadow-[0_0_5px_currentColor]" /> Vector Academic RAG
           </span>
-          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-sm bg-white/5 border border-white/10 text-white/80 text-[10px] font-mono font-medium uppercase tracking-wider shadow-inner">
+          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-white/80 text-[10px] font-mono font-medium uppercase tracking-wider shadow-inner">
             <ShieldCheck className="w-3 h-3 text-[#00FF66] drop-shadow-[0_0_5px_currentColor]" /> Secured
           </span>
         </div>
 
         {/* Brand Header with Matching Gradient Fade */}
-        <div className="text-center mb-7 flex flex-col items-center">
+        <div className="text-center mb-8 flex flex-col items-center">
           <motion.div
             whileHover={{ scale: 1.05 }}
-            className="w-14 h-14 rounded-md bg-white/5 border border-white/10 flex items-center justify-center text-[#00FF66] mb-3.5 shadow-inner"
+            className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-[#00FF66] mb-4 shadow-inner"
           >
-            <PDFScholarLogo className="w-7 h-7 text-[#00FF66] drop-shadow-[0_0_12px_currentColor]" />
+            <PDFScholarLogo className="w-8 h-8 text-[#00FF66] drop-shadow-[0_0_12px_currentColor]" />
           </motion.div>
           
           <h1 className="flex items-center justify-center gap-2 font-black text-2xl sm:text-3xl tracking-tight leading-none">
@@ -90,12 +90,12 @@ export default function Auth() {
               Scholar Hub
             </span>
           </h1>
-          <p className="text-[11px] text-zinc-400 font-mono uppercase tracking-wider mt-2.5 bg-white/5 inline-block px-3 py-1 rounded-sm border border-white/5">
+          <p className="text-[11px] text-zinc-400 font-mono uppercase tracking-wider mt-3 bg-white/5 inline-block px-3.5 py-1 rounded-full border border-white/5">
             Your AI Research Companion
           </p>
         </div>
 
-        {/* Form Container */}
+        {/* Form Container with Comfortable Vertical Rhythm */}
         <AnimatePresence mode="wait">
           <motion.form
             key={isLogin ? "login" : "signup"}
@@ -111,7 +111,7 @@ export default function Auth() {
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-red-500/10 text-red-400 border border-red-500/30 rounded-sm p-3 text-xs font-mono uppercase text-center leading-relaxed backdrop-blur-sm"
+                className="bg-red-500/10 text-red-400 border border-red-500/30 rounded-xl p-3.5 text-xs font-mono uppercase text-center leading-relaxed backdrop-blur-sm"
               >
                 {error}
               </motion.div>
@@ -122,16 +122,16 @@ export default function Auth() {
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-[#00FF66]/10 text-[#00FF66] border border-[#00FF66]/30 rounded-sm p-3 text-xs font-mono uppercase text-center leading-relaxed backdrop-blur-sm"
+                className="bg-[#00FF66]/10 text-[#00FF66] border border-[#00FF66]/30 rounded-xl p-3.5 text-xs font-mono uppercase text-center leading-relaxed backdrop-blur-sm"
               >
                 {message}
               </motion.div>
             )}
 
-            {/* Form Inputs with Boxy Precision */}
+            {/* Form Inputs with Sleek Curves */}
             <div className="space-y-3.5">
               <div className="relative group">
-                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-500 group-focus-within:text-[#00FF66] transition-colors">
+                <span className="absolute inset-y-0 left-0 pl-4 flex items-center text-zinc-500 group-focus-within:text-[#00FF66] transition-colors">
                   <User className="w-4 h-4 drop-shadow-sm" />
                 </span>
                 <input
@@ -139,13 +139,13 @@ export default function Auth() {
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="Username (e.g. ayush_scholar)"
-                  className="w-full bg-black/50 border border-white/10 focus:border-[#00FF66] focus:ring-1 focus:ring-[#00FF66]/30 hover:border-white/20 text-white text-xs sm:text-sm px-4 py-3.5 pl-11 rounded-sm transition-all outline-none placeholder-zinc-500 font-mono shadow-inner"
+                  className="w-full bg-black/50 border border-white/10 focus:border-[#00FF66] focus:ring-1 focus:ring-[#00FF66]/30 hover:border-white/20 text-white text-xs sm:text-sm px-4 py-3.5 pl-12 rounded-xl transition-all outline-none placeholder-zinc-500 font-mono shadow-inner"
                   required
                 />
               </div>
 
               <div className="relative group">
-                <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-500 group-focus-within:text-[#00FF66] transition-colors">
+                <span className="absolute inset-y-0 left-0 pl-4 flex items-center text-zinc-500 group-focus-within:text-[#00FF66] transition-colors">
                   <Lock className="w-4 h-4 drop-shadow-sm" />
                 </span>
                 <input
@@ -153,7 +153,7 @@ export default function Auth() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Password"
-                  className="w-full bg-black/50 border border-white/10 focus:border-[#00FF66] focus:ring-1 focus:ring-[#00FF66]/30 hover:border-white/20 text-white text-xs sm:text-sm px-4 py-3.5 pl-11 rounded-sm transition-all outline-none placeholder-zinc-500 font-mono shadow-inner"
+                  className="w-full bg-black/50 border border-white/10 focus:border-[#00FF66] focus:ring-1 focus:ring-[#00FF66]/30 hover:border-white/20 text-white text-xs sm:text-sm px-4 py-3.5 pl-12 rounded-xl transition-all outline-none placeholder-zinc-500 font-mono shadow-inner"
                   required
                 />
               </div>
@@ -166,7 +166,7 @@ export default function Auth() {
                     exit={{ opacity: 0, height: 0 }}
                     className="relative group overflow-hidden"
                   >
-                    <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-500 group-focus-within:text-[#00FF66] transition-colors">
+                    <span className="absolute inset-y-0 left-0 pl-4 flex items-center text-zinc-500 group-focus-within:text-[#00FF66] transition-colors">
                       <Key className="w-4 h-4 drop-shadow-sm" />
                     </span>
                     <input
@@ -174,7 +174,7 @@ export default function Auth() {
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       placeholder="Confirm Password"
-                      className="w-full bg-black/50 border border-white/10 focus:border-[#00FF66] focus:ring-1 focus:ring-[#00FF66]/30 hover:border-white/20 text-white text-xs sm:text-sm px-4 py-3.5 pl-11 rounded-sm transition-all outline-none placeholder-zinc-500 font-mono shadow-inner"
+                      className="w-full bg-black/50 border border-white/10 focus:border-[#00FF66] focus:ring-1 focus:ring-[#00FF66]/30 hover:border-white/20 text-white text-xs sm:text-sm px-4 py-3.5 pl-12 rounded-xl transition-all outline-none placeholder-zinc-500 font-mono shadow-inner"
                       required
                     />
                   </motion.div>
@@ -182,13 +182,13 @@ export default function Auth() {
               </AnimatePresence>
             </div>
 
-            {/* Boxy Cyber Submit Button */}
+            {/* Subtle Curved Cyber Submit Button */}
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               type="submit"
               disabled={loading}
-              className="w-full inline-flex items-center justify-center gap-2.5 px-5 py-3.5 bg-gradient-to-r from-[#00FF66] to-[#00E55B] hover:from-[#00E55B] hover:to-[#00CC55] disabled:opacity-50 disabled:cursor-not-allowed text-black text-xs sm:text-sm font-black uppercase tracking-wider rounded-sm transition-all shadow-[0_0_20px_rgba(0,255,102,0.35)] mt-5 cursor-pointer"
+              className="w-full inline-flex items-center justify-center gap-2.5 px-5 py-4 bg-gradient-to-r from-[#00FF66] to-[#00E55B] hover:from-[#00E55B] hover:to-[#00CC55] disabled:opacity-50 disabled:cursor-not-allowed text-black text-xs sm:text-sm font-black uppercase tracking-wider rounded-xl transition-all shadow-[0_0_20px_rgba(0,255,102,0.35)] mt-6 cursor-pointer"
             >
               {loading ? (
                 <>
@@ -206,7 +206,7 @@ export default function Auth() {
         </AnimatePresence>
 
         {/* Toggle Mode Footer */}
-        <div className="mt-7 text-center border-t border-white/10 pt-5">
+        <div className="mt-8 text-center border-t border-white/10 pt-6">
           <button
             type="button"
             onClick={() => {

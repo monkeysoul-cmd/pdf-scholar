@@ -73,14 +73,14 @@ export default function Sidebar() {
             <motion.div
               whileHover={{ scale: 1.05 }}
               onClick={() => setIsCollapsed(false)}
-              className="w-9 h-9 sm:w-10 sm:h-10 rounded-sm bg-white/5 border border-white/10 flex items-center justify-center text-[#00FF66] shrink-0 cursor-pointer shadow-inner"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-[#00FF66] shrink-0 cursor-pointer shadow-inner"
               title="Expand PDF Scholar Hub"
             >
               <PDFScholarLogo className="w-4 h-4 sm:w-5 sm:h-5 text-[#00FF66]" />
             </motion.div>
             <button
               onClick={() => setIsCollapsed(false)}
-              className="w-7 h-7 sm:w-8 sm:h-8 bg-white/5 hover:bg-[#00FF66] text-zinc-400 hover:text-black border border-white/10 hover:border-[#00FF66] rounded-sm transition-all flex items-center justify-center cursor-pointer shrink-0"
+              className="w-7 h-7 sm:w-8 sm:h-8 bg-white/5 hover:bg-[#00FF66] text-zinc-400 hover:text-black border border-white/10 hover:border-[#00FF66] rounded-full transition-all flex items-center justify-center cursor-pointer shrink-0"
               title="Expand Sidebar"
             >
               <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -91,7 +91,7 @@ export default function Sidebar() {
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">
               <motion.div
                 whileHover={{ scale: 1.05 }}
-                className="w-8 h-8 sm:w-9 sm:h-9 rounded-sm bg-white/5 border border-white/10 flex items-center justify-center text-[#00FF66] shrink-0 shadow-inner"
+                className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-[#00FF66] shrink-0 shadow-inner"
               >
                 <PDFScholarLogo className="w-4 h-4 sm:w-5 sm:h-5 text-[#00FF66]" />
               </motion.div>
@@ -103,14 +103,14 @@ export default function Sidebar() {
                   </span>
                 </div>
                 <div className="flex items-center gap-1.5 text-[9px] font-mono tracking-wider text-zinc-500 uppercase mt-1">
-                  <span className="w-1.5 h-1.5 rounded-none bg-[#00FF66] animate-pulse" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#00FF66] animate-pulse" />
                   Vector AI Active
                 </div>
               </motion.div>
             </div>
             <button
               onClick={() => setIsCollapsed(true)}
-              className="hidden md:flex p-1.5 bg-white/5 hover:bg-[#00FF66] text-zinc-400 hover:text-black border border-white/10 hover:border-[#00FF66] rounded-sm transition-all cursor-pointer shrink-0 items-center justify-center"
+              className="hidden md:flex p-1.5 bg-white/5 hover:bg-[#00FF66] text-zinc-400 hover:text-black border border-white/10 hover:border-[#00FF66] rounded-full transition-all cursor-pointer shrink-0 items-center justify-center"
               title="Collapse Sidebar"
             >
               <ChevronLeft className="w-4 h-4" />
@@ -141,7 +141,7 @@ export default function Sidebar() {
                 title={collapsed ? `${item.label}${isDisabled ? " (Select Document First)" : ""}` : undefined}
                 id={`nav-btn-${item.id}`}
                 className={`w-full relative flex items-center ${
-                  collapsed ? "justify-center px-0 py-3 rounded-sm" : "justify-between px-3 sm:px-3.5 py-3 rounded-sm"
+                  collapsed ? "justify-center px-0 py-3 rounded-xl" : "justify-between px-3 sm:px-3.5 py-3 rounded-xl"
                 } text-xs font-bold uppercase tracking-wider text-left transition-all cursor-pointer ${
                   isActive
                     ? "text-black bg-gradient-to-r from-[#00FF66] to-[#00E55B] shadow-[0_0_15px_rgba(0,255,102,0.35)] font-black"
@@ -158,13 +158,13 @@ export default function Sidebar() {
                   <motion.span
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    className="text-[9px] font-black bg-[#00FF66] text-black px-2 py-0.5 rounded-sm relative z-10 shadow-sm"
+                    className="text-[9px] font-black bg-[#00FF66] text-black px-2 py-0.5 rounded-full relative z-10 shadow-sm"
                   >
                     READY
                   </motion.span>
                 )}
                 {collapsed && isActive && (
-                  <span className="absolute right-1 top-1 w-1.5 h-1.5 rounded-none bg-white shadow-[0_0_8px_white]" />
+                  <span className="absolute right-1 top-1 w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_8px_white]" />
                 )}
               </motion.button>
             );
@@ -177,7 +177,7 @@ export default function Sidebar() {
             <div className="text-[10px] font-mono tracking-wider text-zinc-500 uppercase font-black mb-3 px-2 flex items-center justify-between">
               <span>Active Target</span>
               {selectedDocumentId && (
-                <span className="bg-amber-400/20 border border-amber-400/50 text-amber-400 text-[9px] font-black px-2 py-0.5 rounded-sm animate-pulse shadow-inner">
+                <span className="bg-amber-400/20 border border-amber-400/50 text-amber-400 text-[9px] font-black px-2 py-0.5 rounded-full animate-pulse shadow-inner">
                   ACTIVE
                 </span>
               )}
@@ -191,10 +191,10 @@ export default function Sidebar() {
                   whileHover={{ scale: 1.05 }}
                   onClick={() => setTab("chat")}
                   title={`Active Target: ${activeDoc.name}`}
-                  className="w-full p-3 glass-card border-[#00FF66]/50 rounded-sm flex items-center justify-center text-[#00FF66] relative shadow-[0_0_15px_rgba(0,255,102,0.15)] cursor-pointer"
+                  className="w-full p-3 glass-card border-[#00FF66]/50 rounded-xl flex items-center justify-center text-[#00FF66] relative shadow-[0_0_15px_rgba(0,255,102,0.15)] cursor-pointer"
                 >
                   <FileText className="w-4 h-4 drop-shadow-[0_0_5px_currentColor]" />
-                  <span className="absolute -top-1 -right-1 w-2 h-2 rounded-none bg-[#00FF66] animate-pulse" />
+                  <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-[#00FF66] animate-pulse" />
                 </motion.button>
               ) : (
                 <motion.div
@@ -202,10 +202,10 @@ export default function Sidebar() {
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
-                  className="p-3 sm:p-4 glass-card border-l-2 border-l-[#00FF66] rounded-sm flex flex-col gap-3 relative group/doc shadow-lg overflow-hidden"
+                  className="p-3.5 sm:p-4 glass-card border-l-2 border-l-[#00FF66] rounded-xl flex flex-col gap-3 relative group/doc shadow-lg overflow-hidden"
                 >
                   <div className="flex items-start gap-3 relative z-10">
-                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-sm bg-white/5 border border-white/10 flex items-center justify-center shrink-0 mt-0.5 shadow-inner">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center shrink-0 mt-0.5 shadow-inner">
                       <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#00FF66] drop-shadow-sm" />
                     </div>
                     <div className="min-w-0 flex-1">
@@ -224,7 +224,7 @@ export default function Sidebar() {
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => setTab("chat")}
-                      className="flex-1 text-center bg-gradient-to-r from-[#00FF66] to-[#00E55B] hover:from-[#00E55B] hover:to-[#00CC55] text-black font-extrabold text-[10px] uppercase tracking-wider py-2 rounded-sm transition-all shadow-[0_0_12px_rgba(0,255,102,0.25)] cursor-pointer"
+                      className="flex-1 text-center bg-gradient-to-r from-[#00FF66] to-[#00E55B] hover:from-[#00E55B] hover:to-[#00CC55] text-black font-extrabold text-[10px] uppercase tracking-wider py-2 rounded-lg transition-all shadow-[0_0_12px_rgba(0,255,102,0.25)] cursor-pointer"
                     >
                       Start Chat
                     </motion.button>
@@ -233,7 +233,7 @@ export default function Sidebar() {
                       whileTap={{ scale: 0.95 }}
                       onClick={() => deleteDocument(activeDoc.id)}
                       title="Delete Document"
-                      className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 hover:border-red-500/40 rounded-sm transition-all cursor-pointer"
+                      className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 hover:border-red-500/40 rounded-lg transition-all cursor-pointer"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </motion.button>
@@ -241,7 +241,7 @@ export default function Sidebar() {
                 </motion.div>
               )
             ) : !collapsed ? (
-              <div className="text-[11px] font-mono text-zinc-500 p-4 border border-dashed border-white/10 rounded-sm text-center uppercase bg-white/5">
+              <div className="text-[11px] font-mono text-zinc-500 p-4 border border-dashed border-white/10 rounded-xl text-center uppercase bg-white/5">
                 No Document Activated
               </div>
             ) : null}
@@ -253,18 +253,18 @@ export default function Sidebar() {
       <div className={`${collapsed ? "p-2 sm:p-3" : "p-4 sm:p-5"} border-t border-white/10 flex flex-col gap-3 text-xs font-mono uppercase tracking-wider shrink-0 relative z-10`}>
         {!collapsed ? (
           <>
-            <div className="flex items-center justify-between text-[11px] text-zinc-400 glass-card p-3 rounded-sm">
+            <div className="flex items-center justify-between text-[11px] text-zinc-400 glass-card p-3 rounded-xl">
               <div className="flex items-center gap-2 min-w-0">
                 <Cloud className="w-3.5 h-3.5 text-[#00FF66] shrink-0" />
                 <span className="truncate">User: <strong className="text-white drop-shadow-sm">{user?.username}</strong></span>
               </div>
-              <div className="w-2 h-2 rounded-none bg-[#00FF66] shadow-[0_0_8px_#00FF66] animate-pulse shrink-0" />
+              <div className="w-2 h-2 rounded-full bg-[#00FF66] shadow-[0_0_8px_#00FF66] animate-pulse shrink-0" />
             </div>
             <motion.button
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.98 }}
               onClick={logout}
-              className="w-full py-3 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/40 text-red-400 hover:text-red-300 rounded-sm text-[10px] font-extrabold uppercase tracking-wider transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+              className="w-full py-3 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/40 text-red-400 hover:text-red-300 rounded-xl text-[10px] font-extrabold uppercase tracking-wider transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span>Sign Out</span>
@@ -276,7 +276,7 @@ export default function Sidebar() {
             whileTap={{ scale: 0.95 }}
             onClick={logout}
             title={`Sign Out (${user?.username})`}
-            className="w-full py-3 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/40 text-red-400 rounded-sm flex items-center justify-center transition-colors cursor-pointer"
+            className="w-full py-3 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/40 text-red-400 rounded-xl flex items-center justify-center transition-colors cursor-pointer"
           >
             <LogOut className="w-4 h-4" />
           </motion.button>
@@ -294,7 +294,7 @@ export default function Sidebar() {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
             onClick={() => setIsMobileOpen(true)}
-            className="md:hidden fixed top-3 left-3 z-40 w-10 h-10 glass-card border-white/10 text-zinc-300 hover:text-[#00FF66] hover:border-[#00FF66]/40 rounded-sm flex items-center justify-center transition-all shadow-lg cursor-pointer"
+            className="md:hidden fixed top-3 left-3 z-40 w-10 h-10 glass-card border-white/10 text-zinc-300 hover:text-[#00FF66] hover:border-[#00FF66]/40 rounded-xl flex items-center justify-center transition-all shadow-lg cursor-pointer"
             title="Open Navigation"
             id="mobile-menu-btn"
           >
@@ -324,7 +324,7 @@ export default function Sidebar() {
                 <SidebarInner collapsed={false} />
                 <button
                   onClick={() => setIsMobileOpen(false)}
-                  className="absolute top-4 right-4 p-2 glass-card hover:bg-white/10 text-zinc-400 hover:text-white rounded-sm transition-all z-50 cursor-pointer"
+                  className="absolute top-4 right-4 p-2 glass-card hover:bg-white/10 text-zinc-400 hover:text-white rounded-full transition-all z-50 cursor-pointer"
                 >
                   <X className="w-4 h-4" />
                 </button>
