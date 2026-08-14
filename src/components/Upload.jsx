@@ -25,9 +25,9 @@ export default function Upload() {
 
   const steps = [
     { title: "Opening PDF file", desc: "Reading the contents of your document", icon: FileText },
-    { title: "Splitting into Pages", desc: "Preparing text chunks for vector processing", icon: Layers },
+    { title: "Splitting into Pages", desc: "Organizing topics and key concepts", icon: Layers },
     { title: "Saving to Vector Store", desc: "Storing document safely in vector database", icon: Cloud },
-    { title: "Finalizing AI Index", desc: "Setting up your academic discussion partner", icon: Smile },
+    { title: "Getting your study partner ready", desc: "Setting up your academic discussion partner", icon: Smile },
   ];
 
   const handleDrag = (e) => {
@@ -147,13 +147,13 @@ export default function Upload() {
         {/* Header */}
         <div className="text-center mb-9">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-white/80 text-[10px] font-mono font-bold uppercase tracking-wider mb-4 shadow-inner">
-            <VectorAIIcon className="w-3 h-3 text-emerald-400 drop-shadow-[0_0_5px_currentColor]" /> Vector Ingestion Engine
+            <VectorAIIcon className="w-3 h-3 text-emerald-400 drop-shadow-[0_0_5px_currentColor]" /> Vector AI Document Reader
           </div>
           <h2 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-white uppercase drop-shadow-sm">
-            Add Study Document
+            Upload Your Study PDF
           </h2>
           <p className="text-xs text-zinc-400 max-w-md mx-auto uppercase font-mono mt-2">
-            Upload textbook chapters, articles, or research notes for AI extraction.
+            Upload your notes, textbook chapters, or research papers to start studying.
           </p>
         </div>
 
@@ -189,7 +189,7 @@ export default function Upload() {
               <UploadCloud className="w-8 h-8 drop-shadow-[0_0_8px_currentColor]" />
             </motion.div>
             <h3 className="font-extrabold text-white text-sm uppercase tracking-wider">
-              Select or Drop PDF File
+              Choose a PDF or Drag It Here
             </h3>
             <p className="text-zinc-500 text-[10px] mt-2 font-mono uppercase">
               Max Size: 10MB • Format: PDF Only
@@ -207,7 +207,7 @@ export default function Upload() {
                   Processing: {file?.name}
                 </span>
                 <span className="text-[10px] text-zinc-400 font-mono uppercase">
-                  Embedding PDF chunks... Please wait
+                  Reading your document with Vector AI... Just a moment
                 </span>
               </div>
             </div>

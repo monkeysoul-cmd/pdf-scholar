@@ -253,9 +253,9 @@ export default function Quiz() {
           <div className="w-16 h-16 bg-white/5 border border-white/10 text-amber-400 rounded-full flex items-center justify-center mx-auto mb-5 shadow-inner">
             <BrainCircuit className="w-8 h-8 drop-shadow-md" />
           </div>
-          <h3 className="font-extrabold text-white text-lg uppercase tracking-wider">No Active Target</h3>
+          <h3 className="font-extrabold text-white text-lg uppercase tracking-wider">No Document Selected</h3>
           <p className="text-xs text-zinc-400 font-mono uppercase mt-2 mb-6 leading-relaxed">
-            Activate a document from the sidebar or upload a PDF to synthesize diagnostic practice quizzes.
+            Select a document from the sidebar or upload a PDF to take a practice quiz.
           </p>
         </motion.div>
       </div>
@@ -280,10 +280,10 @@ export default function Quiz() {
         <div>
           <h2 className="text-lg sm:text-2xl font-black tracking-tight text-white uppercase flex items-center gap-2.5 drop-shadow-sm">
             <VectorAIIcon className="w-5 h-5 text-amber-400" />
-            Practice Quiz & Diagnostics
+            Practice Quiz & Self-Check
           </h2>
           <p className="text-xs text-zinc-400 font-mono uppercase mt-1">
-            Targeting: <strong className="text-amber-400">"{activeDoc?.name}"</strong>
+            Studying: <strong className="text-amber-400">"{activeDoc?.name}"</strong>
           </p>
         </div>
 
@@ -315,7 +315,7 @@ export default function Quiz() {
           </div>
           <h3 className="font-extrabold text-white text-lg uppercase tracking-wider">Creating {questionCount} Questions</h3>
           <p className="text-xs text-zinc-400 mt-2 max-w-xs mx-auto font-mono uppercase leading-relaxed">
-            Extracting document sections & synthesizing structured diagnostic questions...
+            Reading your PDF and preparing helpful questions to test your knowledge...
           </p>
         </motion.div>
       )}
@@ -330,9 +330,9 @@ export default function Quiz() {
           <div className="w-16 h-16 bg-white/5 border border-white/10 text-amber-400 rounded-full flex items-center justify-center mx-auto mb-5 shadow-inner">
             <GraduationCap className="w-8 h-8 drop-shadow-md" />
           </div>
-          <h3 className="font-black text-white text-2xl uppercase tracking-wide">Generate Quiz</h3>
+          <h3 className="font-black text-white text-2xl uppercase tracking-wide">Create Practice Quiz</h3>
           <p className="text-xs text-zinc-400 font-mono uppercase mt-2 mb-6 leading-relaxed">
-            Synthesize scored practice questions based on <span className="text-amber-400">"{activeDoc?.name}"</span>.
+            Take a scored practice quiz based on <span className="text-amber-400">"{activeDoc?.name}"</span>.
           </p>
 
           <div className="space-y-6 bg-black/40 border border-white/5 p-6 rounded-xl text-left shadow-inner">
@@ -393,7 +393,7 @@ export default function Quiz() {
               onClick={generateQuiz}
               className="w-full py-4 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-black font-black text-xs uppercase tracking-wider rounded-xl transition-all shadow-[0_0_20px_rgba(251,191,36,0.3)] flex items-center justify-center gap-2 cursor-pointer"
             >
-              <span>Generate Quiz Now</span>
+              <span>Create Practice Quiz Now</span>
               <Sparkles className="w-4 h-4 text-black" />
             </motion.button>
           </div>

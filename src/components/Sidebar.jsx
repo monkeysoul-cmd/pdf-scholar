@@ -56,7 +56,7 @@ export default function Sidebar() {
   const SidebarInner = ({ collapsed }) => (
     <aside
       className={`${
-        collapsed ? "w-16 sm:w-20" : "w-72 sm:w-80"
+        collapsed ? "w-16 sm:w-20" : "w-60 sm:w-64"
       } bg-black/60 backdrop-blur-2xl text-white border-r border-white/10 flex flex-col h-full select-none relative shadow-2xl transition-all duration-300 ease-in-out shrink-0 z-50`}
       id="sidebar-container"
     >
@@ -123,7 +123,7 @@ export default function Sidebar() {
       <nav className={`flex-1 ${collapsed ? "px-2 sm:px-3" : "px-4 sm:px-5"} py-5 sm:py-6 space-y-4 overflow-y-auto min-h-0 relative z-10`}>
         {!collapsed && (
           <div className="text-[10px] font-mono tracking-wider text-zinc-500 uppercase font-black px-2">
-            Navigation Menu
+            Main Menu
           </div>
         )}
         <div className="flex flex-col gap-1.5">
@@ -138,10 +138,10 @@ export default function Sidebar() {
                 whileTap={!isDisabled ? { scale: 0.96 } : {}}
                 onClick={() => !isDisabled && setTab(item.id)}
                 disabled={isDisabled}
-                title={collapsed ? `${item.label}${isDisabled ? " (Select Document First)" : ""}` : undefined}
+                title={collapsed ? `${item.label}${isDisabled ? " (Select a PDF first)" : ""}` : undefined}
                 id={`nav-btn-${item.id}`}
                 className={`w-full relative flex items-center ${
-                  collapsed ? "justify-center px-0 py-3 rounded-xl" : "justify-between px-3 sm:px-3.5 py-3 rounded-xl"
+                  collapsed ? "justify-center px-0 py-3 rounded-xl" : "justify-between px-3 py-2.5 rounded-xl"
                 } text-xs font-bold uppercase tracking-wider text-left transition-all cursor-pointer ${
                   isActive
                     ? "text-black bg-gradient-to-r from-[#00FF66] to-[#00E55B] shadow-[0_0_15px_rgba(0,255,102,0.35)] font-black"
@@ -175,7 +175,7 @@ export default function Sidebar() {
         <div className="pt-5 sm:pt-6">
           {!collapsed && (
             <div className="text-[10px] font-mono tracking-wider text-zinc-500 uppercase font-black mb-3 px-2 flex items-center justify-between">
-              <span>Active Target</span>
+              <span>Current Document</span>
               {selectedDocumentId && (
                 <span className="bg-amber-400/20 border border-amber-400/50 text-amber-400 text-[9px] font-black px-2 py-0.5 rounded-full animate-pulse shadow-inner">
                   ACTIVE
@@ -226,7 +226,7 @@ export default function Sidebar() {
                       onClick={() => setTab("chat")}
                       className="flex-1 text-center bg-gradient-to-r from-[#00FF66] to-[#00E55B] hover:from-[#00E55B] hover:to-[#00CC55] text-black font-extrabold text-[10px] uppercase tracking-wider py-2 rounded-lg transition-all shadow-[0_0_12px_rgba(0,255,102,0.25)] cursor-pointer"
                     >
-                      Start Chat
+                      Chat with PDF
                     </motion.button>
                     <motion.button
                       whileHover={{ scale: 1.05 }}
@@ -242,7 +242,7 @@ export default function Sidebar() {
               )
             ) : !collapsed ? (
               <div className="text-[11px] font-mono text-zinc-500 p-4 border border-dashed border-white/10 rounded-xl text-center uppercase bg-white/5">
-                No Document Activated
+                No Document Selected
               </div>
             ) : null}
           </AnimatePresence>

@@ -36,7 +36,7 @@ export default function Auth() {
         await login(username, password);
       } else {
         const res = await register(username, password);
-        setMessage(res.message || "Registration successful! Please sign in.");
+        setMessage(res.message || "Account created successfully! Please sign in.");
         setIsLogin(true);
         setPassword("");
         setConfirmPassword("");
@@ -68,10 +68,10 @@ export default function Auth() {
         {/* Feature Badges */}
         <div className="flex items-center justify-center gap-2 mb-7">
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-white/80 text-[10px] font-mono font-medium uppercase tracking-wider shadow-inner">
-            <VectorAIIcon className="w-3 h-3 text-[#00FF66] drop-shadow-[0_0_5px_currentColor]" /> Vector Academic RAG
+            <VectorAIIcon className="w-3 h-3 text-[#00FF66] drop-shadow-[0_0_5px_currentColor]" /> Vector AI Study Partner
           </span>
           <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-white/80 text-[10px] font-mono font-medium uppercase tracking-wider shadow-inner">
-            <ShieldCheck className="w-3 h-3 text-[#00FF66] drop-shadow-[0_0_5px_currentColor]" /> Secured
+            <ShieldCheck className="w-3 h-3 text-[#00FF66] drop-shadow-[0_0_5px_currentColor]" /> Private & Secure
           </span>
         </div>
 
@@ -91,7 +91,7 @@ export default function Auth() {
             </span>
           </h1>
           <p className="text-[11px] text-zinc-400 font-mono uppercase tracking-wider mt-3 bg-white/5 inline-block px-3.5 py-1 rounded-full border border-white/5">
-            Your AI Research Companion
+            Your Personal AI Study Companion
           </p>
         </div>
 
@@ -193,11 +193,11 @@ export default function Auth() {
               {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 text-black animate-spin" />
-                  <span>{isLogin ? "Authenticating..." : "Creating Scholar..."}</span>
+                  <span>{isLogin ? "Signing In..." : "Setting Up Account..."}</span>
                 </>
               ) : (
                 <>
-                  <span>{isLogin ? "Sign In to Hub" : "Create Scholar Account"}</span>
+                  <span>{isLogin ? "Sign In to PDF Scholar Hub" : "Create Free Account"}</span>
                   <ArrowRight className="w-4 h-4 text-black" />
                 </>
               )}

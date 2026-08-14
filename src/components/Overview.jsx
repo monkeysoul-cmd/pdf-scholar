@@ -115,10 +115,10 @@ export default function Overview() {
   const primaryStats = [
     {
       id: "docs",
-      label: "Indexed Documents",
+      label: "Uploaded PDFs",
       value: animatedStats.docs,
       icon: BookOpen,
-      subtitle: "Total PDFs uploaded",
+      subtitle: "Files in your library",
       badge: `${totalDocuments} Active`,
       color: "from-[#00FF66]/50",
       glow: "group-hover:shadow-[0_0_30px_rgba(0,255,102,0.2)]",
@@ -126,10 +126,10 @@ export default function Overview() {
     },
     {
       id: "pages",
-      label: "Pages Processed",
+      label: "Pages Read",
       value: animatedStats.pages,
       icon: FileText,
-      subtitle: "Extracted for analysis",
+      subtitle: "Total pages analyzed",
       badge: "Deep Parsed",
       color: "from-[#00E5FF]/50",
       glow: "group-hover:shadow-[0_0_30px_rgba(0,229,255,0.2)]",
@@ -137,10 +137,10 @@ export default function Overview() {
     },
     {
       id: "chunks",
-      label: "Vector Chunks",
+      label: "Study Topics",
       value: animatedStats.chunks,
       icon: Database,
-      subtitle: "Semantic embeddings",
+      subtitle: "Key concepts indexed",
       badge: "RAG Indexed",
       color: "from-[#FFB800]/50",
       glow: "group-hover:shadow-[0_0_30px_rgba(255,184,0,0.2)]",
@@ -154,7 +154,7 @@ export default function Overview() {
       label: "Average Quiz Score",
       value: `${animatedStats.scores}%`,
       icon: TrendingUp,
-      subtitle: "Retention diagnostic rate",
+      subtitle: "Overall understanding rate",
       badge: overallGrade.label,
       isGrade: true,
       color: "from-[#00FF66]/50",
@@ -163,10 +163,10 @@ export default function Overview() {
     },
     {
       id: "quizzes",
-      label: "Quizzes Completed",
+      label: "Quizzes Taken",
       value: animatedStats.quizzes,
       icon: Target,
-      subtitle: "Practice test sessions",
+      subtitle: "Completed study sessions",
       badge: quizzesTaken > 0 ? `${quizzesTaken} Runs` : "Ready",
       color: "from-[#00E5FF]/50",
       glow: "group-hover:shadow-[0_0_30px_rgba(0,229,255,0.2)]",
@@ -174,10 +174,10 @@ export default function Overview() {
     },
     {
       id: "points",
-      label: "Knowledge Points",
+      label: "Scholar Points",
       value: animatedStats.points,
       icon: Trophy,
-      subtitle: "Lifetime earned points",
+      subtitle: "Total points earned",
       badge: "Scored",
       color: "from-[#FFB800]/50",
       glow: "group-hover:shadow-[0_0_30px_rgba(255,184,0,0.2)]",
@@ -256,7 +256,7 @@ export default function Overview() {
           <div className="space-y-5">
             <div className="p-4 bg-black/40 border border-white/10 rounded-xl space-y-3">
               <div className="text-[10px] font-mono text-zinc-400 uppercase font-bold tracking-wider flex items-center justify-between">
-                <span>Document Indexing Capacity & Page Distribution</span>
+                <span>Document Library & Page Breakdown</span>
                 <span className="text-[#00FF66] font-bold">{totalDocuments} Active Documents</span>
               </div>
               <div className="space-y-2.5">
@@ -289,7 +289,7 @@ export default function Overview() {
 
             <div className="space-y-2 max-h-[240px] overflow-y-auto pr-1">
               <div className="text-[10px] font-mono text-zinc-400 uppercase font-bold tracking-wider">
-                Chronological Ingestion Activity (Sorted by Date)
+                Recently Uploaded PDFs (Sorted by Date)
               </div>
               {sortedDocuments.map((doc, idx) => (
                 <div key={idx} className="bg-white/5 p-3.5 rounded-xl border border-white/10 flex justify-between items-center hover:border-[#00FF66]/40 transition-colors">
@@ -311,7 +311,7 @@ export default function Overview() {
           <div className="space-y-5">
             <div className="p-5 bg-black/40 border border-white/10 rounded-xl space-y-4">
               <div className="text-[10px] font-mono text-zinc-400 uppercase font-bold tracking-wider flex items-center justify-between">
-                <span>Daily Extraction Volume (Pages Sorted by Day)</span>
+                <span>Pages Read by Day of the Week</span>
                 <span className="text-[#00E5FF] font-bold">{totalPages} Total Pages Parsed</span>
               </div>
               <div className="h-44 w-full flex items-end justify-between gap-3 px-2 pb-1">
@@ -340,7 +340,7 @@ export default function Overview() {
                 <div className="text-base font-black text-[#00E5FF] mt-0.5">{totalPages > 0 ? (totalChunks / totalPages).toFixed(1) : 0}</div>
               </div>
               <div className="bg-white/5 p-3 rounded-xl border border-white/10">
-                <div className="text-[9px] text-zinc-500 uppercase">OCR Extraction</div>
+                <div className="text-[9px] text-zinc-500 uppercase">Text Accuracy</div>
                 <div className="text-base font-black text-[#00FF66] mt-0.5">99.8%</div>
               </div>
             </div>
@@ -354,19 +354,19 @@ export default function Overview() {
             <div className="p-4 bg-black/40 border border-white/10 rounded-xl space-y-3.5">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-3">
                 <div className="text-[10px] font-mono text-zinc-300 uppercase font-bold">
-                  Vector Clustering Matrix (Sorted by Date & Chunk Node)
+                  Knowledge Topics by Date & Depth
                 </div>
                 
                 {/* Clear Light & Dark / More & Less Color Space Legend */}
                 <div className="flex items-center gap-2 text-[9px] font-mono text-zinc-400">
-                  <span className="text-zinc-500 font-bold">Less (Light/Sparse)</span>
+                  <span className="text-zinc-500 font-bold">Less Topics</span>
                   <div className="flex items-center gap-1 bg-black/50 p-1 rounded-lg border border-white/10">
                     <span className="w-3 h-3 rounded-sm bg-[#00FF66]/15 border border-[#00FF66]/30" title="Low Density (<30%)" />
                     <span className="w-3 h-3 rounded-sm bg-[#00FF66]/40 border border-[#00FF66]/50" title="Medium Density (50%)" />
                     <span className="w-3 h-3 rounded-sm bg-[#00FF66]/75 border border-[#00FF66]/80" title="High Density (75%)" />
                     <span className="w-3 h-3 rounded-sm bg-[#00FF66] border border-white shadow-[0_0_6px_#00FF66]" title="Dense (>90%)" />
                   </div>
-                  <span className="text-[#00FF66] font-bold">More (Dense)</span>
+                  <span className="text-[#00FF66] font-bold">More Topics</span>
                 </div>
               </div>
 
@@ -399,7 +399,7 @@ export default function Overview() {
                         {block.day} {block.month}
                       </div>
                       <div className={`text-[7px] font-mono ${isDense ? "text-black/75" : "text-zinc-400"}`}>
-                        {block.intensity > 0.65 ? "Dense (More)" : block.intensity > 0.35 ? "Medium" : "Sparse (Less)"}
+                        {block.intensity > 0.65 ? "Deep" : block.intensity > 0.35 ? "Medium" : "Light"}
                       </div>
                     </motion.div>
                   );
@@ -408,8 +408,8 @@ export default function Overview() {
             </div>
 
             <div className="flex items-center justify-between text-[10px] font-mono text-zinc-400 bg-white/5 p-3 rounded-xl border border-white/10">
-              <span className="flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5 text-[#00FF66]" /> Vector Store: Active</span>
-              <span>Metric: High-Dimensional Cosine Density</span>
+              <span className="flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5 text-[#00FF66]" /> Vector AI: Active</span>
+              <span>Search Mode: Instant & Accurate</span>
               <span className="text-[#00FF66] font-bold">768-D Synced</span>
             </div>
           </div>
@@ -420,7 +420,7 @@ export default function Overview() {
           <div className="space-y-5">
             <div className="p-4 bg-black/40 border border-white/10 rounded-xl space-y-3">
               <div className="text-[10px] font-mono text-zinc-400 uppercase font-bold tracking-wider flex items-center justify-between">
-                <span>Historical Quiz Score Trend (Sorted Chronologically)</span>
+                <span>Your Quiz Scores & Progress Trend</span>
                 <span className="text-[#00FF66] font-bold">Avg: {averageScore}%</span>
               </div>
               <div className="space-y-2.5 max-h-[220px] overflow-y-auto pr-1">
@@ -487,7 +487,7 @@ export default function Overview() {
             {/* 28-day Activity Grid with Date, Month, Year */}
             <div className="p-4 bg-black/40 border border-white/10 rounded-xl space-y-3">
               <div className="flex items-center justify-between text-[10px] font-mono text-zinc-400 uppercase font-bold">
-                <span>Study Activity Calendar Heatmap (Sorted by Dates)</span>
+                <span>Study Calendar & Quiz History</span>
                 <span className="text-[#00E5FF] font-bold">{quizzesTaken} Total Sessions</span>
               </div>
               <div className="grid grid-cols-7 gap-2">
@@ -605,7 +605,7 @@ export default function Overview() {
       case "quizzes":
         return { label: "Quiz Completion Activity & Frequency Matrix", icon: Target, color: "text-[#00E5FF]" };
       case "points":
-        return { label: "Knowledge Points & Tier Progression Graph", icon: Trophy, color: "text-[#FFB800]" };
+        return { label: "Scholar Points & Achievement Levels", icon: Trophy, color: "text-[#FFB800]" };
       default:
         return { label: "Analytics Deep Dive", icon: Activity, color: "text-[#00FF66]" };
     }
@@ -645,7 +645,7 @@ export default function Overview() {
               </span>
             </div>
             <p className="text-[11px] text-zinc-400 font-mono uppercase tracking-wider mt-1">
-              Neural Vector Intelligence & Diagnostic Learning Platform
+              Smart Study Assistant & Knowledge Companion
             </p>
           </div>
         </div>
@@ -790,7 +790,7 @@ export default function Overview() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 border-b border-white/5 pb-4">
               <div className="flex items-center gap-2">
                 <Activity className="w-4 h-4 text-[#00FF66]" />
-                <h3 className="text-xs font-black uppercase tracking-wider text-white">Semantic Vector & Knowledge Heatmap</h3>
+                <h3 className="text-xs font-black uppercase tracking-wider text-white">Study Activity & Topic Heatmap</h3>
               </div>
               
               {/* Expand Graph button and density legend */}
@@ -870,7 +870,7 @@ export default function Overview() {
             <div className="flex items-center justify-between gap-3 mb-5 border-b border-white/5 pb-4">
               <div className="flex items-center gap-2">
                 <BarChart3 className="w-4 h-4 text-[#00E5FF]" />
-                <h3 className="text-xs font-black uppercase tracking-wider text-white">Pages Ingestion Volume</h3>
+                <h3 className="text-xs font-black uppercase tracking-wider text-white">Pages Read This Week</h3>
               </div>
               <span className="text-[10px] font-mono text-[#00E5FF] bg-[#00E5FF]/10 border border-[#00E5FF]/20 px-2 py-0.5 rounded-md font-bold">
                 {totalPages} Total Pgs
@@ -924,7 +924,7 @@ export default function Overview() {
             <div className="pt-3">
               <div className="step-label text-[10px] font-mono font-bold text-[#00FF66] uppercase tracking-wider flex items-center gap-1.5 drop-shadow-[0_0_5px_rgba(0,255,102,0.3)]">
                 <CheckCircle2 className="w-3.5 h-3.5 text-[#00FF66]" />
-                2. Chunking
+                2. Process Topics
               </div>
             </div>
           </div>
@@ -934,7 +934,7 @@ export default function Overview() {
             <div className="pt-3">
               <div className="step-label text-[10px] font-mono font-bold text-[#00FF66] uppercase tracking-wider flex items-center gap-1.5 drop-shadow-[0_0_5px_rgba(0,255,102,0.3)]">
                 <CheckCircle2 className="w-3.5 h-3.5 text-[#00FF66]" />
-                3. Vector Embedding
+                3. Vector AI Index
               </div>
             </div>
           </div>

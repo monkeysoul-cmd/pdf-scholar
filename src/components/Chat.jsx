@@ -98,7 +98,7 @@ export default function Chat() {
           <div className="w-16 h-16 bg-white/5 border border-white/10 text-[#00FF66] rounded-full flex items-center justify-center mx-auto mb-5 shadow-inner">
             <MessageSquare className="w-8 h-8 drop-shadow-sm" />
           </div>
-          <h3 className="font-extrabold text-white text-lg uppercase tracking-wider">No Active Target</h3>
+          <h3 className="font-extrabold text-white text-lg uppercase tracking-wider">No Document Selected</h3>
           <p className="text-xs text-zinc-400 font-mono uppercase mt-2 mb-6 leading-relaxed">
             Select a document from the sidebar or upload a PDF to begin interactive chat sessions.
           </p>
