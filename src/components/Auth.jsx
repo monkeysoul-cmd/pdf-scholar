@@ -50,9 +50,9 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen w-screen overflow-y-auto bg-dot-grid flex flex-col items-center justify-center p-4 md:p-8 select-none relative" id="auth-view">
-      {/* Matching Dashboard Cyber Ambient Gradient Glows */}
-      <div className="ambient-glow ambient-glow-green w-[400px] h-[400px] sm:w-[550px] sm:h-[550px] top-[-80px] left-[-80px] sm:top-[10%] sm:left-[15%] animate-float-slow" />
-      <div className="ambient-glow ambient-glow-cyan w-[350px] h-[350px] sm:w-[480px] sm:h-[480px] bottom-[-80px] right-[-80px] sm:bottom-[10%] sm:right-[15%] animate-pulse-glow opacity-20" />
+      {/* Swapped Cyber Ambient Gradient Glows (Animations preserved) */}
+      <div className="ambient-glow ambient-glow-cyan w-[400px] h-[400px] sm:w-[550px] sm:h-[550px] top-[-80px] left-[-80px] sm:top-[10%] sm:left-[15%] animate-float-slow opacity-25" />
+      <div className="ambient-glow ambient-glow-green w-[350px] h-[350px] sm:w-[480px] sm:h-[480px] bottom-[-80px] right-[-80px] sm:bottom-[10%] sm:right-[15%] animate-pulse-glow" />
       <div className="ambient-glow ambient-glow-amber w-[300px] h-[300px] top-[40%] right-[10%] opacity-15" />
 
       {/* Main Glassmorphism Auth Card - Slightly Taller Vertical Silhouette & Sleek Curves */}
