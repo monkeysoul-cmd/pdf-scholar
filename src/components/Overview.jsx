@@ -22,19 +22,25 @@ import {
   Layers,
   Calendar,
   ShieldCheck,
-  Maximize2
+  Maximize2,
+  ArrowRight,
+  MessageSquare,
+  UploadCloud,
+  Cpu
 } from "lucide-react";
 import VectorAIIcon from "./VectorAIIcon";
+import PDFScholarLogo from "./PDFScholarLogo";
 import { motion, AnimatePresence } from "motion/react";
 
 export default function Overview() {
-  const { documents = [], quizScores = [], setTab } = useAppState();
+  const { documents = [], quizScores = [], selectedDocumentId, setTab } = useAppState();
   const [activeModal, setActiveModal] = useState(null);
   const [selectedHeatmapCell, setSelectedHeatmapCell] = useState(null);
   
   const totalDocuments = documents.length;
   const totalPages = documents.reduce((acc, doc) => acc + (doc.pageCount || 0), 0);
   const totalChunks = documents.reduce((acc, doc) => acc + (doc.chunkCount || 0), 0);
+  const activeDoc = documents.find(d => d.id === selectedDocumentId);
 
   // Combine state quiz scores and document quiz histories
   const allQuizRecords = [
@@ -587,38 +593,150 @@ export default function Overview() {
       <div className="ambient-glow ambient-glow-green w-[550px] h-[550px] top-[-100px] right-[-100px] animate-pulse-glow" />
       <div className="ambient-glow ambient-glow-cyan w-[400px] h-[400px] bottom-[20%] left-[-80px] opacity-15" />
 
-      {/* Top Header */}
+      {/* Top Header Branding with Matching Color & Gradient Fade */}
       <motion.div
         initial={{ opacity: 0, y: -15 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/5 pb-6 mb-8 relative z-10"
+        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/5 pb-5 mb-6 relative z-10"
       >
-        <div>
-          <div className="flex items-center gap-2.5">
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-black uppercase tracking-tight text-white flex items-center gap-2.5 drop-shadow-md">
-              <span className="text-[#00FF66] drop-shadow-[0_0_12px_rgba(0,255,102,0.4)]">PDF</span> Scholar Hub
-            </h1>
-            <span className="bg-[#00FF66]/10 text-[#00FF66] border border-[#00FF66]/30 text-[9px] font-black px-2.5 py-0.5 rounded-sm uppercase tracking-wider flex items-center gap-1.5 shadow-[0_0_10px_rgba(0,255,102,0.2)]">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#00FF66] animate-pulse" />
-              Vector Engine Active
-            </span>
+        <div className="flex items-center gap-3">
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            className="w-10 h-10 rounded-md bg-white/5 border border-white/10 flex items-center justify-center text-[#00FF66] shrink-0 shadow-inner"
+          >
+            <PDFScholarLogo className="w-5 h-5 text-[#00FF66] drop-shadow-[0_0_12px_currentColor]" />
+          </motion.div>
+          <div>
+            <div className="flex items-center gap-2 font-black text-2xl sm:text-3xl tracking-tight leading-none">
+              <span className="text-[#00FF66] drop-shadow-[0_0_15px_rgba(0,255,102,0.4)]">PDF</span>
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-zinc-100 to-zinc-400">
+                Scholar Hub
+              </span>
+              <span className="bg-[#00FF66]/10 text-[#00FF66] border border-[#00FF66]/30 text-[9px] font-black px-2 py-0.5 rounded-sm uppercase tracking-wider ml-1.5 flex items-center gap-1 shadow-[0_0_10px_rgba(0,255,102,0.2)]">
+                <span className="w-1.5 h-1.5 rounded-none bg-[#00FF66] animate-pulse" />
+                Live Hub
+              </span>
+            </div>
+            <p className="text-[11px] text-zinc-400 font-mono uppercase tracking-wider mt-1">
+              Neural Vector Intelligence & Diagnostic Learning Platform
+            </p>
           </div>
-          <p className="text-xs text-zinc-400 font-mono uppercase mt-1">
-            Real-time Knowledge Base Analytics & Diagnostic Learning Center
-          </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => setTab("upload")}
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#00FF66] to-[#00E55B] hover:from-[#00E55B] hover:to-[#00CC55] text-black text-xs font-black uppercase tracking-wider rounded-md transition-all shadow-[0_0_20px_rgba(0,255,102,0.35)] cursor-pointer"
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#00FF66] to-[#00E55B] hover:from-[#00E55B] hover:to-[#00CC55] text-black text-xs font-black uppercase tracking-wider rounded-md transition-all shadow-[0_0_20px_rgba(0,255,102,0.35)] cursor-pointer"
             id="overview-upload-cta"
           >
             <Plus className="w-4 h-4 text-black" />
-            <span>Upload New PDF</span>
+            <span>Upload PDF</span>
           </motion.button>
+        </div>
+      </motion.div>
+
+      {/* Senior Designer Hero Section Command Center */}
+      <motion.div
+        initial={{ opacity: 0, y: 15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.05 }}
+        className="glass-card bg-noise rounded-md p-6 sm:p-7 mb-8 border border-white/10 relative overflow-hidden shadow-2xl z-10"
+      >
+        {/* Top Accent Border with Multi-Tone Glow */}
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-[#00FF66] via-[#00E5FF] to-transparent shadow-[0_0_15px_rgba(0,255,102,0.5)]" />
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+          {/* Left Column: Hero Mission & Fast Action Chips */}
+          <div className="lg:col-span-8 space-y-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-sm bg-white/5 border border-white/10 text-white/80 text-[10px] font-mono font-medium uppercase tracking-wider shadow-inner">
+                <VectorAIIcon className="w-3.5 h-3.5 text-[#00FF66]" />
+                RAG Engine v2.4 Active
+              </span>
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-sm bg-[#00FF66]/10 border border-[#00FF66]/30 text-[#00FF66] text-[10px] font-mono font-bold uppercase tracking-wider">
+                <ShieldCheck className="w-3 h-3 text-[#00FF66]" />
+                Zero-Hallucination Retrieval
+              </span>
+            </div>
+
+            <div>
+              <h2 className="text-xl sm:text-2xl font-black uppercase text-white tracking-tight leading-tight">
+                Autonomous Academic Ingestion & <span className="text-[#00FF66] drop-shadow-[0_0_10px_rgba(0,255,102,0.3)]">Deep Research</span> Engine
+              </h2>
+              <p className="text-xs text-zinc-300 font-mono mt-2 leading-relaxed max-w-2xl">
+                Ingest research papers, index high-dimensional vector embeddings, perform cited question-answering with exact page context, and synthesize retention diagnostic exams.
+              </p>
+            </div>
+
+            {/* Quick Action Navigation Chips */}
+            <div className="flex flex-wrap gap-2.5 pt-1">
+              <button
+                onClick={() => setTab("upload")}
+                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-sm bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-mono text-zinc-200 hover:text-white uppercase font-bold transition-all cursor-pointer hover:border-[#00FF66]/50"
+              >
+                <UploadCloud className="w-3.5 h-3.5 text-[#00FF66]" />
+                <span>Ingest Document</span>
+              </button>
+
+              <button
+                onClick={() => setTab("quiz")}
+                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-sm bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-mono text-zinc-200 hover:text-white uppercase font-bold transition-all cursor-pointer hover:border-[#00FF66]/50"
+              >
+                <Zap className="w-3.5 h-3.5 text-[#FFB800]" />
+                <span>Launch Diagnostic Quiz</span>
+              </button>
+
+              <button
+                onClick={() => setTab("chat")}
+                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-sm bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-mono text-zinc-200 hover:text-white uppercase font-bold transition-all cursor-pointer hover:border-[#00FF66]/50"
+              >
+                <MessageSquare className="w-3.5 h-3.5 text-[#00E5FF]" />
+                <span>Interactive Chat</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Right Column: Live Telemetry Status Widget */}
+          <div className="lg:col-span-4 bg-black/50 border border-white/10 rounded-md p-4 space-y-3 font-mono text-xs shadow-inner">
+            <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
+              <span className="text-[10px] text-zinc-400 uppercase font-bold flex items-center gap-1.5">
+                <Cpu className="w-3.5 h-3.5 text-[#00FF66]" /> System Telemetry
+              </span>
+              <span className="text-[9px] text-[#00FF66] bg-[#00FF66]/10 px-2 py-0.5 rounded-sm border border-[#00FF66]/30 font-bold flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-none bg-[#00FF66] animate-pulse" />
+                READY
+              </span>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex justify-between text-[11px]">
+                <span className="text-zinc-400">Target Target:</span>
+                <span className="text-white font-bold truncate max-w-[140px]" title={activeDoc?.name || "None"}>
+                  {activeDoc ? activeDoc.name : "None Activated"}
+                </span>
+              </div>
+              <div className="flex justify-between text-[11px]">
+                <span className="text-zinc-400">Vector Embeddings:</span>
+                <span className="text-[#FFB800] font-bold">768 Dimensions</span>
+              </div>
+              <div className="flex justify-between text-[11px]">
+                <span className="text-zinc-400">Retrieval Latency:</span>
+                <span className="text-[#00E5FF] font-bold">&lt; 140ms</span>
+              </div>
+            </div>
+
+            <div className="pt-1">
+              <button
+                onClick={() => setTab(selectedDocumentId ? "chat" : "upload")}
+                className="w-full py-2 bg-white/5 hover:bg-[#00FF66] text-zinc-300 hover:text-black border border-white/10 hover:border-[#00FF66] rounded-sm text-[10px] font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <span>{selectedDocumentId ? "Engage Target Document" : "Select Document"}</span>
+                <ArrowRight className="w-3 h-3" />
+              </button>
+            </div>
+          </div>
         </div>
       </motion.div>
 
