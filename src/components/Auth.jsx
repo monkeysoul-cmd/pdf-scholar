@@ -49,31 +49,13 @@ export default function Auth() {
   };
 
   return (
-    <div 
-      className="min-h-screen w-screen overflow-y-auto bg-dot-grid flex flex-col items-center justify-center p-4 md:p-8 select-none relative" 
-      style={{
-        backgroundColor: "#030a05",
-        backgroundImage: "radial-gradient(circle at 50% 30%, rgba(0, 255, 102, 0.08), rgba(2, 24, 12, 0.4) 60%, #030a05 100%)"
-      }}
-      id="auth-view"
-    >
-      {/* 2 Animated Gradient Ambient Glow Orbs: Vibrant Green + Deep Dark Green */}
-      <div 
-        className="ambient-glow w-[380px] h-[380px] sm:w-[520px] sm:h-[520px] top-[-60px] left-[-60px] sm:top-[8%] sm:left-[12%] animate-float-slow"
-        style={{
-          background: "radial-gradient(circle, #00FF66 0%, #00aa44 50%, transparent 75%)",
-          opacity: 0.22
-        }}
-      />
-      <div 
-        className="ambient-glow w-[340px] h-[340px] sm:w-[480px] sm:h-[480px] bottom-[-60px] right-[-60px] sm:bottom-[8%] sm:right-[12%] animate-pulse-glow"
-        style={{
-          background: "radial-gradient(circle, #005522 0%, #012810 55%, transparent 75%)",
-          opacity: 0.45
-        }}
-      />
+    <div className="min-h-screen w-screen overflow-y-auto bg-dot-grid flex flex-col items-center justify-center p-4 md:p-8 select-none relative" id="auth-view">
+      {/* Matching Dashboard Cyber Ambient Gradient Glows */}
+      <div className="ambient-glow ambient-glow-green w-[400px] h-[400px] sm:w-[550px] sm:h-[550px] top-[-80px] left-[-80px] sm:top-[10%] sm:left-[15%] animate-float-slow" />
+      <div className="ambient-glow ambient-glow-cyan w-[350px] h-[350px] sm:w-[480px] sm:h-[480px] bottom-[-80px] right-[-80px] sm:bottom-[10%] sm:right-[15%] animate-pulse-glow opacity-20" />
+      <div className="ambient-glow ambient-glow-amber w-[300px] h-[300px] top-[40%] right-[10%] opacity-15" />
 
-      {/* Main Glassmorphism Auth Card - Slightly Larger & Boxy Rounded Corners */}
+      {/* Main Glassmorphism Auth Card */}
       <motion.div
         initial={{ opacity: 0, y: 20, scale: 0.97 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -93,7 +75,7 @@ export default function Auth() {
           </span>
         </div>
 
-        {/* Brand Header */}
+        {/* Brand Header with Matching Gradient Fade */}
         <div className="text-center mb-7 flex flex-col items-center">
           <motion.div
             whileHover={{ scale: 1.05 }}
