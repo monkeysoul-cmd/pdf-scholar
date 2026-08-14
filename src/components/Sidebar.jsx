@@ -73,14 +73,14 @@ export default function Sidebar() {
             <motion.div
               whileHover={{ scale: 1.05 }}
               onClick={() => setIsCollapsed(false)}
-              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-emerald-400 shrink-0 cursor-pointer shadow-inner"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-[#00FF66] shrink-0 cursor-pointer shadow-inner"
               title="Expand PDF Scholar Hub"
             >
-              <PDFScholarLogo className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400" />
+              <PDFScholarLogo className="w-4 h-4 sm:w-5 sm:h-5 text-[#00FF66]" />
             </motion.div>
             <button
               onClick={() => setIsCollapsed(false)}
-              className="w-7 h-7 sm:w-8 sm:h-8 bg-white/5 hover:bg-emerald-500 text-zinc-400 hover:text-black border border-white/10 hover:border-emerald-500 rounded-full transition-all flex items-center justify-center cursor-pointer shrink-0"
+              className="w-7 h-7 sm:w-8 sm:h-8 bg-white/5 hover:bg-[#00FF66] text-zinc-400 hover:text-black border border-white/10 hover:border-[#00FF66] rounded-full transition-all flex items-center justify-center cursor-pointer shrink-0"
               title="Expand Sidebar"
             >
               <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -91,26 +91,26 @@ export default function Sidebar() {
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">
               <motion.div
                 whileHover={{ scale: 1.05 }}
-                className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-emerald-400 shrink-0 shadow-inner"
+                className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-[#00FF66] shrink-0 shadow-inner"
               >
-                <PDFScholarLogo className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400" />
+                <PDFScholarLogo className="w-4 h-4 sm:w-5 sm:h-5 text-[#00FF66]" />
               </motion.div>
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="min-w-0">
                 <div className="flex items-center gap-1.5 font-black text-lg sm:text-xl tracking-tight leading-none">
-                  <span className="text-emerald-400 drop-shadow-[0_0_12px_rgba(16,185,129,0.35)]">PDF</span>
+                  <span className="text-[#00FF66] drop-shadow-[0_0_12px_rgba(0,255,102,0.35)]">PDF</span>
                   <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-zinc-100 to-zinc-400">
                     Scholar Hub
                   </span>
                 </div>
                 <div className="flex items-center gap-1.5 text-[9px] font-mono tracking-wider text-zinc-500 uppercase mt-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#00FF66] animate-pulse" />
                   Vector AI Active
                 </div>
               </motion.div>
             </div>
             <button
               onClick={() => setIsCollapsed(true)}
-              className="hidden md:flex p-1.5 bg-white/5 hover:bg-emerald-500 text-zinc-400 hover:text-black border border-white/10 hover:border-emerald-500 rounded-full transition-all cursor-pointer shrink-0 items-center justify-center"
+              className="hidden md:flex p-1.5 bg-white/5 hover:bg-[#00FF66] text-zinc-400 hover:text-black border border-white/10 hover:border-[#00FF66] rounded-full transition-all cursor-pointer shrink-0 items-center justify-center"
               title="Collapse Sidebar"
             >
               <ChevronLeft className="w-4 h-4" />
@@ -144,7 +144,7 @@ export default function Sidebar() {
                   collapsed ? "justify-center px-0 py-3 rounded-xl" : "justify-between px-3 sm:px-3.5 py-3 rounded-xl"
                 } text-xs font-bold uppercase tracking-wider text-left transition-all cursor-pointer ${
                   isActive
-                    ? "text-black bg-gradient-to-r from-emerald-500 to-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.3)] font-black"
+                    ? "text-black bg-gradient-to-r from-[#00FF66] to-[#00E55B] shadow-[0_0_15px_rgba(0,255,102,0.35)] font-black"
                     : isDisabled
                     ? "text-zinc-700 bg-transparent cursor-not-allowed opacity-50"
                     : "text-zinc-400 hover:text-white glass-card hover:border-white/20"
@@ -158,7 +158,7 @@ export default function Sidebar() {
                   <motion.span
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
-                    className="text-[9px] font-black bg-emerald-400 text-black px-2 py-0.5 rounded-full relative z-10 shadow-sm"
+                    className="text-[9px] font-black bg-[#00FF66] text-black px-2 py-0.5 rounded-full relative z-10 shadow-sm"
                   >
                     READY
                   </motion.span>
@@ -191,10 +191,10 @@ export default function Sidebar() {
                   whileHover={{ scale: 1.05 }}
                   onClick={() => setTab("chat")}
                   title={`Active Target: ${activeDoc.name}`}
-                  className="w-full p-3 glass-card border-emerald-500/40 rounded-xl flex items-center justify-center text-emerald-400 relative shadow-[0_0_15px_rgba(16,185,129,0.15)] cursor-pointer"
+                  className="w-full p-3 glass-card border-[#00FF66]/50 rounded-xl flex items-center justify-center text-[#00FF66] relative shadow-[0_0_15px_rgba(0,255,102,0.15)] cursor-pointer"
                 >
                   <FileText className="w-4 h-4 drop-shadow-[0_0_5px_currentColor]" />
-                  <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-[#00FF66] animate-pulse" />
                 </motion.button>
               ) : (
                 <motion.div
@@ -202,11 +202,11 @@ export default function Sidebar() {
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
-                  className="p-3 sm:p-4 glass-card border-l-2 border-l-emerald-400 rounded-xl flex flex-col gap-3 relative group/doc shadow-lg overflow-hidden"
+                  className="p-3 sm:p-4 glass-card border-l-2 border-l-[#00FF66] rounded-xl flex flex-col gap-3 relative group/doc shadow-lg overflow-hidden"
                 >
                   <div className="flex items-start gap-3 relative z-10">
                     <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center shrink-0 mt-0.5 shadow-inner">
-                      <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400 drop-shadow-sm" />
+                      <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#00FF66] drop-shadow-sm" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="text-xs font-bold uppercase tracking-wide text-zinc-100 truncate drop-shadow-sm" title={activeDoc.name}>
@@ -224,7 +224,7 @@ export default function Sidebar() {
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => setTab("chat")}
-                      className="flex-1 text-center bg-gradient-to-r from-emerald-500 to-emerald-400 hover:from-emerald-400 hover:to-emerald-300 text-black font-extrabold text-[10px] uppercase tracking-wider py-2 rounded-lg transition-all shadow-[0_0_12px_rgba(16,185,129,0.2)] cursor-pointer"
+                      className="flex-1 text-center bg-gradient-to-r from-[#00FF66] to-[#00E55B] hover:from-[#00E55B] hover:to-[#00CC55] text-black font-extrabold text-[10px] uppercase tracking-wider py-2 rounded-lg transition-all shadow-[0_0_12px_rgba(0,255,102,0.25)] cursor-pointer"
                     >
                       Start Chat
                     </motion.button>
@@ -255,10 +255,10 @@ export default function Sidebar() {
           <>
             <div className="flex items-center justify-between text-[11px] text-zinc-400 glass-card p-3 rounded-xl">
               <div className="flex items-center gap-2 min-w-0">
-                <Cloud className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                <Cloud className="w-3.5 h-3.5 text-[#00FF66] shrink-0" />
                 <span className="truncate">User: <strong className="text-white drop-shadow-sm">{user?.username}</strong></span>
               </div>
-              <div className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#10B981] animate-pulse shrink-0" />
+              <div className="w-2 h-2 rounded-full bg-[#00FF66] shadow-[0_0_8px_#00FF66] animate-pulse shrink-0" />
             </div>
             <motion.button
               whileHover={{ scale: 1.01 }}
@@ -294,7 +294,7 @@ export default function Sidebar() {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.8 }}
             onClick={() => setIsMobileOpen(true)}
-            className="md:hidden fixed top-3 left-3 z-40 w-10 h-10 glass-card border-white/10 text-zinc-300 hover:text-emerald-400 hover:border-emerald-500/40 rounded-xl flex items-center justify-center transition-all shadow-lg cursor-pointer"
+            className="md:hidden fixed top-3 left-3 z-40 w-10 h-10 glass-card border-white/10 text-zinc-300 hover:text-[#00FF66] hover:border-[#00FF66]/40 rounded-xl flex items-center justify-center transition-all shadow-lg cursor-pointer"
             title="Open Navigation"
             id="mobile-menu-btn"
           >

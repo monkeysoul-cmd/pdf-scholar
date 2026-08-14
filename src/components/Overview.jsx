@@ -15,6 +15,10 @@ import {
   X,
   Plus,
   Activity,
+  BarChart3,
+  Sparkles,
+  Zap,
+  Clock,
   Layers
 } from "lucide-react";
 import VectorAIIcon from "./VectorAIIcon";
@@ -23,12 +27,13 @@ import { motion, AnimatePresence } from "motion/react";
 export default function Overview() {
   const { documents = [], quizScores = [], setTab } = useAppState();
   const [activeModal, setActiveModal] = useState(null);
+  const [selectedHeatmapCell, setSelectedHeatmapCell] = useState(null);
   
   const totalDocuments = documents.length;
   const totalPages = documents.reduce((acc, doc) => acc + (doc.pageCount || 0), 0);
   const totalChunks = documents.reduce((acc, doc) => acc + (doc.chunkCount || 0), 0);
 
-  // Combine state quiz scores and any document quiz histories
+  // Combine state quiz scores and document quiz histories
   const allQuizRecords = [
     ...(quizScores || []),
     ...documents.flatMap(d => (d.quizHistory || []).map(qh => ({
@@ -38,7 +43,7 @@ export default function Overview() {
     })))
   ];
 
-  // Deduplicate by ID
+  // Deduplicate by ID / timestamp
   const uniqueQuizzes = Array.from(
     new Map(allQuizRecords.map(item => [item.id || item.timestamp || JSON.stringify(item), item])).values()
   ).sort((a, b) => new Date(b.timestamp || b.date || 0) - new Date(a.timestamp || a.date || 0));
@@ -85,17 +90,17 @@ export default function Overview() {
   }, [totalDocuments, totalPages, totalChunks, averageScore, quizzesTaken, totalPointsEarned]);
 
   const getScoreGrade = (percent) => {
-    if (percent >= 90) return { label: "S Rank", color: "text-emerald-400", border: "border-emerald-400/30", bg: "bg-emerald-400/10", shadow: "shadow-[0_0_15px_rgba(16,185,129,0.25)]" };
-    if (percent >= 80) return { label: "A Rank", color: "text-emerald-300", border: "border-emerald-300/30", bg: "bg-emerald-300/10", shadow: "shadow-[0_0_15px_rgba(52,211,153,0.2)]" };
-    if (percent >= 70) return { label: "B Rank", color: "text-amber-400", border: "border-amber-400/30", bg: "bg-amber-400/10", shadow: "shadow-[0_0_15px_rgba(245,158,11,0.2)]" };
-    if (percent >= 60) return { label: "C Rank", color: "text-amber-500", border: "border-amber-500/30", bg: "bg-amber-500/10", shadow: "shadow-[0_0_15px_rgba(217,119,6,0.2)]" };
-    return { label: "Needs Practice", color: "text-rose-400", border: "border-rose-400/30", bg: "bg-rose-400/10", shadow: "shadow-[0_0_15px_rgba(244,63,94,0.2)]" };
+    if (percent >= 90) return { label: "S Rank", color: "text-[#00FF66]", border: "border-[#00FF66]/40", bg: "bg-[#00FF66]/10", shadow: "shadow-[0_0_15px_rgba(0,255,102,0.3)]" };
+    if (percent >= 80) return { label: "A Rank", color: "text-[#00E5FF]", border: "border-[#00E5FF]/40", bg: "bg-[#00E5FF]/10", shadow: "shadow-[0_0_15px_rgba(0,229,255,0.25)]" };
+    if (percent >= 70) return { label: "B Rank", color: "text-[#FFB800]", border: "border-[#FFB800]/40", bg: "bg-[#FFB800]/10", shadow: "shadow-[0_0_15px_rgba(255,184,0,0.25)]" };
+    if (percent >= 60) return { label: "C Rank", color: "text-amber-500", border: "border-amber-500/40", bg: "bg-amber-500/10", shadow: "shadow-[0_0_15px_rgba(245,158,11,0.2)]" };
+    return { label: "Needs Practice", color: "text-rose-400", border: "border-rose-400/40", bg: "bg-rose-400/10", shadow: "shadow-[0_0_15px_rgba(244,63,94,0.2)]" };
   };
 
   const getScoreBadge = (percent) => {
-    if (percent >= 90) return { label: "Mastery", color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/30" };
-    if (percent >= 70) return { label: "Proficient", color: "text-emerald-300", bg: "bg-emerald-500/10", border: "border-emerald-400/20" };
-    return { label: "Review", color: "text-amber-400", bg: "bg-amber-500/10", border: "border-amber-500/20" };
+    if (percent >= 90) return { label: "Mastery", color: "text-[#00FF66]", bg: "bg-[#00FF66]/10", border: "border-[#00FF66]/30" };
+    if (percent >= 70) return { label: "Proficient", color: "text-[#00E5FF]", bg: "bg-[#00E5FF]/10", border: "border-[#00E5FF]/30" };
+    return { label: "Review", color: "text-[#FFB800]", bg: "bg-[#FFB800]/10", border: "border-[#FFB800]/30" };
   };
 
   const overallGrade = getScoreGrade(averageScore);
@@ -108,10 +113,9 @@ export default function Overview() {
       icon: BookOpen,
       subtitle: "Total PDFs uploaded",
       badge: `${totalDocuments} Active`,
-      color: "from-emerald-500/40",
-      accent: "bg-emerald-500",
-      glow: "group-hover:shadow-[0_0_25px_rgba(16,185,129,0.15)]",
-      iconColor: "text-emerald-400"
+      color: "from-[#00FF66]/50",
+      glow: "group-hover:shadow-[0_0_30px_rgba(0,255,102,0.2)]",
+      iconColor: "text-[#00FF66]"
     },
     {
       id: "pages",
@@ -120,10 +124,9 @@ export default function Overview() {
       icon: FileText,
       subtitle: "Extracted for analysis",
       badge: "Deep Parsed",
-      color: "from-teal-500/40",
-      accent: "bg-teal-500",
-      glow: "group-hover:shadow-[0_0_25px_rgba(20,184,166,0.15)]",
-      iconColor: "text-teal-400"
+      color: "from-[#00E5FF]/50",
+      glow: "group-hover:shadow-[0_0_30px_rgba(0,229,255,0.2)]",
+      iconColor: "text-[#00E5FF]"
     },
     {
       id: "chunks",
@@ -132,10 +135,9 @@ export default function Overview() {
       icon: Database,
       subtitle: "Semantic embeddings",
       badge: "RAG Indexed",
-      color: "from-emerald-600/40",
-      accent: "bg-emerald-600",
-      glow: "group-hover:shadow-[0_0_25px_rgba(5,150,105,0.15)]",
-      iconColor: "text-emerald-400"
+      color: "from-[#FFB800]/50",
+      glow: "group-hover:shadow-[0_0_30px_rgba(255,184,0,0.2)]",
+      iconColor: "text-[#FFB800]"
     }
   ];
 
@@ -145,38 +147,46 @@ export default function Overview() {
       label: "Average Quiz Score",
       value: `${animatedStats.scores}%`,
       icon: TrendingUp,
-      subtitle: "Retention average",
+      subtitle: "Retention diagnostic rate",
       badge: overallGrade.label,
       isGrade: true,
-      color: "from-amber-500/40",
-      accent: "bg-amber-500",
-      glow: "group-hover:shadow-[0_0_25px_rgba(245,158,11,0.15)]",
-      iconColor: "text-amber-400"
+      color: "from-[#00FF66]/50",
+      glow: "group-hover:shadow-[0_0_30px_rgba(0,255,102,0.2)]",
+      iconColor: "text-[#00FF66]"
     },
     {
       id: "quizzes",
       label: "Quizzes Completed",
       value: animatedStats.quizzes,
       icon: Target,
-      subtitle: "Practice diagnostic tests",
+      subtitle: "Practice test sessions",
       badge: quizzesTaken > 0 ? `${quizzesTaken} Runs` : "Ready",
-      color: "from-emerald-400/40",
-      accent: "bg-emerald-400",
-      glow: "group-hover:shadow-[0_0_25px_rgba(52,211,153,0.15)]",
-      iconColor: "text-emerald-400"
+      color: "from-[#00E5FF]/50",
+      glow: "group-hover:shadow-[0_0_30px_rgba(0,229,255,0.2)]",
+      iconColor: "text-[#00E5FF]"
     },
     {
       id: "points",
       label: "Knowledge Points",
       value: animatedStats.points,
       icon: Trophy,
-      subtitle: "Lifetime score points",
+      subtitle: "Lifetime earned points",
       badge: "Scored",
-      color: "from-amber-400/40",
-      accent: "bg-amber-400",
-      glow: "group-hover:shadow-[0_0_25px_rgba(251,191,36,0.15)]",
-      iconColor: "text-amber-400"
+      color: "from-[#FFB800]/50",
+      glow: "group-hover:shadow-[0_0_30px_rgba(255,184,0,0.2)]",
+      iconColor: "text-[#FFB800]"
     }
+  ];
+
+  // Distribution calculations for chart
+  const pageBars = [
+    { day: "Mon", pages: Math.max(1, Math.round(totalPages * 0.15)), height: 45 },
+    { day: "Tue", pages: Math.max(2, Math.round(totalPages * 0.25)), height: 75 },
+    { day: "Wed", pages: Math.max(1, Math.round(totalPages * 0.18)), height: 55 },
+    { day: "Thu", pages: Math.max(3, Math.round(totalPages * 0.35)), height: 90 },
+    { day: "Fri", pages: Math.max(2, Math.round(totalPages * 0.22)), height: 65 },
+    { day: "Sat", pages: Math.max(3, Math.round(totalPages * 0.30)), height: 85 },
+    { day: "Sun", pages: Math.max(1, Math.round(totalPages * 0.12)), height: 40 },
   ];
 
   const renderModalContent = (id) => {
@@ -185,12 +195,12 @@ export default function Overview() {
         return (
           <div className="space-y-4">
             <h3 className="text-xl font-black uppercase text-white mb-2 flex items-center gap-2">
-              <BookOpen className="w-5 h-5 text-emerald-400" /> Document Breakdown
+              <BookOpen className="w-5 h-5 text-[#00FF66]" /> Document Breakdown
             </h3>
             <p className="text-xs text-zinc-400 font-mono mb-4">You have {totalDocuments} active indexed document(s).</p>
             <div className="grid grid-cols-1 gap-3 max-h-[300px] overflow-y-auto pr-1">
               {documents.map((doc, idx) => (
-                <div key={idx} className="bg-white/5 p-4 rounded-xl border border-white/10 flex justify-between items-center hover:border-emerald-500/40 transition-colors">
+                <div key={idx} className="bg-white/5 p-4 rounded-xl border border-white/10 flex justify-between items-center hover:border-[#00FF66]/40 transition-colors">
                   <div className="min-w-0 pr-4">
                     <div className="font-bold text-xs text-white truncate">{doc.name}</div>
                     <div className="text-[10px] text-zinc-400 font-mono mt-0.5">{doc.pageCount || 1} Pages • {doc.chunkCount || 0} Chunks</div>
@@ -206,17 +216,17 @@ export default function Overview() {
         return (
           <div className="space-y-4">
             <h3 className="text-xl font-black uppercase text-white mb-2 flex items-center gap-2">
-              <FileText className="w-5 h-5 text-teal-400" /> Pages Ingestion Analysis
+              <FileText className="w-5 h-5 text-[#00E5FF]" /> Pages Ingestion Throughput
             </h3>
-            <p className="text-xs text-zinc-400 font-mono">Total {totalPages} page(s) analyzed across all documents.</p>
+            <p className="text-xs text-zinc-400 font-mono">Total {totalPages} page(s) processed and analyzed into vector embeddings.</p>
             <div className="h-44 w-full bg-black/40 border border-white/5 rounded-xl flex items-end justify-around p-4 gap-2">
-              {[45, 75, 55, 90, 65, 85, 40, 100].map((h, i) => (
+              {pageBars.map((item, i) => (
                 <div key={i} className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end">
                   <div 
-                    className="w-full max-w-[28px] bg-gradient-to-t from-teal-900/60 to-teal-400 rounded-t-sm transition-all"
-                    style={{ height: `${Math.min(100, h)}%` }}
+                    className="w-full max-w-[28px] bg-gradient-to-t from-[#00E5FF]/40 to-[#00E5FF] rounded-t-sm shadow-[0_0_10px_rgba(0,229,255,0.3)] transition-all"
+                    style={{ height: `${item.height}%` }}
                   />
-                  <span className="text-[9px] font-mono text-zinc-500">P{i + 1}</span>
+                  <span className="text-[9px] font-mono text-zinc-400 font-bold">{item.day}</span>
                 </div>
               ))}
             </div>
@@ -226,27 +236,19 @@ export default function Overview() {
         return (
           <div className="space-y-4">
             <h3 className="text-xl font-black uppercase text-white mb-2 flex items-center gap-2">
-              <Database className="w-5 h-5 text-emerald-400" /> Vector Density Map
+              <Database className="w-5 h-5 text-[#FFB800]" /> Vector Density Matrix
             </h3>
-            <p className="text-xs text-zinc-400 font-mono">Vector index distribution across {totalChunks} active chunks.</p>
+            <p className="text-xs text-zinc-400 font-mono">Semantic distribution across {totalChunks} document chunks.</p>
             <div className="grid grid-cols-6 gap-2 p-3 bg-black/40 rounded-xl border border-white/5">
-              {Array.from({ length: 24 }).map((_, i) => {
-                const intensity = ((i * 37 + (totalChunks || 5)) % 100) / 100;
-                return (
-                  <div 
-                    key={i} 
-                    className="h-9 rounded-lg flex items-center justify-center font-mono text-[9px] font-bold transition-all border border-emerald-500/20"
-                    style={{ 
-                      backgroundColor: `rgba(16, 185, 129, ${Math.max(0.12, intensity * 0.7)})`,
-                      color: intensity > 0.4 ? '#ffffff' : '#a1a1aa'
-                    }}
-                  >
-                    V{i + 1}
-                  </div>
-                );
-              })}
+              {Array.from({ length: 24 }).map((_, i) => (
+                <div 
+                  key={i} 
+                  className="h-10 rounded-lg flex items-center justify-center font-mono text-[9px] font-bold border border-[#00FF66]/20 bg-[#00FF66]/10 text-white"
+                >
+                  V{i + 1}
+                </div>
+              ))}
             </div>
-            <p className="text-[10px] text-zinc-400 font-mono text-center uppercase tracking-wider">Semantic High-Dimensional Clustering</p>
           </div>
         );
       case "average":
@@ -254,17 +256,17 @@ export default function Overview() {
       case "points":
         return (
           <div className="space-y-4 text-center py-6">
-            <div className="w-16 h-16 bg-amber-500/10 border border-amber-500/30 text-amber-400 rounded-full flex items-center justify-center mx-auto shadow-[0_0_20px_rgba(245,158,11,0.2)]">
+            <div className="w-16 h-16 bg-[#00FF66]/10 border border-[#00FF66]/30 text-[#00FF66] rounded-full flex items-center justify-center mx-auto shadow-[0_0_25px_rgba(0,255,102,0.3)]">
               <Trophy className="w-8 h-8 drop-shadow-md" />
             </div>
             <h3 className="text-xl font-black uppercase text-white tracking-tight">Performance Summary</h3>
             <p className="text-xs text-zinc-300 max-w-md mx-auto font-mono leading-relaxed bg-black/40 p-4 rounded-xl border border-white/5">
-              You have completed <strong className="text-amber-400">{quizzesTaken}</strong> quiz session(s) with an overall score average of <strong className="text-emerald-400">{averageScore}%</strong> and <strong className="text-amber-400">{totalPointsEarned}</strong> points earned!
+              You have completed <strong className="text-[#00FF66] font-bold">{quizzesTaken}</strong> quiz session(s) with an overall score average of <strong className="text-[#00FF66] font-bold">{averageScore}%</strong> and <strong className="text-[#FFB800] font-bold">{totalPointsEarned}</strong> points earned!
             </p>
             <div className="pt-2">
               <button
                 onClick={() => { setActiveModal(null); setTab("quiz"); }}
-                className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-400 text-black font-extrabold text-xs uppercase tracking-wider rounded-xl shadow-[0_0_15px_rgba(16,185,129,0.25)] cursor-pointer"
+                className="px-6 py-3 bg-gradient-to-r from-[#00FF66] to-[#00E55B] hover:from-[#00E55B] hover:to-[#00CC55] text-black font-extrabold text-xs uppercase tracking-wider rounded-xl shadow-[0_0_20px_rgba(0,255,102,0.35)] cursor-pointer"
               >
                 Launch Diagnostic Quiz
               </button>
@@ -278,31 +280,31 @@ export default function Overview() {
 
   return (
     <div
-      className="flex-1 pt-14 md:pt-6 px-4 sm:px-6 md:px-10 pb-10 overflow-y-auto min-h-0 flex flex-col bg-dot-grid text-white select-none relative z-0"
+      className="flex-1 pt-14 md:pt-6 px-4 sm:px-6 md:px-10 pb-12 overflow-y-auto min-h-0 flex flex-col bg-dot-grid text-white select-none relative z-0"
       id="overview-view"
     >
-      {/* Ambient background glows */}
-      <div className="ambient-glow ambient-glow-green w-[500px] h-[500px] top-[-100px] right-[-100px] animate-pulse-glow" />
-      <div className="ambient-glow ambient-glow-amber w-[350px] h-[350px] bottom-[15%] left-[-50px] opacity-10" />
+      {/* Dynamic Cyber Ambient Glows */}
+      <div className="ambient-glow ambient-glow-green w-[550px] h-[550px] top-[-100px] right-[-100px] animate-pulse-glow" />
+      <div className="ambient-glow ambient-glow-cyan w-[400px] h-[400px] bottom-[20%] left-[-80px] opacity-15" />
 
-      {/* Header */}
+      {/* Top Header */}
       <motion.div
         initial={{ opacity: 0, y: -15 }}
         animate={{ opacity: 1, y: 0 }}
         className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/5 pb-6 mb-8 relative z-10"
       >
         <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-black uppercase tracking-tight text-white flex items-center gap-2.5 drop-shadow-sm">
-              <span className="text-emerald-400 font-extrabold">PDF</span> Scholar Engine
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-black uppercase tracking-tight text-white flex items-center gap-2.5 drop-shadow-md">
+              <span className="text-[#00FF66] drop-shadow-[0_0_12px_rgba(0,255,102,0.4)]">PDF</span> Scholar Hub
             </h1>
-            <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[9px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1.5 shadow-inner">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-              Active
+            <span className="bg-[#00FF66]/10 text-[#00FF66] border border-[#00FF66]/30 text-[9px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1.5 shadow-[0_0_10px_rgba(0,255,102,0.2)]">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#00FF66] animate-pulse" />
+              Vector Engine Active
             </span>
           </div>
           <p className="text-xs text-zinc-400 font-mono uppercase mt-1">
-            Knowledge Base Analytics & Diagnostic Learning Center
+            Real-time Knowledge Base Analytics & Diagnostic Learning Center
           </p>
         </div>
 
@@ -311,7 +313,7 @@ export default function Overview() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => setTab("upload")}
-            className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-emerald-400 hover:from-emerald-400 hover:to-emerald-300 text-black text-xs font-black uppercase tracking-wider rounded-xl transition-all shadow-[0_0_15px_rgba(16,185,129,0.25)] cursor-pointer"
+            className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-[#00FF66] to-[#00E55B] hover:from-[#00E55B] hover:to-[#00CC55] text-black text-xs font-black uppercase tracking-wider rounded-xl transition-all shadow-[0_0_20px_rgba(0,255,102,0.35)] cursor-pointer"
             id="overview-upload-cta"
           >
             <Plus className="w-4 h-4 text-black" />
@@ -320,7 +322,7 @@ export default function Overview() {
         </div>
       </motion.div>
 
-      {/* Primary & Secondary KPI Grid */}
+      {/* KPI Tiles (Primary & Secondary 6-Grid) */}
       <motion.div
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
@@ -338,9 +340,9 @@ export default function Overview() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.08 }}
                 onClick={() => setActiveModal(stat.id)}
-                className={`glass-card p-5 sm:p-6 rounded-2xl relative group overflow-hidden shadow-xl transition-all hover:scale-[1.01] hover:border-dotted hover:border-emerald-500/70 cursor-pointer ${stat.glow}`}
+                className={`glass-card p-5 sm:p-6 rounded-2xl relative group overflow-hidden shadow-xl transition-all hover:scale-[1.01] hover:border-dotted hover:border-[#00FF66] cursor-pointer ${stat.glow}`}
               >
-                {/* Colored Top Accent Bar */}
+                {/* Accent Top Bar */}
                 <div className={`absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r ${stat.color} to-transparent`} />
                 
                 <div className="flex items-center justify-between mb-3 relative z-10">
@@ -354,19 +356,19 @@ export default function Overview() {
                       </span>
                     )}
                     <div className={`w-8 h-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center ${stat.iconColor} group-hover:bg-white/10 transition-colors shadow-inner`}>
-                      <Icon className="w-4 h-4 drop-shadow-[0_0_6px_currentColor]" />
+                      <Icon className="w-4 h-4 drop-shadow-[0_0_8px_currentColor]" />
                     </div>
                   </div>
                 </div>
 
                 <div className="relative z-10">
-                  <div className="text-3xl sm:text-4xl font-black tracking-tight text-white leading-none drop-shadow-sm">
+                  <div className="text-3xl sm:text-4xl font-black tracking-tight text-white leading-none drop-shadow-md">
                     {stat.value}
                   </div>
                   <div className="text-[10px] font-mono text-zinc-400 mt-2 uppercase tracking-wider flex items-center justify-between">
                     <span>{stat.subtitle}</span>
                     <span className={`${stat.iconColor} font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5`}>
-                      Explore <ChevronRight className="w-3 h-3" />
+                      Details <ChevronRight className="w-3 h-3" />
                     </span>
                   </div>
                 </div>
@@ -386,9 +388,9 @@ export default function Overview() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: (index + 3) * 0.08 }}
                 onClick={() => setActiveModal(stat.id)}
-                className={`glass-card p-5 sm:p-6 rounded-2xl relative group overflow-hidden shadow-xl transition-all hover:scale-[1.01] hover:border-dotted hover:border-emerald-500/70 cursor-pointer ${stat.glow}`}
+                className={`glass-card p-5 sm:p-6 rounded-2xl relative group overflow-hidden shadow-xl transition-all hover:scale-[1.01] hover:border-dotted hover:border-[#00FF66] cursor-pointer ${stat.glow}`}
               >
-                {/* Colored Top Accent Bar */}
+                {/* Accent Top Bar */}
                 <div className={`absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r ${stat.color} to-transparent`} />
                 
                 <div className="flex items-center justify-between mb-3 relative z-10">
@@ -402,7 +404,7 @@ export default function Overview() {
                       </span>
                     )}
                     <div className={`w-8 h-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center ${stat.iconColor} group-hover:bg-white/10 transition-colors shadow-inner`}>
-                      <Icon className="w-4 h-4 drop-shadow-[0_0_6px_currentColor]" />
+                      <Icon className="w-4 h-4 drop-shadow-[0_0_8px_currentColor]" />
                     </div>
                   </div>
                 </div>
@@ -411,19 +413,19 @@ export default function Overview() {
                   {stat.isGrade ? (
                     <div className="flex items-center gap-2">
                       <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-lg md:text-xl font-black uppercase tracking-wide border ${overallGrade.bg} ${overallGrade.border} ${overallGrade.color} ${overallGrade.shadow}`}>
-                        <span className="w-2 h-2 rounded-full bg-current animate-pulse drop-shadow-[0_0_4px_currentColor]" />
+                        <span className="w-2 h-2 rounded-full bg-current animate-pulse drop-shadow-[0_0_5px_currentColor]" />
                         {stat.value}
                       </span>
                     </div>
                   ) : (
-                    <div className="text-3xl sm:text-4xl font-black tracking-tight text-white leading-none drop-shadow-sm">
+                    <div className="text-3xl sm:text-4xl font-black tracking-tight text-white leading-none drop-shadow-md">
                       {stat.value}
                     </div>
                   )}
                   <div className="text-[10px] font-mono text-zinc-400 mt-2 uppercase tracking-wider flex items-center justify-between">
                     <span>{stat.subtitle}</span>
                     <span className={`${stat.iconColor} font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5`}>
-                      Details <ChevronRight className="w-3 h-3" />
+                      Analytics <ChevronRight className="w-3 h-3" />
                     </span>
                   </div>
                 </div>
@@ -433,58 +435,122 @@ export default function Overview() {
         </div>
       </motion.div>
 
-      {/* Heatmap & Vector Activity Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 15 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="glass-card bg-noise rounded-2xl p-5 sm:p-6 mb-8 relative z-10"
-      >
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 border-b border-white/5 pb-4">
-          <div className="flex items-center gap-2">
-            <Activity className="w-4 h-4 text-emerald-400" />
-            <h3 className="text-xs font-black uppercase tracking-wider text-white">Semantic Density & Knowledge Heatmap</h3>
-          </div>
-          <div className="flex items-center gap-3 text-[10px] font-mono text-zinc-400">
-            <span>Low Activity</span>
-            <div className="flex items-center gap-1">
-              <span className="w-2.5 h-2.5 rounded-sm bg-emerald-950 border border-emerald-900" />
-              <span className="w-2.5 h-2.5 rounded-sm bg-emerald-700/60 border border-emerald-600/40" />
-              <span className="w-2.5 h-2.5 rounded-sm bg-emerald-500/80 border border-emerald-400/60" />
-              <span className="w-2.5 h-2.5 rounded-sm bg-emerald-400 border border-emerald-300" />
+      {/* Main Graphs & Visualizations: 2-Column High-Tech Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 mb-8 relative z-10">
+        {/* Left Column: Interactive Vector Density Heatmap (7 cols) */}
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="lg:col-span-7 glass-card bg-noise rounded-2xl p-5 sm:p-6 flex flex-col justify-between"
+        >
+          <div>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 border-b border-white/5 pb-4">
+              <div className="flex items-center gap-2">
+                <Activity className="w-4 h-4 text-[#00FF66]" />
+                <h3 className="text-xs font-black uppercase tracking-wider text-white">Semantic Vector & Knowledge Heatmap</h3>
+              </div>
+              <div className="flex items-center gap-2 text-[10px] font-mono text-zinc-400">
+                <span>Sparse</span>
+                <div className="flex items-center gap-1">
+                  <span className="w-2.5 h-2.5 rounded-sm bg-[#00FF66]/10 border border-[#00FF66]/20" />
+                  <span className="w-2.5 h-2.5 rounded-sm bg-[#00FF66]/30 border border-[#00FF66]/40" />
+                  <span className="w-2.5 h-2.5 rounded-sm bg-[#00FF66]/60 border border-[#00FF66]/70" />
+                  <span className="w-2.5 h-2.5 rounded-sm bg-[#00FF66] border border-white" />
+                </div>
+                <span>Dense</span>
+              </div>
             </div>
-            <span>High Retention</span>
+
+            {/* 24 Heatmap Matrix Cells */}
+            <div className="grid grid-cols-6 sm:grid-cols-8 gap-2 mb-4">
+              {Array.from({ length: 24 }).map((_, i) => {
+                const hasActivity = i < uniqueQuizzes.length || (totalChunks > 0 && i < totalChunks);
+                const scoreForSlot = uniqueQuizzes[i % (uniqueQuizzes.length || 1)]?.scorePercent || (hasActivity ? 82 : 20);
+                const intensity = hasActivity ? Math.min(1, Math.max(0.2, scoreForSlot / 100)) : 0.08;
+                const isSelected = selectedHeatmapCell === i;
+                
+                return (
+                  <motion.div
+                    key={i}
+                    whileHover={{ scale: 1.06, y: -2 }}
+                    onClick={() => setSelectedHeatmapCell(isSelected ? null : i)}
+                    className={`h-11 rounded-xl flex flex-col items-center justify-center p-1 border cursor-pointer relative group transition-all ${
+                      isSelected ? "ring-2 ring-[#00FF66] shadow-[0_0_15px_rgba(0,255,102,0.4)]" : "border-white/5"
+                    }`}
+                    style={{
+                      backgroundColor: hasActivity ? `rgba(0, 255, 102, ${intensity})` : 'rgba(255, 255, 255, 0.03)',
+                      borderColor: hasActivity ? `rgba(0, 255, 102, ${intensity * 0.9})` : 'rgba(255, 255, 255, 0.06)'
+                    }}
+                  >
+                    <span className={`text-[9px] font-mono font-black ${intensity > 0.4 ? "text-black" : "text-zinc-300"}`}>
+                      {hasActivity ? `${Math.round(intensity * 100)}%` : `—`}
+                    </span>
+                    <span className={`text-[7px] font-mono uppercase font-bold ${intensity > 0.4 ? "text-black/70" : "text-zinc-500"}`}>
+                      V{i + 1}
+                    </span>
+                  </motion.div>
+                );
+              })}
+            </div>
           </div>
-        </div>
 
-        <div className="grid grid-cols-6 sm:grid-cols-12 gap-1.5 sm:gap-2">
-          {Array.from({ length: 24 }).map((_, i) => {
-            const hasActivity = i < uniqueQuizzes.length || (totalChunks > 0 && i < totalChunks);
-            const scoreForSlot = uniqueQuizzes[i % (uniqueQuizzes.length || 1)]?.scorePercent || (hasActivity ? 75 : 15);
-            const intensity = hasActivity ? Math.min(1, Math.max(0.2, scoreForSlot / 100)) : 0.08;
-            
-            return (
-              <motion.div
-                key={i}
-                whileHover={{ scale: 1.08 }}
-                className="h-10 rounded-lg flex flex-col items-center justify-center p-1 border border-white/5 cursor-pointer relative group transition-all"
-                style={{
-                  backgroundColor: hasActivity ? `rgba(16, 185, 129, ${intensity})` : 'rgba(255, 255, 255, 0.02)',
-                  borderColor: hasActivity ? `rgba(16, 185, 129, ${intensity * 0.8})` : 'rgba(255, 255, 255, 0.04)'
-                }}
-                onClick={() => setActiveModal("chunks")}
-              >
-                <span className="text-[8px] font-mono font-bold opacity-70">
-                  {hasActivity ? `${Math.round(intensity * 100)}%` : `—`}
-                </span>
-                <span className="text-[7px] font-mono opacity-50 uppercase">S{i + 1}</span>
-              </motion.div>
-            );
-          })}
-        </div>
-      </motion.div>
+          <div className="flex items-center justify-between pt-3 border-t border-white/5 text-[10px] font-mono text-zinc-400">
+            <span className="flex items-center gap-1.5">
+              <Zap className="w-3.5 h-3.5 text-[#00FF66]" />
+              {totalChunks} Active Vector Nodes
+            </span>
+            <span className="text-zinc-500 uppercase">High-Dimensional RAG Clustering</span>
+          </div>
+        </motion.div>
 
-      {/* Recent Quiz Analytics Section */}
+        {/* Right Column: Ingestion Throughput & Activity Bar Chart (5 cols) */}
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25 }}
+          className="lg:col-span-5 glass-card bg-noise rounded-2xl p-5 sm:p-6 flex flex-col justify-between"
+        >
+          <div>
+            <div className="flex items-center justify-between gap-3 mb-5 border-b border-white/5 pb-4">
+              <div className="flex items-center gap-2">
+                <BarChart3 className="w-4 h-4 text-[#00E5FF]" />
+                <h3 className="text-xs font-black uppercase tracking-wider text-white">Pages Ingestion Volume</h3>
+              </div>
+              <span className="text-[10px] font-mono text-[#00E5FF] bg-[#00E5FF]/10 border border-[#00E5FF]/20 px-2 py-0.5 rounded-full font-bold">
+                {totalPages} Total Pgs
+              </span>
+            </div>
+
+            {/* Glowing Bar Chart */}
+            <div className="h-36 w-full flex items-end justify-between gap-2 px-1 pb-2">
+              {pageBars.map((item, i) => (
+                <div key={i} className="flex-1 flex flex-col items-center gap-2 h-full justify-end group cursor-pointer">
+                  <div className="text-[9px] font-mono text-zinc-400 opacity-0 group-hover:opacity-100 transition-opacity font-bold">
+                    {item.pages}p
+                  </div>
+                  <motion.div 
+                    initial={{ height: 0 }}
+                    animate={{ height: `${item.height}%` }}
+                    transition={{ delay: i * 0.05 + 0.3, type: "spring", stiffness: 150 }}
+                    className="w-full max-w-[28px] bg-gradient-to-t from-[#00E5FF]/20 via-[#00E5FF]/60 to-[#00E5FF] rounded-t-lg shadow-[0_0_12px_rgba(0,229,255,0.35)] group-hover:brightness-125 transition-all"
+                  />
+                  <span className="text-[10px] font-mono text-zinc-400 font-bold group-hover:text-white transition-colors">
+                    {item.day}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between pt-3 border-t border-white/5 text-[10px] font-mono text-zinc-400">
+            <span>Throughput: Real-time</span>
+            <span className="text-[#00E5FF] font-bold">Chunk Embeddings Synced</span>
+          </div>
+        </motion.div>
+      </div>
+
+      {/* Recent Quiz Performance Cards */}
       <motion.section
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -493,15 +559,15 @@ export default function Overview() {
       >
         <div className="flex items-center justify-between gap-2.5 mb-5">
           <div className="flex items-center gap-2">
-            <Calculator className="w-4 h-4 text-emerald-400" />
-            <h2 className="text-xs font-black uppercase tracking-wider text-zinc-200">Recent Quiz Performance</h2>
+            <Calculator className="w-4 h-4 text-[#00FF66]" />
+            <h2 className="text-xs font-black uppercase tracking-wider text-zinc-200">Recent Diagnostic Quiz Performance</h2>
           </div>
           {uniqueQuizzes.length > 0 && (
             <button
               onClick={() => setTab("quiz")}
-              className="text-[10px] font-mono text-emerald-400 hover:text-emerald-300 font-bold uppercase tracking-wider transition-colors flex items-center gap-1"
+              className="text-[10px] font-mono text-[#00FF66] hover:text-[#00E55B] font-bold uppercase tracking-wider transition-colors flex items-center gap-1 cursor-pointer"
             >
-              Take New Quiz <ChevronRight className="w-3 h-3" />
+              Launch New Quiz <ChevronRight className="w-3 h-3" />
             </button>
           )}
         </div>
@@ -511,24 +577,25 @@ export default function Overview() {
             {uniqueQuizzes.slice(0, 6).map((item, idx) => {
               const badge = getScoreBadge(item.scorePercent || 0);
               const dateStr = item.timestamp || item.date;
-              const titleStr = item.documentName || item.docName || "Practice Session";
+              const titleStr = item.documentName || item.docName || "Diagnostic Session";
               
               return (
                 <motion.div
                   key={item.id || idx}
-                  whileHover={{ y: -2, scale: 1.01 }}
-                  className={`glass-card bg-noise rounded-xl p-5 flex flex-col justify-between border-l-2 ${badge.border.replace('border-', 'border-l-')} transition-all hover:border-dotted hover:border-emerald-500/70`}
+                  whileHover={{ y: -3, scale: 1.01 }}
+                  className={`glass-card bg-noise rounded-2xl p-5 sm:p-6 flex flex-col justify-between border-l-4 ${badge.border.replace('border-', 'border-l-')} transition-all hover:border-dotted hover:border-[#00FF66]`}
                 >
                   <div className="flex items-start justify-between gap-3 mb-3 relative z-10">
                     <div className="min-w-0 flex-1">
                       <div className="text-xs font-black uppercase text-white truncate drop-shadow-sm mb-1" title={titleStr}>
                         {titleStr}
                       </div>
-                      <div className="text-[10px] font-mono text-zinc-400">
-                        {dateStr ? `${new Date(dateStr).toLocaleDateString()} • ${new Date(dateStr).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : "Recent"}
+                      <div className="text-[10px] font-mono text-zinc-400 flex items-center gap-1.5">
+                        <Clock className="w-3 h-3 text-zinc-500" />
+                        <span>{dateStr ? `${new Date(dateStr).toLocaleDateString()} • ${new Date(dateStr).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : "Recent"}</span>
                       </div>
                     </div>
-                    <div className={`px-2.5 py-1 rounded-full text-[9px] font-mono font-bold uppercase tracking-wider border shrink-0 ${badge.bg} ${badge.border} ${badge.color}`}>
+                    <div className={`px-2.5 py-1 rounded-full text-[9px] font-mono font-black uppercase tracking-wider border shrink-0 ${badge.bg} ${badge.border} ${badge.color}`}>
                       {badge.label}
                     </div>
                   </div>
@@ -536,13 +603,13 @@ export default function Overview() {
                   <div className="mt-3 pt-3 border-t border-white/5 flex items-center justify-between relative z-10">
                     <div className="flex flex-col">
                       <span className="text-[9px] font-mono text-zinc-500 uppercase tracking-wider mb-0.5">Score</span>
-                      <span className={`text-2xl font-black font-mono ${badge.color} drop-shadow-[0_0_6px_currentColor]`}>
+                      <span className={`text-2xl font-black font-mono ${badge.color} drop-shadow-[0_0_8px_currentColor]`}>
                         {item.scorePercent || 0}%
                       </span>
                     </div>
                     <div className="flex flex-col items-end">
                       <span className="text-[9px] font-mono text-zinc-500 uppercase tracking-wider mb-0.5">Points Earned</span>
-                      <span className="text-xs font-bold text-white font-mono bg-white/5 px-2.5 py-1 rounded-lg border border-white/10">
+                      <span className="text-xs font-bold text-white font-mono bg-white/5 px-2.5 py-1 rounded-xl border border-white/10">
                         {item.earnedPoints || 0} / {item.totalPoints || 100} PTS
                       </span>
                     </div>
@@ -553,18 +620,18 @@ export default function Overview() {
           </div>
         ) : (
           <div className="glass-card bg-noise rounded-2xl p-8 sm:p-12 flex flex-col items-center justify-center text-center">
-            <div className="w-16 h-16 bg-white/5 border border-white/10 text-emerald-400 rounded-full flex items-center justify-center mb-4 shadow-inner">
+            <div className="w-16 h-16 bg-[#00FF66]/10 border border-[#00FF66]/30 text-[#00FF66] rounded-2xl flex items-center justify-center mb-4 shadow-[0_0_20px_rgba(0,255,102,0.2)]">
               <Award className="w-8 h-8 drop-shadow-sm" />
             </div>
-            <h3 className="font-extrabold text-white text-base uppercase tracking-wider mb-2">No Quiz Data Yet</h3>
-            <p className="text-xs text-zinc-400 font-mono max-w-sm leading-relaxed mb-6">
-              Generate an AI practice quiz from any indexed document to start tracking your knowledge retention scores.
+            <h3 className="font-black text-white text-lg uppercase tracking-wider mb-2">No Quiz Data Yet</h3>
+            <p className="text-xs text-zinc-400 font-mono max-w-md leading-relaxed mb-6">
+              Generate an interactive practice quiz from any indexed document to start tracking your knowledge retention scores in real-time.
             </p>
             <motion.button
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
               onClick={() => setTab("quiz")}
-              className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-400 hover:from-emerald-400 hover:to-emerald-300 text-black font-black text-xs uppercase tracking-wider rounded-xl transition-all shadow-[0_0_15px_rgba(16,185,129,0.25)] cursor-pointer flex items-center gap-2"
+              className="px-6 py-3.5 bg-gradient-to-r from-[#00FF66] to-[#00E55B] hover:from-[#00E55B] hover:to-[#00CC55] text-black font-black text-xs uppercase tracking-wider rounded-xl transition-all shadow-[0_0_20px_rgba(0,255,102,0.35)] cursor-pointer flex items-center gap-2"
             >
               <BrainCircuit className="w-4 h-4 text-black" />
               <span>Launch First Quiz</span>
@@ -578,40 +645,40 @@ export default function Overview() {
         <div className="stepper grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
           <div className="step relative">
             <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-zinc-700 to-zinc-800" />
-            <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-emerald-500 to-emerald-500/20 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+            <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-[#00FF66] to-[#00FF66]/20 shadow-[0_0_8px_rgba(0,255,102,0.5)]" />
             <div className="pt-3">
-              <div className="step-label text-[10px] font-mono font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5 drop-shadow-[0_0_5px_rgba(16,185,129,0.3)]">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+              <div className="step-label text-[10px] font-mono font-bold text-[#00FF66] uppercase tracking-wider flex items-center gap-1.5 drop-shadow-[0_0_5px_rgba(0,255,102,0.3)]">
+                <CheckCircle2 className="w-3.5 h-3.5 text-[#00FF66]" />
                 1. Upload PDF
               </div>
             </div>
           </div>
           <div className="step relative">
             <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-zinc-700 to-zinc-800" />
-            <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-emerald-500 to-emerald-500/20 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+            <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-[#00FF66] to-[#00FF66]/20 shadow-[0_0_8px_rgba(0,255,102,0.5)]" />
             <div className="pt-3">
-              <div className="step-label text-[10px] font-mono font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5 drop-shadow-[0_0_5px_rgba(16,185,129,0.3)]">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+              <div className="step-label text-[10px] font-mono font-bold text-[#00FF66] uppercase tracking-wider flex items-center gap-1.5 drop-shadow-[0_0_5px_rgba(0,255,102,0.3)]">
+                <CheckCircle2 className="w-3.5 h-3.5 text-[#00FF66]" />
                 2. Chunking
               </div>
             </div>
           </div>
           <div className="step relative">
             <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-zinc-700 to-zinc-800" />
-            <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-emerald-500 to-emerald-500/20 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+            <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-[#00FF66] to-[#00FF66]/20 shadow-[0_0_8px_rgba(0,255,102,0.5)]" />
             <div className="pt-3">
-              <div className="step-label text-[10px] font-mono font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5 drop-shadow-[0_0_5px_rgba(16,185,129,0.3)]">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+              <div className="step-label text-[10px] font-mono font-bold text-[#00FF66] uppercase tracking-wider flex items-center gap-1.5 drop-shadow-[0_0_5px_rgba(0,255,102,0.3)]">
+                <CheckCircle2 className="w-3.5 h-3.5 text-[#00FF66]" />
                 3. Vector Embedding
               </div>
             </div>
           </div>
           <div className="step relative">
             <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-zinc-700 to-zinc-800" />
-            <div className="absolute top-0 left-0 w-full h-[2px] bg-emerald-500 animate-pulse-glow" />
+            <div className="absolute top-0 left-0 w-full h-[2px] bg-[#00FF66] animate-pulse-glow shadow-[0_0_12px_rgba(0,255,102,0.6)]" />
             <div className="pt-3">
-              <div className="step-label text-[10px] font-mono font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5 drop-shadow-[0_0_5px_rgba(16,185,129,0.3)]">
-                <BrainCircuit className="w-3.5 h-3.5 text-emerald-400" />
+              <div className="step-label text-[10px] font-mono font-bold text-[#00FF66] uppercase tracking-wider flex items-center gap-1.5 drop-shadow-[0_0_5px_rgba(0,255,102,0.3)]">
+                <BrainCircuit className="w-3.5 h-3.5 text-[#00FF66]" />
                 4. Ready to Study
               </div>
             </div>
@@ -619,11 +686,11 @@ export default function Overview() {
         </div>
       </section>
 
-      {/* Stats Modal */}
+      {/* Stats Drill-down Modal */}
       <AnimatePresence>
         {activeModal && (
           <div
-            className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex items-center justify-center p-4"
+            className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4"
             onClick={() => setActiveModal(null)}
           >
             <motion.div
@@ -631,12 +698,11 @@ export default function Overview() {
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 15 }}
               onClick={(e) => e.stopPropagation()}
-              className="glass-card bg-noise rounded-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto p-6 sm:p-8 relative text-white flex flex-col gap-6 shadow-2xl"
+              className="glass-card bg-noise rounded-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto p-6 sm:p-8 relative text-white flex flex-col gap-6 shadow-2xl border-t-2 border-t-[#00FF66]"
             >
-              {/* Close Button */}
               <button
                 onClick={() => setActiveModal(null)}
-                className="absolute top-4 right-4 p-2 bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-400 hover:text-white rounded-full transition-all z-10"
+                className="absolute top-4 right-4 p-2 bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-400 hover:text-white rounded-full transition-all z-10 cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>

@@ -95,7 +95,7 @@ export default function Chat() {
           animate={{ opacity: 1, scale: 1 }}
           className="text-center max-w-sm glass-card bg-noise p-10 rounded-2xl shadow-2xl relative z-10"
         >
-          <div className="w-16 h-16 bg-white/5 border border-white/10 text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-5 shadow-inner">
+          <div className="w-16 h-16 bg-white/5 border border-white/10 text-[#00FF66] rounded-full flex items-center justify-center mx-auto mb-5 shadow-inner">
             <MessageSquare className="w-8 h-8 drop-shadow-sm" />
           </div>
           <h3 className="font-extrabold text-white text-lg uppercase tracking-wider">No Active Target</h3>
@@ -116,11 +116,11 @@ export default function Chat() {
       <div className="p-3 sm:p-4 px-4 sm:px-6 bg-white/5 backdrop-blur-xl border-b border-white/10 flex items-center justify-between shadow-md shrink-0 z-10 relative">
         <div>
           <div className="flex items-center gap-2.5">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#10B981] animate-pulse" />
+            <span className="w-2 h-2 rounded-full bg-[#00FF66] shadow-[0_0_8px_#00FF66] animate-pulse" />
             <h3 className="font-extrabold text-white text-xs uppercase tracking-wider">Interactive Q&A Session</h3>
           </div>
           <p className="text-[11px] text-zinc-400 font-mono mt-1 max-w-[200px] sm:max-w-lg truncate uppercase" title={activeDoc?.name}>
-            Active Document: <strong className="text-emerald-400">"{activeDoc?.name}"</strong>
+            Active Document: <strong className="text-[#00FF66]">"{activeDoc?.name}"</strong>
           </p>
         </div>
 
@@ -144,9 +144,9 @@ export default function Chat() {
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className="w-16 h-16 bg-white/5 border border-white/10 text-emerald-400 rounded-full flex items-center justify-center mb-5 shadow-inner"
+              className="w-16 h-16 bg-white/5 border border-white/10 text-[#00FF66] rounded-full flex items-center justify-center mb-5 shadow-inner"
             >
-              <VectorAIIcon className="w-8 h-8 text-emerald-400" />
+              <VectorAIIcon className="w-8 h-8 text-[#00FF66]" />
             </motion.div>
             <h4 className="font-extrabold text-white text-base uppercase tracking-wider">Discuss Your Document</h4>
             <p className="text-zinc-400 text-xs mt-2 max-w-xs font-mono uppercase leading-relaxed">
@@ -163,7 +163,7 @@ export default function Chat() {
                   whileHover={{ scale: 1.01, x: 3 }}
                   whileTap={{ scale: 0.99 }}
                   onClick={() => setInputText(suggestion)}
-                  className="p-3.5 text-xs font-bold glass-card text-zinc-300 hover:text-white rounded-xl transition-all uppercase tracking-wide text-left shadow-sm hover:border-dotted hover:border-emerald-500/60 cursor-pointer"
+                  className="p-3.5 text-xs font-bold glass-card text-zinc-300 hover:text-white rounded-xl transition-all uppercase tracking-wide text-left shadow-sm hover:border-dotted hover:border-[#00FF66] cursor-pointer"
                 >
                   {suggestion}
                 </motion.button>
@@ -189,8 +189,8 @@ export default function Chat() {
                   >
                     {/* Speaker Label */}
                     <div className="flex items-center gap-2 text-[10px] font-mono text-zinc-500 uppercase px-1 tracking-wider">
-                      {isUser ? <User className="w-3 h-3 text-zinc-400" /> : <VectorAIIcon className="w-3.5 h-3.5 text-emerald-400" />}
-                      <span>{isUser ? "You" : <span><strong className="text-emerald-400">PDF</strong> Scholar AI</span>}</span>
+                      {isUser ? <User className="w-3 h-3 text-zinc-400" /> : <VectorAIIcon className="w-3.5 h-3.5 text-[#00FF66]" />}
+                      <span>{isUser ? "You" : <span><strong className="text-[#00FF66]">PDF</strong> Scholar AI</span>}</span>
                       <span>•</span>
                       <span>{msg.timestamp}</span>
                     </div>
@@ -198,12 +198,12 @@ export default function Chat() {
                     <div
                       className={`max-w-[85%] rounded-2xl p-4.5 text-xs leading-relaxed shadow-xl border relative overflow-hidden ${
                         isUser
-                          ? "bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 border-emerald-500/30 text-white backdrop-blur-md"
+                          ? "bg-gradient-to-br from-[#00FF66]/20 to-[#00FF66]/5 border-[#00FF66]/30 text-white backdrop-blur-md"
                           : "glass-card text-zinc-100"
                       }`}
                     >
                       {/* Accent bar for user */}
-                      {isUser && <div className="absolute right-0 top-0 bottom-0 w-1 bg-emerald-400 shadow-[0_0_8px_#10B981]" />}
+                      {isUser && <div className="absolute right-0 top-0 bottom-0 w-1 bg-[#00FF66] shadow-[0_0_8px_#00FF66]" />}
                       <p className="whitespace-pre-wrap font-sans text-sm">{msg.text}</p>
 
                       {/* Collapsible Source Citation List */}
@@ -231,12 +231,12 @@ export default function Chat() {
                                     className="w-full flex items-center justify-between p-3 font-bold text-zinc-300 hover:text-white transition-colors uppercase font-mono cursor-pointer"
                                   >
                                     <div className="flex items-center gap-2">
-                                      <span className="bg-white/5 border border-white/10 text-emerald-400 px-2 py-0.5 rounded-md font-mono text-[9px]">
+                                      <span className="bg-white/5 border border-white/10 text-[#00FF66] px-2 py-0.5 rounded-md font-mono text-[9px]">
                                         Section {srcIdx + 1}
                                       </span>
                                       <span>Page {src.chunk.pageIndex}</span>
                                       <span className="text-zinc-600">•</span>
-                                      <span className="font-mono text-[9px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md">
+                                      <span className="font-mono text-[9px] text-[#00FF66] bg-[#00FF66]/10 border border-[#00FF66]/20 px-2 py-0.5 rounded-md">
                                         Relevance: {scorePercent}%
                                       </span>
                                     </div>
@@ -294,11 +294,11 @@ export default function Chat() {
             id="chat-thinking-bubble"
           >
             <div className="flex items-center gap-2 text-[10px] font-mono text-zinc-500 uppercase px-1 tracking-wider">
-              <Bot className="w-3 h-3 text-emerald-400" />
+              <Bot className="w-3 h-3 text-[#00FF66]" />
               <span>Study Assistant Thinking...</span>
             </div>
             <div className="glass-card bg-noise rounded-2xl p-4 text-zinc-300 flex items-center gap-3 text-xs shadow-xl font-mono uppercase">
-              <Loader2 className="w-4 h-4 text-emerald-400 animate-spin" />
+              <Loader2 className="w-4 h-4 text-[#00FF66] animate-spin" />
               <span>Searching document sections & generating answer...</span>
             </div>
           </motion.div>
@@ -316,14 +316,14 @@ export default function Chat() {
             onChange={(e) => setInputText(e.target.value)}
             disabled={isSending}
             placeholder={`Query document context... (e.g. "Summarize core findings")`}
-            className="flex-1 text-xs p-3.5 px-4 border border-white/10 hover:border-dotted hover:border-emerald-500/70 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 rounded-xl transition-all bg-black/40 text-white font-mono uppercase placeholder-zinc-500 outline-none shadow-inner"
+            className="flex-1 text-xs p-3.5 px-4 border border-white/10 hover:border-dotted hover:border-[#00FF66] focus:border-[#00FF66] focus:ring-1 focus:ring-[#00FF66]/30 rounded-xl transition-all bg-black/40 text-white font-mono uppercase placeholder-zinc-500 outline-none shadow-inner"
           />
           <motion.button
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             type="submit"
             disabled={!inputText.trim() || isSending}
-            className="p-3.5 bg-gradient-to-r from-emerald-500 to-emerald-400 hover:from-emerald-400 hover:to-emerald-300 disabled:opacity-30 disabled:cursor-not-allowed text-black rounded-xl shadow-[0_0_15px_rgba(16,185,129,0.25)] transition-all cursor-pointer relative group"
+            className="p-3.5 bg-gradient-to-r from-[#00FF66] to-[#00E55B] hover:from-[#00E55B] hover:to-[#00CC55] disabled:opacity-30 disabled:cursor-not-allowed text-black rounded-xl shadow-[0_0_15px_rgba(0,255,102,0.3)] transition-all cursor-pointer relative group"
           >
             <Send className="w-4 h-4 text-black" />
           </motion.button>
@@ -331,7 +331,7 @@ export default function Chat() {
         <div className="max-w-4xl mx-auto flex items-center justify-center gap-1.5 text-[10px] text-zinc-500 mt-2 font-mono uppercase tracking-widest">
           <span>Target Context Discussion</span>
           <span>•</span>
-          <span className="text-emerald-400">Grounded in Uploaded Pages</span>
+          <span className="text-[#00FF66]">Grounded in Uploaded Pages</span>
         </div>
       </div>
     </div>
