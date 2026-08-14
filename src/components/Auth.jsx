@@ -60,7 +60,7 @@ export default function Auth() {
         initial={{ opacity: 0, y: 20, scale: 0.97 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-        className="max-w-[460px] w-full glass-card bg-noise rounded-md p-7 sm:p-9 relative z-10 my-auto overflow-hidden shadow-2xl border border-white/10"
+        className="max-w-[430px] w-full glass-card bg-noise rounded-md p-6 sm:p-8 relative z-10 my-auto overflow-hidden shadow-2xl border border-white/10"
       >
         {/* Top border accent */}
         <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-[#00FF66] to-transparent shadow-[0_0_15px_rgba(0,255,102,0.6)]" />
