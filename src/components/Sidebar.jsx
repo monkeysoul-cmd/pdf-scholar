@@ -56,7 +56,7 @@ export default function Sidebar() {
   const SidebarInner = ({ collapsed }) => (
     <aside
       className={`${
-        collapsed ? "w-16 sm:w-20" : "w-60 sm:w-64"
+        collapsed ? "w-16 sm:w-20" : "w-[260px] sm:w-[270px]"
       } bg-black/60 backdrop-blur-2xl text-white border-r border-white/10 flex flex-col h-full select-none relative shadow-2xl transition-all duration-300 ease-in-out shrink-0 z-50`}
       id="sidebar-container"
     >
@@ -65,7 +65,7 @@ export default function Sidebar() {
       {/* Header */}
       <div
         className={`border-b border-white/10 relative z-10 ${
-          collapsed ? "py-4 px-2 flex flex-col items-center gap-3" : "p-4 sm:p-6 flex items-center justify-between"
+          collapsed ? "py-4 px-2 flex flex-col items-center gap-3" : "px-4 py-4 sm:py-5 flex items-center justify-between gap-2"
         }`}
       >
         {collapsed ? (
@@ -88,23 +88,23 @@ export default function Sidebar() {
           </>
         ) : (
           <>
-            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <div className="flex items-center gap-2.5 min-w-0 flex-nowrap">
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-[#00FF66] shrink-0 shadow-inner"
               >
                 <PDFScholarLogo className="w-4 h-4 sm:w-5 sm:h-5 text-[#00FF66]" />
               </motion.div>
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="min-w-0">
-                <div className="flex items-center gap-1.5 font-black text-lg sm:text-xl tracking-tight leading-none">
-                  <span className="text-[#00FF66] drop-shadow-[0_0_12px_rgba(0,255,102,0.35)]">PDF</span>
-                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-zinc-100 to-zinc-400">
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="min-w-0 flex-1">
+                <div className="flex items-center gap-1 font-black text-base sm:text-[17px] tracking-tight leading-none whitespace-nowrap">
+                  <span className="text-[#00FF66] drop-shadow-[0_0_12px_rgba(0,255,102,0.35)] shrink-0">PDF</span>
+                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-zinc-100 to-zinc-400 whitespace-nowrap truncate">
                     Scholar Hub
                   </span>
                 </div>
-                <div className="flex items-center gap-1.5 text-[9px] font-mono tracking-wider text-zinc-500 uppercase mt-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#00FF66] animate-pulse" />
-                  Vector AI Active
+                <div className="flex items-center gap-1.5 text-[9px] font-mono tracking-wider text-zinc-500 uppercase mt-1 whitespace-nowrap">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#00FF66] animate-pulse shrink-0" />
+                  <span>Vector AI Active</span>
                 </div>
               </motion.div>
             </div>
