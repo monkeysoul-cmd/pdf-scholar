@@ -12,7 +12,7 @@ import {
   ArrowRight
 } from "lucide-react";
 import VectorAIIcon from "./VectorAIIcon";
-import { motion, AnimatePresence } from "motion/react";
+import { motion } from "motion/react";
 
 export default function Upload() {
   const { fetchDocuments, selectDocument, setTab, authenticatedFetch } = useAppState();
@@ -142,18 +142,18 @@ export default function Upload() {
       <motion.div
         initial={{ opacity: 0, y: 25, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
-        className="max-w-2xl w-full glass-card bg-noise rounded-xl p-6 sm:p-8 md:p-12 relative z-10 my-auto overflow-hidden"
+        className="max-w-2xl w-full glass-card bg-noise rounded-2xl p-6 sm:p-8 md:p-12 relative z-10 my-auto overflow-hidden shadow-2xl"
       >
         {/* Header */}
         <div className="text-center mb-9">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-white/80 text-[10px] font-mono font-bold uppercase tracking-wider mb-4 shadow-inner">
-            <VectorAIIcon className="w-3 h-3 text-[#00FF66] drop-shadow-[0_0_5px_currentColor]" /> Vector Ingestion Engine
+            <VectorAIIcon className="w-3 h-3 text-emerald-400 drop-shadow-[0_0_5px_currentColor]" /> Vector Ingestion Engine
           </div>
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-white uppercase drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-white uppercase drop-shadow-sm">
             Add Study Document
           </h2>
           <p className="text-xs text-zinc-400 max-w-md mx-auto uppercase font-mono mt-2">
-            Upload textbook chapters, articles, or notes for AI discussion.
+            Upload textbook chapters, articles, or research notes for AI extraction.
           </p>
         </div>
 
@@ -167,15 +167,13 @@ export default function Upload() {
             onDragLeave={handleDrag}
             onDrop={handleDrop}
             onClick={triggerFileSelect}
-            className={`border-2 border-dashed rounded-xl p-6 sm:p-10 md:p-12 text-center cursor-pointer transition-all relative overflow-hidden group ${
+            className={`border-2 border-dashed rounded-2xl p-6 sm:p-10 md:p-12 text-center cursor-pointer transition-all relative overflow-hidden group ${
               dragActive
-                ? "border-[#00FF66] bg-[#00FF66]/5 shadow-[0_0_30px_rgba(0,255,102,0.15)] animate-border-glow"
-                : "border-zinc-700 hover:border-[#00FF66]/60 hover:bg-white/5"
+                ? "border-emerald-400 bg-emerald-500/10 shadow-[0_0_30px_rgba(16,185,129,0.2)] animate-border-glow"
+                : "border-zinc-700 hover:border-emerald-400/60 hover:bg-white/5"
             }`}
             id="drop-zone"
           >
-            {/* Inner glow on hover */}
-            <div className="absolute inset-0 bg-gradient-to-b from-[#00FF66]/0 via-[#00FF66]/5 to-[#00FF66]/0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
             <input
               type="file"
               ref={fileInputRef}
@@ -186,7 +184,7 @@ export default function Upload() {
             <motion.div
               animate={{ y: [0, -4, 0] }}
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-              className="w-16 h-16 bg-white/5 border border-white/10 text-[#00FF66] flex items-center justify-center mx-auto mb-5 rounded-full shadow-inner relative z-10"
+              className="w-16 h-16 bg-white/5 border border-white/10 text-emerald-400 flex items-center justify-center mx-auto mb-5 rounded-2xl shadow-inner relative z-10"
             >
               <UploadCloud className="w-8 h-8 drop-shadow-[0_0_8px_currentColor]" />
             </motion.div>
@@ -202,8 +200,8 @@ export default function Upload() {
         {/* Stepper Progress */}
         {(status === "reading" || status === "processing") && (
           <div className="space-y-6" id="progress-stepper">
-            <div className="glass-card bg-noise rounded-lg p-5 flex items-center gap-4 border-l-2 border-l-[#00FF66]">
-              <Loader2 className="w-5 h-5 text-[#00FF66] animate-spin shrink-0" />
+            <div className="glass-card bg-noise rounded-xl p-5 flex items-center gap-4 border-l-2 border-l-emerald-400">
+              <Loader2 className="w-5 h-5 text-emerald-400 animate-spin shrink-0" />
               <div className="min-w-0 flex-1">
                 <span className="text-xs font-bold text-white block truncate uppercase tracking-wider">
                   Processing: {file?.name}
@@ -226,17 +224,17 @@ export default function Upload() {
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className={`flex items-start gap-4 p-4 rounded-lg border transition-all ${
+                    className={`flex items-start gap-4 p-4 rounded-xl border transition-all ${
                       isCompleted
                         ? "bg-white/5 border-white/10 text-white"
                         : isActive
-                        ? "glass-card border-[#00FF66]/50 shadow-[0_0_20px_rgba(0,255,102,0.15)] border-l-2 border-l-[#00FF66]"
+                        ? "glass-card border-emerald-500/50 shadow-[0_0_20px_rgba(16,185,129,0.15)] border-l-2 border-l-emerald-400"
                         : "bg-transparent border-white/5 opacity-40"
                     }`}
                   >
-                    <div className={`p-2 rounded-sm shrink-0 ${
+                    <div className={`p-2 rounded-lg shrink-0 ${
                       isCompleted
-                        ? "bg-[#00FF66] text-black"
+                        ? "bg-emerald-500 text-black"
                         : isActive
                         ? "bg-white text-black animate-pulse"
                         : "bg-zinc-900 text-zinc-600 border border-zinc-800"
@@ -246,12 +244,12 @@ export default function Upload() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <h4 className={`text-xs font-bold uppercase tracking-wider ${
-                          isCompleted ? "text-[#00FF66]" : isActive ? "text-white" : "text-zinc-500"
+                          isCompleted ? "text-emerald-400" : isActive ? "text-white" : "text-zinc-500"
                         }`}>
                           {step.title}
                         </h4>
                         {isCompleted && (
-                          <span className="text-[9px] bg-[#00FF66] text-black px-2 py-0.5 rounded-sm font-black tracking-widest">
+                          <span className="text-[9px] bg-emerald-500 text-black px-2 py-0.5 rounded-full font-black tracking-widest">
                             DONE
                           </span>
                         )}
@@ -277,7 +275,7 @@ export default function Upload() {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 200 }}
-              className="w-16 h-16 bg-[#00FF66]/10 text-[#00FF66] border border-[#00FF66]/30 flex items-center justify-center mx-auto mb-5 rounded-sm shadow-[0_0_30px_rgba(0,255,102,0.2)]"
+              className="w-16 h-16 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center justify-center mx-auto mb-5 rounded-2xl shadow-[0_0_30px_rgba(16,185,129,0.2)]"
             >
               <CheckCircle className="w-8 h-8" />
             </motion.div>
@@ -285,7 +283,7 @@ export default function Upload() {
               Document Ingested Successfully!
             </h3>
             <p className="text-xs text-zinc-400 mt-2 max-w-sm mx-auto uppercase font-mono">
-              Target <strong className="text-[#00FF66] font-bold">"{file?.name}"</strong> is indexed and ready for discussion.
+              Target <strong className="text-emerald-400 font-bold">"{file?.name}"</strong> is indexed and ready for discussion.
             </p>
             
             <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -293,7 +291,7 @@ export default function Upload() {
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
                 onClick={() => setTab("chat")}
-                className="w-full sm:w-auto px-6 py-3 bg-[#00FF66] hover:bg-[#00e55b] text-black font-extrabold text-xs uppercase tracking-wider rounded-sm transition-all shadow-[0_0_15px_rgba(0,255,102,0.2)] flex items-center justify-center gap-1.5"
+                className="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-emerald-500 to-emerald-400 hover:from-emerald-400 hover:to-emerald-300 text-black font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all shadow-[0_0_15px_rgba(16,185,129,0.25)] flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 <span>Start Chat Q&A</span>
                 <ArrowRight className="w-4 h-4" />
@@ -302,13 +300,13 @@ export default function Upload() {
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
                 onClick={() => setTab("quiz")}
-                className="w-full sm:w-auto px-6 py-3 bg-zinc-900 hover:bg-zinc-800 text-white border border-zinc-700 font-extrabold text-xs uppercase tracking-wider rounded-sm transition-all"
+                className="w-full sm:w-auto px-6 py-3.5 glass-card hover:bg-white/10 text-white font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer shadow-sm"
               >
                 Generate Quiz
               </motion.button>
               <button
                 onClick={resetUploader}
-                className="w-full sm:w-auto px-4 py-3 text-zinc-400 hover:text-white font-bold text-xs uppercase tracking-wider transition-colors"
+                className="w-full sm:w-auto px-4 py-3.5 text-zinc-400 hover:text-white font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer"
               >
                 Upload Another
               </button>
@@ -324,11 +322,11 @@ export default function Upload() {
             className="text-center py-6"
             id="upload-error"
           >
-            <div className="w-16 h-16 bg-red-950/40 text-red-400 border border-red-800/40 flex items-center justify-center mx-auto mb-5 rounded-sm">
+            <div className="w-16 h-16 bg-red-950/40 text-red-400 border border-red-800/40 flex items-center justify-center mx-auto mb-5 rounded-2xl">
               <XCircle className="w-8 h-8" />
             </div>
             <h3 className="font-black text-white text-lg uppercase tracking-wide">Ingestion Failed</h3>
-            <div className="bg-zinc-950 text-red-400 border border-red-900/40 rounded-sm p-4 text-[11px] mt-4 max-w-md mx-auto text-left font-mono break-words uppercase">
+            <div className="bg-black/50 text-red-400 border border-red-900/40 rounded-xl p-4 text-[11px] mt-4 max-w-md mx-auto text-left font-mono break-words uppercase">
               {errorMessage}
             </div>
 
@@ -337,13 +335,13 @@ export default function Upload() {
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
                 onClick={resetUploader}
-                className="px-6 py-3 bg-red-600 hover:bg-red-500 text-white font-extrabold text-xs uppercase tracking-wider rounded-sm transition-all"
+                className="px-6 py-3 bg-red-500 hover:bg-red-400 text-white font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer"
               >
                 Try Again
               </motion.button>
               <button
                 onClick={() => setTab("overview")}
-                className="px-5 py-3 text-zinc-400 hover:text-white font-bold text-xs uppercase tracking-wider transition-colors"
+                className="px-5 py-3 text-zinc-400 hover:text-white font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer"
               >
                 Go to Dashboard
               </button>

@@ -42,9 +42,13 @@ export function StateProvider({ children }) {
   }, [quizScores]);
 
   const saveQuizResult = (result) => {
+    const nowIso = new Date().toISOString();
     const newEntry = {
-      id: `score_${Date.now()}`,
-      timestamp: new Date().toISOString(),
+      id: `score_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+      timestamp: nowIso,
+      date: nowIso,
+      docName: result.documentName || result.docName || "Study Document",
+      documentName: result.documentName || result.docName || "Study Document",
       ...result
     };
     setQuizScores(prev => [newEntry, ...prev]);
