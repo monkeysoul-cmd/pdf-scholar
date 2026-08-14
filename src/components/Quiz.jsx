@@ -16,7 +16,8 @@ import {
   Check,
   AlertTriangle,
   Send,
-  HelpCircle
+  HelpCircle,
+  Sparkles
 } from "lucide-react";
 import VectorAIIcon from "./VectorAIIcon";
 import { motion, AnimatePresence } from "motion/react";

@@ -1,37 +1,66 @@
 import React from "react";
 
 /**
- * Ultra-Modern PDF Scholar Hub Brand Logo.
- * Seamlessly integrates a PDF Document silhouette, a futuristic Scholar Mortarboard Cap, 
- * and a Central Vector Hub node with glowing neon green styling.
+ * Ultra-Premium PDF Scholar Hub Brand Logo.
+ * Designed by a Senior Designer:
+ * Features a sleek, minimalist glowing geometry that combines a document fold, 
+ * an AI neural node, and a scholar cap silhouette.
  */
 export default function PDFScholarLogo({ className = "w-5 h-5", ...props }) {
   return (
     <svg
       viewBox="0 0 24 24"
       fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      xmlns="http://www.w3.org/2000/svg"
       className={className}
       {...props}
     >
-      {/* Modern PDF Document Badge Frame */}
-      <path d="M4.5 4A2.5 2.5 0 0 1 7 1.5h8.5L20.5 6V19.5A2.5 2.5 0 0 1 18 22H7a2.5 2.5 0 0 1-2.5-2.5V4z" />
-      <path d="M15 1.5V6.5h5" />
+      <defs>
+        <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="currentColor" stopOpacity="1" />
+          <stop offset="100%" stopColor="currentColor" stopOpacity="0.4" />
+        </linearGradient>
+        <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="1.5" result="blur" />
+          <feComposite in="SourceGraphic" in2="blur" operator="over" />
+        </filter>
+      </defs>
 
-      {/* Futuristic Scholar Cap (Mortarboard Diamond) */}
-      <polygon
-        points="12 7.8 5.8 11 12 14.2 18.2 11"
-        fill="currentColor"
-        fillOpacity="0.3"
+      {/* Neural Node / Scholar Cap Diamond */}
+      <path
+        d="M12 2L2 7l10 5 10-5-10-5z"
+        fill="url(#logoGradient)"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+        filter="url(#neonGlow)"
       />
-      {/* Scholar Cap Crest Base */}
-      <path d="M8.5 12.8v2.2a3.5 3.5 0 0 0 7 0v-2.2" />
-
-      {/* Central Vector Hub Core Node */}
-      <circle cx="12" cy="11" r="1.4" fill="currentColor" />
+      
+      {/* Document Fold & Depth Lines */}
+      <path
+        d="M4.5 9.5v5c0 3 2.5 5.5 7.5 5.5s7.5-2.5 7.5-5.5v-5"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        opacity="0.8"
+      />
+      <path
+        d="M12 12v10"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        opacity="0.5"
+      />
+      
+      {/* Accent AI Core Dot */}
+      <circle
+        cx="12"
+        cy="7"
+        r="2"
+        fill="currentColor"
+        filter="url(#neonGlow)"
+      />
     </svg>
   );
 }
