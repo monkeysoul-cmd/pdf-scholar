@@ -32,17 +32,13 @@ export default function Sidebar() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
 
-  // Close mobile sidebar on tab change
   useEffect(() => {
     setIsMobileOpen(false);
   }, [activeTab]);
 
-  // Close mobile sidebar on resize to desktop
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 768) {
-        setIsMobileOpen(false);
-      }
+      if (window.innerWidth >= 768) setIsMobileOpen(false);
     };
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
@@ -57,7 +53,6 @@ export default function Sidebar() {
 
   const activeDoc = documents.find((d) => d.id === selectedDocumentId);
 
-  // Reusable sidebar inner content (used for both desktop & mobile drawer)
   const SidebarInner = ({ collapsed }) => (
     <aside
       className={`${
@@ -65,7 +60,6 @@ export default function Sidebar() {
       } bg-[#0B0B0B] text-white border-r border-zinc-800/80 flex flex-col h-full select-none relative shadow-2xl transition-all duration-300 ease-in-out shrink-0`}
       id="sidebar-container"
     >
-      {/* Brand Header & Collapse Toggle */}
       <div
         className={`border-b border-zinc-800/80 bg-[#090909] ${
           collapsed ? "py-4 px-2 flex flex-col items-center gap-3" : "p-4 sm:p-6 flex items-center justify-between"
@@ -73,7 +67,6 @@ export default function Sidebar() {
       >
         {collapsed ? (
           <>
-            {/* Collapsed Logo */}
             <motion.div
               whileHover={{ scale: 1.05 }}
               onClick={() => setIsCollapsed(false)}
@@ -82,8 +75,6 @@ export default function Sidebar() {
             >
               <PDFScholarLogo className="w-4 h-4 sm:w-5 sm:h-5 text-[#00FF66]" />
             </motion.div>
-
-            {/* Collapsed Expand Toggle Button */}
             <button
               onClick={() => setIsCollapsed(false)}
               className="w-7 h-7 sm:w-8 sm:h-8 bg-zinc-900 hover:bg-[#00FF66] text-zinc-400 hover:text-black border border-zinc-800 hover:border-[#00FF66] rounded-sm transition-all flex items-center justify-center cursor-pointer shrink-0"
@@ -101,13 +92,7 @@ export default function Sidebar() {
               >
                 <PDFScholarLogo className="w-4 h-4 sm:w-5 sm:h-5 text-[#00FF66]" />
               </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="min-w-0"
-              >
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="min-w-0">
                 <div className="flex items-center gap-1.5 font-black text-lg sm:text-xl tracking-tight leading-none">
                   <span className="text-[#00FF66] drop-shadow-[0_0_12px_rgba(0,255,102,0.35)]">PDF</span>
                   <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-zinc-100 to-zinc-400">
@@ -120,8 +105,6 @@ export default function Sidebar() {
                 </div>
               </motion.div>
             </div>
-
-            {/* Expanded Collapse Toggle Button — desktop only */}
             <button
               onClick={() => setIsCollapsed(true)}
               className="hidden md:flex p-1.5 bg-zinc-900 hover:bg-[#00FF66] text-zinc-400 hover:text-black border border-zinc-800 hover:border-[#00FF66] rounded-sm transition-all cursor-pointer shrink-0 items-center justify-center"
@@ -133,20 +116,17 @@ export default function Sidebar() {
         )}
       </div>
 
-      {/* Main Navigation */}
       <nav className={`flex-1 ${collapsed ? "px-2 sm:px-3" : "px-4 sm:px-5"} py-5 sm:py-6 space-y-4 overflow-y-auto min-h-0`}>
         {!collapsed && (
           <div className="text-[10px] font-mono tracking-wider text-zinc-500 uppercase font-black px-2">
             Navigation Menu
           </div>
         )}
-
         <div className="flex flex-col gap-2">
           {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
             const isDisabled = item.disabled;
-
             return (
               <motion.button
                 key={item.id}
@@ -170,7 +150,6 @@ export default function Sidebar() {
                   <Icon className={`w-4 h-4 transition-colors ${isActive ? "text-[#00FF66]" : "text-zinc-400"}`} />
                   {!collapsed && <span>{item.label}</span>}
                 </div>
-
                 {!collapsed && item.id === "quiz" && selectedDocumentId && (
                   <motion.span
                     initial={{ scale: 0 }}
@@ -180,8 +159,6 @@ export default function Sidebar() {
                     READY
                   </motion.span>
                 )}
-
-                {/* Pulsing indicator when collapsed & active */}
                 {collapsed && isActive && (
                   <span className="absolute right-1 top-1 w-1.5 h-1.5 rounded-full bg-[#00FF66] shadow-[0_0_8px_#00FF66]" />
                 )}
@@ -190,7 +167,6 @@ export default function Sidebar() {
           })}
         </div>
 
-        {/* Selected Document Section */}
         <div className="pt-5 sm:pt-6">
           {!collapsed && (
             <div className="text-[10px] font-mono tracking-wider text-zinc-500 uppercase font-black mb-3 px-2 flex items-center justify-between">
@@ -202,7 +178,6 @@ export default function Sidebar() {
               )}
             </div>
           )}
-
           <AnimatePresence mode="wait">
             {activeDoc ? (
               collapsed ? (
@@ -239,7 +214,6 @@ export default function Sidebar() {
                       </div>
                     </div>
                   </div>
-
                   <div className="flex items-center gap-2 mt-1 relative z-10">
                     <motion.button
                       whileHover={{ scale: 1.02 }}
@@ -270,7 +244,6 @@ export default function Sidebar() {
         </div>
       </nav>
 
-      {/* User Info & Logout Footer */}
       <div className={`${collapsed ? "p-2 sm:p-3" : "p-4 sm:p-5"} border-t border-zinc-800/80 flex flex-col gap-3 text-xs font-mono uppercase tracking-wider shrink-0 bg-[#080808]`}>
         {!collapsed ? (
           <>
@@ -281,7 +254,6 @@ export default function Sidebar() {
               </div>
               <div className="w-2 h-2 rounded-none bg-[#00FF66] shadow-[0_0_8px_#00FF66] animate-pulse shrink-0" />
             </div>
-
             <motion.button
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.98 }}
@@ -309,7 +281,6 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* Mobile Hamburger Button */}
       <AnimatePresence>
         {!isMobileOpen && (
           <motion.button
@@ -326,11 +297,9 @@ export default function Sidebar() {
         )}
       </AnimatePresence>
 
-      {/* Mobile Sidebar Overlay + Drawer */}
       <AnimatePresence>
         {isMobileOpen && (
           <>
-            {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -338,7 +307,6 @@ export default function Sidebar() {
               onClick={() => setIsMobileOpen(false)}
               className="md:hidden fixed inset-0 z-30 bg-black/70 backdrop-blur-sm"
             />
-            {/* Drawer */}
             <motion.div
               initial={{ x: "-100%" }}
               animate={{ x: 0 }}
@@ -348,7 +316,6 @@ export default function Sidebar() {
             >
               <div className="relative h-full">
                 <SidebarInner collapsed={false} />
-                {/* Close button inside drawer */}
                 <button
                   onClick={() => setIsMobileOpen(false)}
                   className="absolute top-3 right-3 p-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-400 hover:text-white rounded-sm transition-all z-50"
@@ -361,7 +328,6 @@ export default function Sidebar() {
         )}
       </AnimatePresence>
 
-      {/* Desktop Sidebar — always visible on md+ */}
       <div className="hidden md:flex">
         <SidebarInner collapsed={isCollapsed} />
       </div>
