@@ -6,6 +6,16 @@
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 }
 
+:root {
+  --app-bg: #030303;
+  --card-bg: rgba(16, 16, 16, 0.4);
+  --card-border: rgba(255, 255, 255, 0.08);
+  --primary: #00FF66;
+  --accent-blue: #3B82F6;
+  --accent-amber: #F59E0B;
+  --accent-purple: #8B5CF6;
+}
+
 html,
 body,
 #root {
@@ -13,8 +23,8 @@ body,
   padding: 0;
   height: 100%;
   width: 100%;
+  background-color: var(--app-bg);
 }
-
 
 /* Custom scrollbars for a neat brutalist interface */
 ::-webkit-scrollbar {
@@ -22,14 +32,63 @@ body,
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0A0A0A;
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #222;
-  border-radius: 0px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #333;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Base dot grid pattern for backgrounds */
+.bg-dot-grid {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Noise texture overlay for depth */
+.bg-noise {
+  position: relative;
+}
+.bg-noise::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  mix-blend-mode: overlay;
+}
+
+/* Glass card utility */
+.glass-card {
+  background-color: var(--card-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--card-border);
+  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.05),
+              0 4px 24px -8px rgba(0, 0, 0, 0.5);
+}
+
+/* Ambient glow orb utility */
+.ambient-glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.15;
+  pointer-events: none;
+  z-index: 0;
+}
+.ambient-glow-green {
+  background-color: var(--primary);
+}
+.ambient-glow-blue {
+  background-color: var(--accent-blue);
+}
+.ambient-glow-purple {
+  background-color: var(--accent-purple);
 }
 
 @keyframes pulseGlow {
@@ -61,12 +120,25 @@ body,
   }
 }
 
+@keyframes borderGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(0, 255, 102, 0);
+  }
+  50% {
+    box-shadow: 0 0 20px 0 rgba(0, 255, 102, 0.2);
+  }
+}
+
 .animate-pulse-glow {
   animation: pulseGlow 6s ease-in-out infinite;
 }
 
 .animate-float-slow {
   animation: floatSlow 8s ease-in-out infinite;
+}
+
+.animate-border-glow {
+  animation: borderGlow 3s ease-in-out infinite;
 }
 
 .shimmer-effect {
@@ -110,6 +182,3 @@ a:disabled,
 [disabled] {
   cursor: not-allowed !important;
 }
-
-
-
