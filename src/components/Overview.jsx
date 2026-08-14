@@ -22,7 +22,7 @@ import {
   Layers,
   Calendar,
   ShieldCheck,
-  CheckCircle
+  Maximize2
 } from "lucide-react";
 import VectorAIIcon from "./VectorAIIcon";
 import { motion, AnimatePresence } from "motion/react";
@@ -101,12 +101,6 @@ export default function Overview() {
     if (percent >= 70) return { label: "B Rank", color: "text-[#FFB800]", border: "border-[#FFB800]/40", bg: "bg-[#FFB800]/10", shadow: "shadow-[0_0_15px_rgba(255,184,0,0.25)]" };
     if (percent >= 60) return { label: "C Rank", color: "text-amber-500", border: "border-amber-500/40", bg: "bg-amber-500/10", shadow: "shadow-[0_0_15px_rgba(245,158,11,0.2)]" };
     return { label: "Needs Practice", color: "text-rose-400", border: "border-rose-400/40", bg: "bg-rose-400/10", shadow: "shadow-[0_0_15px_rgba(244,63,94,0.2)]" };
-  };
-
-  const getScoreBadge = (percent) => {
-    if (percent >= 90) return { label: "Mastery", color: "text-[#00FF66]", bg: "bg-[#00FF66]/10", border: "border-[#00FF66]/30" };
-    if (percent >= 70) return { label: "Proficient", color: "text-[#00E5FF]", bg: "bg-[#00E5FF]/10", border: "border-[#00E5FF]/30" };
-    return { label: "Review", color: "text-[#FFB800]", bg: "bg-[#FFB800]/10", border: "border-[#FFB800]/30" };
   };
 
   const overallGrade = getScoreGrade(averageScore);
@@ -265,7 +259,7 @@ export default function Overview() {
                         <span className="text-zinc-200 truncate pr-2">{doc.name}</span>
                         <span className="text-[#00FF66] font-bold shrink-0">{doc.pageCount || 1} Pgs ({pct}%)</span>
                       </div>
-                      <div className="w-full h-2 bg-white/5 rounded-none overflow-hidden">
+                      <div className="w-full h-2 bg-white/5 rounded-sm overflow-hidden">
                         <motion.div
                           initial={{ width: 0 }}
                           animate={{ width: `${pct}%` }}
@@ -409,7 +403,7 @@ export default function Overview() {
                         <span className="text-zinc-200 truncate pr-2 font-bold">{quiz.documentName || quiz.docName || "Diagnostic Test"}</span>
                         <span className={`font-black ${grade.color}`}>{quiz.scorePercent || 0}% ({grade.label})</span>
                       </div>
-                      <div className="w-full h-2 bg-black/40 rounded-none overflow-hidden">
+                      <div className="w-full h-2 bg-black/40 rounded-sm overflow-hidden">
                         <motion.div
                           initial={{ width: 0 }}
                           animate={{ width: `${quiz.scorePercent || 0}%` }}
@@ -516,7 +510,7 @@ export default function Overview() {
                 <span>Current Tier: {totalPointsEarned >= 500 ? "Grandmaster Scholar" : totalPointsEarned >= 250 ? "Master Scholar" : totalPointsEarned >= 100 ? "Active Scholar" : "Novice Explorer"}</span>
                 <span className="text-[#FFB800]">{totalPointsEarned} / 500 PTS</span>
               </div>
-              <div className="w-full h-3 bg-black/60 rounded-none overflow-hidden p-0.5 border border-white/10">
+              <div className="w-full h-3 bg-black/60 rounded-sm overflow-hidden p-0.5 border border-white/10">
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${Math.min(100, Math.round((totalPointsEarned / 500) * 100))}%` }}
@@ -661,7 +655,7 @@ export default function Overview() {
                         {stat.badge}
                       </span>
                     )}
-                    <div className={`w-8 h-8 rounded-sm bg-white/5 border border-white/10 flex items-center justify-center ${stat.iconColor} group-hover:bg-white/10 transition-colors shadow-inner`}>
+                    <div className={`w-8 h-8 rounded-md bg-white/5 border border-white/10 flex items-center justify-center ${stat.iconColor} group-hover:bg-white/10 transition-colors shadow-inner`}>
                       <Icon className="w-4 h-4 drop-shadow-[0_0_8px_currentColor]" />
                     </div>
                   </div>
@@ -709,7 +703,7 @@ export default function Overview() {
                         {stat.badge}
                       </span>
                     )}
-                    <div className={`w-8 h-8 rounded-sm bg-white/5 border border-white/10 flex items-center justify-center ${stat.iconColor} group-hover:bg-white/10 transition-colors shadow-inner`}>
+                    <div className={`w-8 h-8 rounded-md bg-white/5 border border-white/10 flex items-center justify-center ${stat.iconColor} group-hover:bg-white/10 transition-colors shadow-inner`}>
                       <Icon className="w-4 h-4 drop-shadow-[0_0_8px_currentColor]" />
                     </div>
                   </div>
@@ -756,15 +750,24 @@ export default function Overview() {
                 <Activity className="w-4 h-4 text-[#00FF66]" />
                 <h3 className="text-xs font-black uppercase tracking-wider text-white">Semantic Vector & Knowledge Heatmap</h3>
               </div>
-              <div className="flex items-center gap-2 text-[10px] font-mono text-zinc-400">
-                <span>Sparse</span>
-                <div className="flex items-center gap-1">
-                  <span className="w-2.5 h-2.5 rounded-none bg-[#00FF66]/10 border border-[#00FF66]/20" />
-                  <span className="w-2.5 h-2.5 rounded-none bg-[#00FF66]/30 border border-[#00FF66]/40" />
-                  <span className="w-2.5 h-2.5 rounded-none bg-[#00FF66]/60 border border-[#00FF66]/70" />
-                  <span className="w-2.5 h-2.5 rounded-none bg-[#00FF66] border border-white" />
+              
+              {/* Expand Heatmap Option Button in Header */}
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setActiveModal("chunks")}
+                  className="text-[10px] font-mono text-[#00FF66] hover:text-black hover:bg-[#00FF66] font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer bg-[#00FF66]/10 px-2.5 py-1 rounded-sm border border-[#00FF66]/30 transition-all shadow-sm"
+                  title="Expand Heatmap"
+                >
+                  <Maximize2 className="w-3 h-3" />
+                  <span>Expand Heatmap</span>
+                </button>
+                <div className="flex items-center gap-1 text-[10px] font-mono text-zinc-400">
+                  <span>Sparse</span>
+                  <span className="w-2 h-2 rounded-none bg-[#00FF66]/20 border border-[#00FF66]/30" />
+                  <span className="w-2 h-2 rounded-none bg-[#00FF66]/60 border border-[#00FF66]/70" />
+                  <span className="w-2 h-2 rounded-none bg-[#00FF66] border border-white" />
+                  <span>Dense</span>
                 </div>
-                <span>Dense</span>
               </div>
             </div>
 
@@ -803,7 +806,13 @@ export default function Overview() {
               <Zap className="w-3.5 h-3.5 text-[#00FF66]" />
               {totalChunks} Active Vector Nodes
             </span>
-            <span className="text-zinc-500 uppercase">Chronological Date Matrix (Aug 2026)</span>
+            <button
+              onClick={() => setActiveModal("chunks")}
+              className="text-[#00FF66] font-bold flex items-center gap-1 cursor-pointer hover:underline uppercase"
+            >
+              <span>Expand Matrix</span>
+              <ChevronRight className="w-3 h-3" />
+            </button>
           </div>
         </motion.div>
 
@@ -853,101 +862,6 @@ export default function Overview() {
           </div>
         </motion.div>
       </div>
-
-      {/* Recent Diagnostic Quiz Performance Section (Restored on Dashboard) */}
-      <motion.section
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="mb-8 relative z-10 flex-1 flex flex-col min-h-0"
-        id="recent-quizzes-section"
-      >
-        <div className="flex items-center justify-between gap-2.5 mb-5">
-          <div className="flex items-center gap-2">
-            <Calculator className="w-4 h-4 text-[#00FF66]" />
-            <h2 className="text-xs font-black uppercase tracking-wider text-zinc-200">Recent Diagnostic Quiz Performance</h2>
-          </div>
-          {uniqueQuizzes.length > 0 && (
-            <button
-              onClick={() => setTab("quiz")}
-              className="text-[10px] font-mono text-[#00FF66] hover:text-[#00E55B] font-bold uppercase tracking-wider transition-colors flex items-center gap-1 cursor-pointer"
-            >
-              Launch New Quiz <ChevronRight className="w-3 h-3" />
-            </button>
-          )}
-        </div>
-
-        {uniqueQuizzes.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pb-4">
-            {uniqueQuizzes.slice(0, 6).map((item, idx) => {
-              const badge = getScoreBadge(item.scorePercent || 0);
-              const grade = getScoreGrade(item.scorePercent || 0);
-              const dateObj = new Date(item.timestamp || item.date || Date.now());
-              const dateStr = dateObj.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
-              const timeStr = dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-              const titleStr = item.documentName || item.docName || "Diagnostic Session";
-              
-              return (
-                <motion.div
-                  key={item.id || idx}
-                  whileHover={{ y: -3, scale: 1.01 }}
-                  onClick={() => setActiveModal("average")}
-                  className={`glass-card bg-noise rounded-md p-5 sm:p-6 flex flex-col justify-between border-l-4 ${badge.border.replace('border-', 'border-l-')} transition-all hover:border-dotted hover:border-[#00FF66] cursor-pointer shadow-lg`}
-                >
-                  <div className="flex items-start justify-between gap-3 mb-3 relative z-10">
-                    <div className="min-w-0 flex-1">
-                      <div className="text-xs font-black uppercase text-white truncate drop-shadow-sm mb-1" title={titleStr}>
-                        {titleStr}
-                      </div>
-                      <div className="text-[10px] font-mono text-zinc-400 flex items-center gap-1.5">
-                        <Clock className="w-3 h-3 text-zinc-500" />
-                        <span>{dateStr} • {timeStr}</span>
-                      </div>
-                    </div>
-                    <div className={`px-2.5 py-1 rounded-sm text-[9px] font-mono font-black uppercase tracking-wider border shrink-0 ${grade.bg} ${grade.border} ${grade.color}`}>
-                      {grade.label}
-                    </div>
-                  </div>
-                  
-                  <div className="mt-3 pt-3 border-t border-white/5 flex items-center justify-between relative z-10">
-                    <div className="flex flex-col">
-                      <span className="text-[9px] font-mono text-zinc-500 uppercase tracking-wider mb-0.5">Score</span>
-                      <span className={`text-2xl font-black font-mono ${grade.color} drop-shadow-[0_0_8px_currentColor]`}>
-                        {item.scorePercent || 0}%
-                      </span>
-                    </div>
-                    <div className="flex flex-col items-end">
-                      <span className="text-[9px] font-mono text-zinc-500 uppercase tracking-wider mb-0.5">Points Earned</span>
-                      <span className="text-xs font-bold text-white font-mono bg-white/5 px-2.5 py-1 rounded-sm border border-white/10">
-                        {item.earnedPoints || 0} / {item.totalPoints || 100} PTS
-                      </span>
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="glass-card bg-noise rounded-md p-8 sm:p-10 flex flex-col items-center justify-center text-center">
-            <div className="w-14 h-14 bg-[#00FF66]/10 border border-[#00FF66]/30 text-[#00FF66] rounded-md flex items-center justify-center mb-3.5 shadow-[0_0_20px_rgba(0,255,102,0.2)]">
-              <Award className="w-7 h-7 drop-shadow-sm" />
-            </div>
-            <h3 className="font-black text-white text-base uppercase tracking-wider mb-1.5">No Quiz Data Yet</h3>
-            <p className="text-xs text-zinc-400 font-mono max-w-md leading-relaxed mb-5">
-              Generate an interactive practice quiz from any indexed document to start tracking your knowledge retention scores in real-time.
-            </p>
-            <motion.button
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              onClick={() => setTab("quiz")}
-              className="px-6 py-3 bg-gradient-to-r from-[#00FF66] to-[#00E55B] hover:from-[#00E55B] hover:to-[#00CC55] text-black font-black text-xs uppercase tracking-wider rounded-md transition-all shadow-[0_0_20px_rgba(0,255,102,0.35)] cursor-pointer flex items-center gap-2"
-            >
-              <BrainCircuit className="w-4 h-4 text-black" />
-              <span>Launch First Quiz</span>
-            </motion.button>
-          </div>
-        )}
-      </motion.section>
 
       {/* Stepper Process Footer */}
       <section className="mt-auto border-t border-white/5 pt-6 relative z-10 pb-2">
