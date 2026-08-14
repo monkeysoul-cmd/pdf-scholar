@@ -21,7 +21,8 @@ import {
   Clock,
   Layers,
   Calendar,
-  ShieldCheck
+  ShieldCheck,
+  Maximize2
 } from "lucide-react";
 import VectorAIIcon from "./VectorAIIcon";
 import PDFScholarLogo from "./PDFScholarLogo";
@@ -792,13 +793,23 @@ export default function Overview() {
                 <h3 className="text-xs font-black uppercase tracking-wider text-white">Semantic Vector & Knowledge Heatmap</h3>
               </div>
               
-              {/* Density legend */}
-              <div className="flex items-center gap-1.5 text-[10px] font-mono text-zinc-400">
-                <span>Sparse</span>
-                <span className="w-2.5 h-2.5 rounded-sm bg-[#00FF66]/20 border border-[#00FF66]/30" />
-                <span className="w-2.5 h-2.5 rounded-sm bg-[#00FF66]/60 border border-[#00FF66]/70" />
-                <span className="w-2.5 h-2.5 rounded-sm bg-[#00FF66] border border-white" />
-                <span>Dense</span>
+              {/* Expand Graph button and density legend */}
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => setActiveModal("chunks")}
+                  className="text-[10px] font-mono text-[#00FF66] hover:text-black hover:bg-[#00FF66] font-bold uppercase tracking-wider flex items-center gap-1.5 cursor-pointer bg-[#00FF66]/10 px-2.5 py-1 rounded-lg border border-[#00FF66]/30 transition-all shadow-sm"
+                  title="Expand Graph"
+                >
+                  <Maximize2 className="w-3 h-3" />
+                  <span>Expand Graph</span>
+                </button>
+                <div className="flex items-center gap-1.5 text-[10px] font-mono text-zinc-400">
+                  <span>Sparse</span>
+                  <span className="w-2.5 h-2.5 rounded-sm bg-[#00FF66]/20 border border-[#00FF66]/30" />
+                  <span className="w-2.5 h-2.5 rounded-sm bg-[#00FF66]/60 border border-[#00FF66]/70" />
+                  <span className="w-2.5 h-2.5 rounded-sm bg-[#00FF66] border border-white" />
+                  <span>Dense</span>
+                </div>
               </div>
             </div>
 
@@ -837,7 +848,13 @@ export default function Overview() {
               <Zap className="w-3.5 h-3.5 text-[#00FF66]" />
               {totalChunks} Active Vector Nodes
             </span>
-            <span className="text-zinc-500 uppercase">Chronological Date Matrix (Aug 2026)</span>
+            <button
+              onClick={() => setActiveModal("chunks")}
+              className="text-[#00FF66] font-bold flex items-center gap-1 cursor-pointer hover:underline uppercase transition-all"
+            >
+              <span>Expand Graph</span>
+              <ChevronRight className="w-3 h-3" />
+            </button>
           </div>
         </motion.div>
 
