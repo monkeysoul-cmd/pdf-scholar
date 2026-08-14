@@ -52,7 +52,7 @@ export default function Auth() {
     <div className="min-h-screen w-screen overflow-y-auto bg-dot-grid flex flex-col items-center justify-center p-4 md:p-8 select-none relative" id="auth-view">
       {/* Dynamic Animated Ambient Lights */}
       <div className="ambient-glow ambient-glow-green w-[300px] h-[300px] sm:w-[450px] sm:h-[450px] top-[-50px] left-[-50px] sm:top-[10%] sm:left-[15%] animate-float-slow" />
-      <div className="ambient-glow ambient-glow-blue w-[350px] h-[350px] sm:w-[500px] sm:h-[500px] bottom-[-50px] right-[-50px] sm:bottom-[10%] sm:right-[15%] animate-pulse-glow" style={{ animationDelay: '1s' }} />
+      <div className="ambient-glow ambient-glow-purple w-[350px] h-[350px] sm:w-[500px] sm:h-[500px] bottom-[-50px] right-[-50px] sm:bottom-[10%] sm:right-[15%] animate-pulse-glow" style={{ animationDelay: '1s' }} />
 
       {/* Main Glassmorphism Auth Card */}
       <motion.div

@@ -313,7 +313,7 @@ export default function Chat() {
             onChange={(e) => setInputText(e.target.value)}
             disabled={isSending}
             placeholder={`Query document context... (e.g. "Summarize core findings")`}
-            className="flex-1 text-xs p-3.5 px-4 border border-white/10 focus:border-[#00FF66] focus:ring-1 focus:ring-[#00FF66]/30 rounded-lg transition-all bg-black/40 text-white font-mono uppercase placeholder-zinc-500 outline-none shadow-inner"
+            className="flex-1 text-xs p-3.5 px-4 border border-white/10 hover:border-dotted hover:border-[#00FF66] focus:border-[#00FF66] focus:ring-1 focus:ring-[#00FF66]/30 rounded-lg transition-all bg-black/40 text-white font-mono uppercase placeholder-zinc-500 outline-none shadow-inner"
           />
           <motion.button
             whileHover={{ scale: 1.03 }}

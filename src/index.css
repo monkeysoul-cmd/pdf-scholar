@@ -11,7 +11,6 @@
   --card-bg: rgba(16, 16, 16, 0.4);
   --card-border: rgba(255, 255, 255, 0.08);
   --primary: #00FF66;
-  --accent-blue: #3B82F6;
   --accent-amber: #F59E0B;
   --accent-purple: #8B5CF6;
 }
@@ -83,9 +82,6 @@ body,
 }
 .ambient-glow-green {
   background-color: var(--primary);
-}
-.ambient-glow-blue {
-  background-color: var(--accent-blue);
 }
 .ambient-glow-purple {
   background-color: var(--accent-purple);

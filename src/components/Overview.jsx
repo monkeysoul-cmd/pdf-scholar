@@ -67,7 +67,7 @@ export default function Overview() {
 
   const getScoreGrade = (percent) => {
     if (percent >= 90) return { label: "S Rank", color: "text-[#00FF66]", border: "border-[#00FF66]/30", bg: "bg-[#00FF66]/10", shadow: "shadow-[0_0_15px_rgba(0,255,102,0.2)]" };
-    if (percent >= 80) return { label: "A Rank", color: "text-blue-400", border: "border-blue-400/30", bg: "bg-blue-400/10", shadow: "shadow-[0_0_15px_rgba(59,130,246,0.2)]" };
+    if (percent >= 80) return { label: "A Rank", color: "text-emerald-400", border: "border-emerald-400/30", bg: "bg-emerald-400/10", shadow: "shadow-[0_0_15px_rgba(52,211,153,0.2)]" };
     if (percent >= 70) return { label: "B Rank", color: "text-yellow-400", border: "border-yellow-400/30", bg: "bg-yellow-400/10", shadow: "shadow-[0_0_15px_rgba(250,204,21,0.2)]" };
     if (percent >= 60) return { label: "C Rank", color: "text-orange-400", border: "border-orange-400/30", bg: "bg-orange-400/10", shadow: "shadow-[0_0_15px_rgba(251,146,60,0.2)]" };
     return { label: "F Rank", color: "text-red-400", border: "border-red-400/30", bg: "bg-red-400/10", shadow: "shadow-[0_0_15px_rgba(248,113,113,0.2)]" };
@@ -75,7 +75,7 @@ export default function Overview() {
 
   const getScoreBadge = (percent) => {
     if (percent >= 90) return { label: "Excellent", color: "text-[#00FF66]", bg: "bg-[#00FF66]/10", border: "border-[#00FF66]/20" };
-    if (percent >= 70) return { label: "Good", color: "text-blue-400", bg: "bg-blue-400/10", border: "border-blue-400/20" };
+    if (percent >= 70) return { label: "Good", color: "text-emerald-400", bg: "bg-emerald-400/10", border: "border-emerald-400/20" };
     return { label: "Needs Review", color: "text-amber-400", bg: "bg-amber-400/10", border: "border-amber-400/20" };
   };
 
@@ -101,10 +101,10 @@ export default function Overview() {
       icon: FileText,
       subtitle: "Extracted for analysis",
       badge: "High Volume",
-      color: "from-blue-500/40",
-      accent: "bg-blue-500",
-      glow: "group-hover:shadow-[0_0_30px_rgba(59,130,246,0.15)]",
-      iconColor: "text-blue-400"
+      color: "from-emerald-500/40",
+      accent: "bg-emerald-500",
+      glow: "group-hover:shadow-[0_0_30px_rgba(16,185,129,0.15)]",
+      iconColor: "text-emerald-400"
     },
     {
       id: "chunks",
@@ -194,27 +194,31 @@ export default function Overview() {
         return (
           <div className="space-y-4">
             <h3 className="text-xl font-black uppercase text-white mb-2 flex items-center gap-2">
-              <FileText className="w-5 h-5 text-blue-400" /> Pages Analysis
+              <FileText className="w-5 h-5 text-emerald-400" /> Pages Analysis
             </h3>
-            <div className="h-40 w-full bg-zinc-900/50 border border-zinc-800 rounded-sm flex items-end justify-around p-4">
-              {/* Dummy bar chart */}
-              {[40, 70, 45, 90, 60, 85, 30].map((h, i) => (
-                <motion.div 
+            <div className="flex-1 flex items-end gap-1 md:gap-2 justify-between">
+              {[60, 80, 40, 90, 70, 50, 85].map((val, i) => (
+                <motion.div
+                  key={i}
                   initial={{ height: 0 }}
-                  animate={{ height: `${h}%` }}
-                  key={i} 
-                  className="w-8 bg-gradient-to-t from-blue-900/50 to-blue-500 rounded-t-sm"
-                ></motion.div>
+                  animate={{ height: `${val}%` }}
+                  transition={{ delay: i * 0.05 + 0.5, type: "spring" }}
+                  className="w-full max-w-[40px] bg-white/5 rounded-t-sm relative group overflow-hidden"
+                >
+                  <div 
+                    className="absolute bottom-0 w-full bg-gradient-to-t from-emerald-900/50 to-emerald-500 rounded-t-sm opacity-80 group-hover:opacity-100 transition-opacity" 
+                    style={{ height: `${val}%` }} 
+                  />
+                </motion.div>
               ))}
             </div>
-            <p className="text-xs text-zinc-400 font-mono text-center mt-4 uppercase">Weekly Page Ingestion Volume</p>
           </div>
         );
       case "chunks":
         return (
           <div className="space-y-4">
             <h3 className="text-xl font-black uppercase text-white mb-2 flex items-center gap-2">
-              <Database className="w-5 h-5 text-purple-400" /> Vector Density Map
+              <Database className="w-5 h-5 text-amber-400" /> Vector Density Map
             </h3>
             <div className="grid grid-cols-6 gap-1 p-2 bg-zinc-900/50 rounded-sm border border-zinc-800">
               {/* Dummy heatmap */}
@@ -225,7 +229,7 @@ export default function Overview() {
                     initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.02 }}
                     key={i} 
                     className="h-10 rounded-sm"
-                    style={{ backgroundColor: `rgba(168, 85, 247, ${intensity * 0.8 + 0.1})` }}
+                    style={{ backgroundColor: `rgba(251, 191, 36, ${intensity * 0.8 + 0.1})` }}
                   ></motion.div>
                 )
               })}
@@ -256,9 +260,9 @@ export default function Overview() {
       className="flex-1 pt-16 md:pt-8 px-4 sm:px-6 md:px-12 pb-8 md:pb-12 overflow-y-auto min-h-0 flex flex-col bg-dot-grid text-white select-none relative z-0"
       id="overview-view"
     >
-      {/* Ambient Glow Orbs */}
-      <div className="ambient-glow ambient-glow-green w-[400px] h-[400px] top-[-100px] right-[-100px]" />
-      <div className="ambient-glow ambient-glow-blue w-[300px] h-[300px] bottom-[20%] left-[-50px] opacity-10" />
+      {/* Ambient background glows for the dashboard */}
+      <div className="ambient-glow ambient-glow-green w-[500px] h-[500px] top-[-100px] right-[-100px] animate-pulse-glow" />
+      <div className="ambient-glow ambient-glow-purple w-[300px] h-[300px] bottom-[20%] left-[-50px] opacity-10" />
 
       {/* Upper Header */}
       <motion.div
@@ -316,15 +320,16 @@ export default function Overview() {
       >
         {/* Row 1: Primary */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-5">
-          {primaryStats.map((stat) => {
+          {primaryStats.map((stat, index) => {
             const Icon = stat.icon;
             return (
               <motion.div
                 key={`primary-${stat.id}`}
-                whileHover={{ y: -4 }}
-                whileTap={{ scale: 0.98 }}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
                 onClick={() => setActiveModal(stat.id)}
-                className={`glass-card bg-noise p-4 sm:p-6 rounded-lg flex flex-col justify-between relative overflow-hidden group transition-all min-h-[120px] sm:h-36 cursor-pointer ${stat.glow}`}
+                className={`glass-card p-6 md:p-8 rounded-2xl relative group overflow-hidden shadow-xl transition-all hover:scale-[1.02] hover:border-dotted hover:border-[#00FF66] cursor-pointer ${stat.glow}`}
               >
                 {/* Colored Top Accent Bar */}
                 <div className={`absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r ${stat.color} to-transparent`} />
@@ -368,10 +373,10 @@ export default function Overview() {
             return (
               <motion.div
                 key={`secondary-${stat.id}`}
-                whileHover={{ y: -4 }}
-                whileTap={{ scale: 0.98 }}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
                 onClick={() => setActiveModal(stat.id)}
-                className={`glass-card bg-noise p-4 sm:p-6 rounded-lg flex flex-col justify-between relative overflow-hidden group transition-all min-h-[120px] sm:h-36 cursor-pointer ${stat.glow}`}
+                className={`glass-card p-6 md:p-8 rounded-2xl relative group overflow-hidden shadow-xl transition-all hover:scale-[1.02] hover:border-dotted hover:border-[#00FF66] cursor-pointer ${stat.glow}`}
               >
                 {/* Colored Top Accent Bar */}
                 <div className={`absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r ${stat.color} to-transparent`} />
