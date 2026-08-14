@@ -135,18 +135,21 @@ export default function Upload() {
   };
 
   return (
-    <div className="flex-1 pt-16 md:pt-0 px-4 sm:px-8 pb-8 bg-[#080808] overflow-y-auto min-h-0 flex flex-col items-center justify-center relative select-none" id="upload-view">
+    <div className="flex-1 pt-16 md:pt-0 px-4 sm:px-8 pb-8 bg-dot-grid overflow-y-auto min-h-0 flex flex-col items-center justify-center relative select-none z-0" id="upload-view">
+      {/* Ambient Glow */}
+      <div className="ambient-glow ambient-glow-green w-[400px] h-[400px] top-[10%] left-[20%] animate-float-slow" />
+
       <motion.div
         initial={{ opacity: 0, y: 25, scale: 0.96 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
-        className="max-w-2xl w-full bg-[#101010] border border-zinc-800/80 rounded-sm p-6 sm:p-8 md:p-12 shadow-2xl relative z-10 my-auto overflow-hidden"
+        className="max-w-2xl w-full glass-card bg-noise rounded-xl p-6 sm:p-8 md:p-12 relative z-10 my-auto overflow-hidden"
       >
         {/* Header */}
         <div className="text-center mb-9">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-sm bg-[#00FF66]/10 border border-[#00FF66]/20 text-[#00FF66] text-[10px] font-mono font-bold uppercase tracking-wider mb-3">
-            <VectorAIIcon className="w-3 h-3 text-[#00FF66]" /> Vector Ingestion Engine
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-white/80 text-[10px] font-mono font-bold uppercase tracking-wider mb-4 shadow-inner">
+            <VectorAIIcon className="w-3 h-3 text-[#00FF66] drop-shadow-[0_0_5px_currentColor]" /> Vector Ingestion Engine
           </div>
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-white uppercase">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-white uppercase drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]">
             Add Study Document
           </h2>
           <p className="text-xs text-zinc-400 max-w-md mx-auto uppercase font-mono mt-2">
@@ -164,13 +167,15 @@ export default function Upload() {
             onDragLeave={handleDrag}
             onDrop={handleDrop}
             onClick={triggerFileSelect}
-            className={`border-2 border-dashed rounded-sm p-6 sm:p-10 md:p-12 text-center cursor-pointer transition-all ${
+            className={`border-2 border-dashed rounded-xl p-6 sm:p-10 md:p-12 text-center cursor-pointer transition-all relative overflow-hidden group ${
               dragActive
-                ? "border-[#00FF66] bg-[#00FF66]/10 shadow-[0_0_30px_rgba(0,255,102,0.15)]"
-                : "border-zinc-800 hover:border-[#00FF66]/60 hover:bg-zinc-900/60"
+                ? "border-[#00FF66] bg-[#00FF66]/5 shadow-[0_0_30px_rgba(0,255,102,0.15)] animate-border-glow"
+                : "border-zinc-700 hover:border-[#00FF66]/60 hover:bg-white/5"
             }`}
             id="drop-zone"
           >
+            {/* Inner glow on hover */}
+            <div className="absolute inset-0 bg-gradient-to-b from-[#00FF66]/0 via-[#00FF66]/5 to-[#00FF66]/0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
             <input
               type="file"
               ref={fileInputRef}
@@ -181,9 +186,9 @@ export default function Upload() {
             <motion.div
               animate={{ y: [0, -4, 0] }}
               transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-              className="w-16 h-16 bg-zinc-900 border border-zinc-800 text-[#00FF66] flex items-center justify-center mx-auto mb-4 rounded-sm shadow-lg"
+              className="w-16 h-16 bg-white/5 border border-white/10 text-[#00FF66] flex items-center justify-center mx-auto mb-5 rounded-full shadow-inner relative z-10"
             >
-              <UploadCloud className="w-8 h-8" />
+              <UploadCloud className="w-8 h-8 drop-shadow-[0_0_8px_currentColor]" />
             </motion.div>
             <h3 className="font-extrabold text-white text-sm uppercase tracking-wider">
               Select or Drop PDF File
@@ -197,7 +202,7 @@ export default function Upload() {
         {/* Stepper Progress */}
         {(status === "reading" || status === "processing") && (
           <div className="space-y-6" id="progress-stepper">
-            <div className="bg-zinc-900/80 border border-zinc-800 rounded-sm p-5 flex items-center gap-4">
+            <div className="glass-card bg-noise rounded-lg p-5 flex items-center gap-4 border-l-2 border-l-[#00FF66]">
               <Loader2 className="w-5 h-5 text-[#00FF66] animate-spin shrink-0" />
               <div className="min-w-0 flex-1">
                 <span className="text-xs font-bold text-white block truncate uppercase tracking-wider">
@@ -221,12 +226,12 @@ export default function Upload() {
                     initial={{ opacity: 0, x: -10 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.1 }}
-                    className={`flex items-start gap-4 p-4 rounded-sm border transition-all ${
+                    className={`flex items-start gap-4 p-4 rounded-lg border transition-all ${
                       isCompleted
-                        ? "bg-[#00FF66]/5 border-[#00FF66]/30 text-white"
+                        ? "bg-white/5 border-white/10 text-white"
                         : isActive
-                        ? "bg-zinc-900 border-[#00FF66] shadow-[0_0_15px_rgba(0,255,102,0.1)]"
-                        : "bg-transparent border-zinc-800/40 opacity-40"
+                        ? "glass-card border-[#00FF66]/50 shadow-[0_0_20px_rgba(0,255,102,0.15)] border-l-2 border-l-[#00FF66]"
+                        : "bg-transparent border-white/5 opacity-40"
                     }`}
                   >
                     <div className={`p-2 rounded-sm shrink-0 ${

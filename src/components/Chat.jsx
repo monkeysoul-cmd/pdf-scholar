@@ -107,9 +107,11 @@ export default function Chat() {
   }
 
   return (
-    <div className="flex-1 bg-[#080808] flex flex-col min-h-0 h-full select-none relative pt-14 md:pt-0" id="chat-view">
+    <div className="flex-1 bg-dot-grid flex flex-col min-h-0 h-full select-none relative pt-14 md:pt-0 z-0" id="chat-view">
+      {/* Ambient Glow */}
+      <div className="ambient-glow ambient-glow-purple w-[500px] h-[500px] top-[20%] right-[-100px] animate-float-slow" />
       {/* Thread Header */}
-      <div className="p-3 sm:p-4 px-4 sm:px-6 bg-[#0E0E0E] border-b border-zinc-800/80 flex items-center justify-between shadow-md shrink-0 z-10">
+      <div className="p-3 sm:p-4 px-4 sm:px-6 bg-white/5 backdrop-blur-xl border-b border-white/10 flex items-center justify-between shadow-md shrink-0 z-10 relative">
         <div>
           <div className="flex items-center gap-2.5">
             <span className="w-2 h-2 rounded-none bg-[#00FF66] shadow-[0_0_8px_#00FF66] animate-pulse" />
@@ -125,7 +127,7 @@ export default function Chat() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => clearChat(selectedDocumentId)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 hover:bg-red-950/40 text-zinc-400 hover:text-red-400 border border-zinc-800 hover:border-red-900/40 rounded-sm text-[10px] font-extrabold uppercase tracking-wider transition-all"
+            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 hover:border-red-500/40 rounded-sm text-[10px] font-extrabold uppercase tracking-wider transition-all"
           >
             <Trash2 className="w-3.5 h-3.5" />
             <span>Clear Chat</span>
@@ -134,13 +136,13 @@ export default function Chat() {
       </div>
 
       {/* Message List Area */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-6">
+      <div className="flex-1 overflow-y-auto p-6 space-y-6 relative z-10">
         {messages.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-center max-w-md mx-auto py-12">
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
-              className="w-16 h-16 bg-zinc-900 border border-zinc-800 text-[#00FF66] rounded-sm flex items-center justify-center mb-5 shadow-xl"
+              className="w-16 h-16 bg-white/5 border border-white/10 text-[#00FF66] rounded-full flex items-center justify-center mb-5 shadow-inner"
             >
               <VectorAIIcon className="w-8 h-8 text-[#00FF66]" />
             </motion.div>
@@ -159,7 +161,7 @@ export default function Chat() {
                   whileHover={{ scale: 1.01, x: 3, borderColor: "#00FF66" }}
                   whileTap={{ scale: 0.99 }}
                   onClick={() => setInputText(suggestion)}
-                  className="p-3.5 text-xs font-bold bg-[#121212] border border-zinc-800/80 text-zinc-300 hover:text-white rounded-sm transition-all uppercase tracking-wide text-left shadow-sm"
+                  className="p-3.5 text-xs font-bold glass-card text-zinc-300 hover:text-white rounded-lg transition-all uppercase tracking-wide text-left shadow-sm"
                 >
                   {suggestion}
                 </motion.button>
@@ -191,14 +193,15 @@ export default function Chat() {
                       <span>{msg.timestamp}</span>
                     </div>
 
-                    {/* Message Bubble (Boxy Design) */}
                     <div
-                      className={`max-w-[85%] rounded-sm p-4.5 text-xs leading-relaxed shadow-xl border ${
+                      className={`max-w-[85%] rounded-lg p-4.5 text-xs leading-relaxed shadow-xl border relative overflow-hidden ${
                         isUser
-                          ? "bg-[#00FF66] border-[#00FF66] text-black font-extrabold shadow-[0_0_15px_rgba(0,255,102,0.15)]"
-                          : "bg-[#121212] border-zinc-800 text-zinc-100"
+                          ? "bg-gradient-to-br from-[#00FF66]/20 to-[#00FF66]/5 border-[#00FF66]/30 text-white backdrop-blur-md"
+                          : "glass-card text-zinc-100"
                       }`}
                     >
+                      {/* Accent bar for user */}
+                      {isUser && <div className="absolute right-0 top-0 bottom-0 w-1 bg-[#00FF66] shadow-[0_0_10px_#00FF66]" />}
                       <p className="whitespace-pre-wrap font-sans text-sm">{msg.text}</p>
 
                       {/* Collapsible Source Citation List */}
@@ -218,7 +221,7 @@ export default function Chat() {
                               return (
                                 <div
                                   key={srcIdx}
-                                  className="w-full bg-[#0A0A0A] border border-zinc-800 rounded-sm overflow-hidden text-[10px]"
+                                  className="w-full bg-black/40 border border-white/10 rounded-sm overflow-hidden text-[10px]"
                                 >
                                   <button
                                     type="button"
@@ -292,7 +295,7 @@ export default function Chat() {
               <Bot className="w-3 h-3 text-[#00FF66]" />
               <span>Study Assistant Thinking...</span>
             </div>
-            <div className="bg-[#121212] border border-zinc-800 rounded-sm p-4 text-zinc-300 flex items-center gap-3 text-xs shadow-xl font-mono uppercase">
+            <div className="glass-card bg-noise rounded-sm p-4 text-zinc-300 flex items-center gap-3 text-xs shadow-xl font-mono uppercase">
               <Loader2 className="w-4 h-4 text-[#00FF66] animate-spin" />
               <span>Searching document sections & crafting answer...</span>
             </div>
@@ -302,8 +305,7 @@ export default function Chat() {
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Message Area (Boxy Design) */}
-      <div className="p-3 sm:p-4 px-4 sm:px-6 bg-[#0E0E0E] border-t border-zinc-800/80 shrink-0" id="chat-input-bar">
+      <div className="p-3 sm:p-4 px-4 sm:px-6 bg-white/5 backdrop-blur-xl border-t border-white/10 shrink-0 relative z-10" id="chat-input-bar">
         <form onSubmit={handleSend} className="max-w-4xl mx-auto flex items-center gap-3">
           <input
             type="text"
@@ -311,15 +313,17 @@ export default function Chat() {
             onChange={(e) => setInputText(e.target.value)}
             disabled={isSending}
             placeholder={`Query document context... (e.g. "Summarize core findings")`}
-            className="flex-1 text-xs p-3.5 px-4 border border-zinc-800 focus:border-[#00FF66] focus:ring-1 focus:ring-[#00FF66]/30 rounded-sm transition-all bg-[#141414] text-white font-mono uppercase placeholder-zinc-600 outline-none"
+            className="flex-1 text-xs p-3.5 px-4 border border-white/10 focus:border-[#00FF66] focus:ring-1 focus:ring-[#00FF66]/30 rounded-lg transition-all bg-black/40 text-white font-mono uppercase placeholder-zinc-500 outline-none shadow-inner"
           />
           <motion.button
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             type="submit"
             disabled={!inputText.trim() || isSending}
-            className="p-3.5 bg-[#00FF66] hover:bg-[#00e55b] disabled:opacity-30 disabled:cursor-not-allowed text-black rounded-sm shadow-lg transition-colors cursor-pointer"
+            className="p-3.5 bg-gradient-to-br from-[#00FF66] to-[#00e55b] hover:from-[#00e55b] hover:to-[#00cc55] disabled:opacity-30 disabled:cursor-not-allowed text-black rounded-lg shadow-[0_0_15px_rgba(0,255,102,0.3)] transition-all cursor-pointer relative group"
           >
+            {/* Shine effect */}
+            <div className="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] bg-gradient-to-r from-transparent via-white/40 to-transparent rounded-lg overflow-hidden pointer-events-none" />
             <Send className="w-4.5 h-4.5" />
           </motion.button>
         </form>
