@@ -614,7 +614,7 @@ export default function Overview() {
               </span>
               <span className="bg-[#00FF66]/10 text-[#00FF66] border border-[#00FF66]/30 text-[9px] font-black px-2 py-0.5 rounded-sm uppercase tracking-wider ml-1.5 flex items-center gap-1 shadow-[0_0_10px_rgba(0,255,102,0.2)]">
                 <span className="w-1.5 h-1.5 rounded-none bg-[#00FF66] animate-pulse" />
-                Live Hub
+                Vector AI
               </span>
             </div>
             <p className="text-[11px] text-zinc-400 font-mono uppercase tracking-wider mt-1">
@@ -634,109 +634,6 @@ export default function Overview() {
             <Plus className="w-4 h-4 text-black" />
             <span>Upload PDF</span>
           </motion.button>
-        </div>
-      </motion.div>
-
-      {/* Senior Designer Hero Section Command Center */}
-      <motion.div
-        initial={{ opacity: 0, y: 15 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.05 }}
-        className="glass-card bg-noise rounded-md p-6 sm:p-7 mb-8 border border-white/10 relative overflow-hidden shadow-2xl z-10"
-      >
-        {/* Top Accent Border with Multi-Tone Glow */}
-        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-[#00FF66] via-[#00E5FF] to-transparent shadow-[0_0_15px_rgba(0,255,102,0.5)]" />
-
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-          {/* Left Column: Hero Mission & Fast Action Chips */}
-          <div className="lg:col-span-8 space-y-4">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-sm bg-white/5 border border-white/10 text-white/80 text-[10px] font-mono font-medium uppercase tracking-wider shadow-inner">
-                <VectorAIIcon className="w-3.5 h-3.5 text-[#00FF66]" />
-                RAG Engine v2.4 Active
-              </span>
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-sm bg-[#00FF66]/10 border border-[#00FF66]/30 text-[#00FF66] text-[10px] font-mono font-bold uppercase tracking-wider">
-                <ShieldCheck className="w-3 h-3 text-[#00FF66]" />
-                Zero-Hallucination Retrieval
-              </span>
-            </div>
-
-            <div>
-              <h2 className="text-xl sm:text-2xl font-black uppercase text-white tracking-tight leading-tight">
-                Autonomous Academic Ingestion & <span className="text-[#00FF66] drop-shadow-[0_0_10px_rgba(0,255,102,0.3)]">Deep Research</span> Engine
-              </h2>
-              <p className="text-xs text-zinc-300 font-mono mt-2 leading-relaxed max-w-2xl">
-                Ingest research papers, index high-dimensional vector embeddings, perform cited question-answering with exact page context, and synthesize retention diagnostic exams.
-              </p>
-            </div>
-
-            {/* Quick Action Navigation Chips */}
-            <div className="flex flex-wrap gap-2.5 pt-1">
-              <button
-                onClick={() => setTab("upload")}
-                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-sm bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-mono text-zinc-200 hover:text-white uppercase font-bold transition-all cursor-pointer hover:border-[#00FF66]/50"
-              >
-                <UploadCloud className="w-3.5 h-3.5 text-[#00FF66]" />
-                <span>Ingest Document</span>
-              </button>
-
-              <button
-                onClick={() => setTab("quiz")}
-                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-sm bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-mono text-zinc-200 hover:text-white uppercase font-bold transition-all cursor-pointer hover:border-[#00FF66]/50"
-              >
-                <Zap className="w-3.5 h-3.5 text-[#FFB800]" />
-                <span>Launch Diagnostic Quiz</span>
-              </button>
-
-              <button
-                onClick={() => setTab("chat")}
-                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-sm bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-mono text-zinc-200 hover:text-white uppercase font-bold transition-all cursor-pointer hover:border-[#00FF66]/50"
-              >
-                <MessageSquare className="w-3.5 h-3.5 text-[#00E5FF]" />
-                <span>Interactive Chat</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Right Column: Live Telemetry Status Widget */}
-          <div className="lg:col-span-4 bg-black/50 border border-white/10 rounded-md p-4 space-y-3 font-mono text-xs shadow-inner">
-            <div className="flex items-center justify-between border-b border-white/10 pb-2.5">
-              <span className="text-[10px] text-zinc-400 uppercase font-bold flex items-center gap-1.5">
-                <Cpu className="w-3.5 h-3.5 text-[#00FF66]" /> System Telemetry
-              </span>
-              <span className="text-[9px] text-[#00FF66] bg-[#00FF66]/10 px-2 py-0.5 rounded-sm border border-[#00FF66]/30 font-bold flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-none bg-[#00FF66] animate-pulse" />
-                READY
-              </span>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex justify-between text-[11px]">
-                <span className="text-zinc-400">Target Target:</span>
-                <span className="text-white font-bold truncate max-w-[140px]" title={activeDoc?.name || "None"}>
-                  {activeDoc ? activeDoc.name : "None Activated"}
-                </span>
-              </div>
-              <div className="flex justify-between text-[11px]">
-                <span className="text-zinc-400">Vector Embeddings:</span>
-                <span className="text-[#FFB800] font-bold">768 Dimensions</span>
-              </div>
-              <div className="flex justify-between text-[11px]">
-                <span className="text-zinc-400">Retrieval Latency:</span>
-                <span className="text-[#00E5FF] font-bold">&lt; 140ms</span>
-              </div>
-            </div>
-
-            <div className="pt-1">
-              <button
-                onClick={() => setTab(selectedDocumentId ? "chat" : "upload")}
-                className="w-full py-2 bg-white/5 hover:bg-[#00FF66] text-zinc-300 hover:text-black border border-white/10 hover:border-[#00FF66] rounded-sm text-[10px] font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-              >
-                <span>{selectedDocumentId ? "Engage Target Document" : "Select Document"}</span>
-                <ArrowRight className="w-3 h-3" />
-              </button>
-            </div>
-          </div>
         </div>
       </motion.div>
 
