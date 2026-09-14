@@ -135,7 +135,7 @@ export default function Upload() {
   };
 
   return (
-    <div className="flex-1 pt-16 md:pt-0 px-4 sm:px-8 pb-8 bg-dot-grid overflow-y-auto min-h-0 flex flex-col items-center justify-center relative select-none z-0" id="upload-view">
+    <div className="flex-1 pt-16 md:pt-0 px-4 sm:px-8 pb-8 bg-dot-grid overflow-y-auto min-h-0 flex flex-col items-center justify-center relative select-text-content z-0" id="upload-view">
       {/* Ambient Glow */}
       <div className="ambient-glow ambient-glow-green w-[400px] h-[400px] top-[10%] left-[20%] animate-float-slow" />
 
@@ -326,7 +326,7 @@ export default function Upload() {
               <XCircle className="w-8 h-8" />
             </div>
             <h3 className="font-black text-white text-lg uppercase tracking-wide">Ingestion Failed</h3>
-            <div className="bg-black/50 text-red-400 border border-red-900/40 rounded-xl p-4 text-[11px] mt-4 max-w-md mx-auto text-left font-mono break-words uppercase">
+            <div className="bg-black/50 text-red-400 border border-red-900/40 rounded-xl p-4 text-xs mt-4 max-w-md mx-auto text-left font-mono break-words normal-case">
               {errorMessage}
             </div>
 

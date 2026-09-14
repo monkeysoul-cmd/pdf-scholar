@@ -143,7 +143,7 @@ export default function Quiz() {
       if (q.type === "multiple-choice") {
         mcTotal++;
         mcPointsTotal += qPoints;
-        if (answers[q.id] === q.correctAnswer) {
+        if (answers[q.id]?.trim() === q.correctAnswer?.trim()) {
           mcCorrect++;
           mcPointsEarned += qPoints;
         }
@@ -268,7 +268,7 @@ export default function Quiz() {
   return (
     <div 
       ref={containerRef}
-      className="flex-1 pt-14 md:pt-6 px-4 sm:px-6 md:px-10 pb-12 bg-dot-grid overflow-y-auto min-h-0 select-none relative z-0" 
+      className="flex-1 pt-14 md:pt-6 px-4 sm:px-6 md:px-10 pb-12 bg-dot-grid overflow-y-auto min-h-0 select-text-content relative z-0" 
       id="quiz-view"
     >
       {/* Ambient Glows */}
@@ -485,7 +485,7 @@ export default function Quiz() {
           {quizQuestions.map((q, index) => {
             const qPoints = q.points || (q.type === "multiple-choice" ? 10 : 15);
             const hasAnsweredMC = !!answers[q.id];
-            const isCorrectMC = answers[q.id] === q.correctAnswer;
+            const isCorrectMC = answers[q.id]?.trim() === q.correctAnswer?.trim();
             const revealedSA = !!revealedShortAnswers[q.id];
             const gradedSA = shortAnswerSelfGrades[q.id];
 
@@ -536,7 +536,7 @@ export default function Quiz() {
                   </span>
                 </div>
 
-                <h4 className="font-extrabold text-white text-base md:text-lg uppercase tracking-tight leading-relaxed">
+                <h4 className="font-bold text-white text-base md:text-lg leading-relaxed normal-case">
                   {q.question}
                 </h4>
 
@@ -545,7 +545,7 @@ export default function Quiz() {
                   <div className="grid grid-cols-1 gap-3 mt-1">
                     {q.options.map((opt, optIdx) => {
                       const isSelected = answers[q.id] === opt;
-                      const isCorrectOption = opt === q.correctAnswer;
+                      const isCorrectOption = opt?.trim() === q.correctAnswer?.trim();
                       const shouldHighlightGreen = hasAnsweredMC && isCorrectOption;
                       const shouldHighlightRed = hasAnsweredMC && isSelected && !isCorrectMC;
 
@@ -556,7 +556,7 @@ export default function Quiz() {
                           whileTap={!hasAnsweredMC ? { scale: 0.99 } : {}}
                           disabled={hasAnsweredMC}
                           onClick={() => handleMultipleChoiceSelect(q.id, opt)}
-                          className={`w-full text-left p-4 rounded-xl border text-xs font-bold uppercase tracking-wide transition-all cursor-pointer ${
+                          className={`w-full text-left p-4 rounded-xl border text-xs font-medium tracking-wide transition-all cursor-pointer ${
                             shouldHighlightGreen
                               ? "bg-emerald-500/20 border-emerald-500/50 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)]"
                               : shouldHighlightRed
@@ -588,7 +588,7 @@ export default function Quiz() {
                           value={shortAnswersText[q.id] || ""}
                           onChange={(e) => setShortAnswersText(prev => ({ ...prev, [q.id]: e.target.value }))}
                           rows={3}
-                          className="w-full text-xs p-4 border border-white/10 rounded-xl focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/30 bg-black/40 text-white font-mono uppercase placeholder-zinc-500 shadow-inner"
+                          className="w-full text-xs p-4 border border-white/10 rounded-xl focus:outline-none focus:border-amber-400 focus:ring-1 focus:ring-amber-400/30 bg-black/40 text-white font-sans placeholder-zinc-500 shadow-inner"
                         />
                         <motion.button
                           whileHover={{ scale: 1.02 }}
@@ -796,7 +796,7 @@ export default function Quiz() {
               const qPoints = q.points || (q.type === "multiple-choice" ? 10 : 15);
               const isMC = q.type === "multiple-choice";
               const userMCAns = answers[q.id];
-              const isCorrectMC = userMCAns === q.correctAnswer;
+              const isCorrectMC = userMCAns?.trim() === q.correctAnswer?.trim();
               
               const gradedSA = shortAnswerSelfGrades[q.id];
               const isFullSA = gradedSA === "full" || gradedSA === "correct";
@@ -830,13 +830,13 @@ export default function Quiz() {
                     </div>
                   </div>
                   
-                  <h5 className="font-bold text-white text-base leading-relaxed">{q.question}</h5>
+                  <h5 className="font-bold text-white text-base leading-relaxed normal-case">{q.question}</h5>
                   
                   {isMC ? (
                     <div className="space-y-2.5">
                       {q.options.map((opt, optIdx) => {
                         const isSelected = userMCAns === opt;
-                        const isActualCorrect = q.correctAnswer === opt;
+                        const isActualCorrect = q.correctAnswer?.trim() === opt?.trim();
                         
                         let optStyle = "bg-black/30 border-white/5 text-zinc-400";
                         if (isActualCorrect) optStyle = "bg-emerald-500/15 border-emerald-500/50 text-emerald-300 font-bold shadow-[0_0_15px_rgba(16,185,129,0.15)]";

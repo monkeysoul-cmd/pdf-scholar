@@ -136,21 +136,29 @@ body,
 }
 
 /* Ensure mouse cursor changes to hand pointer on interactive elements */
-button,
-a,
-[role="button"],
-input[type="button"],
-input[type="submit"],
-input[type="reset"],
-select,
+button:not(:disabled):not([disabled]),
+a:not(:disabled):not([disabled]),
+[role="button"]:not([aria-disabled="true"]):not(:disabled),
+input[type="button"]:not(:disabled),
+input[type="submit"]:not(:disabled),
+input[type="reset"]:not(:disabled),
+select:not(:disabled),
 summary,
 label[for],
-.cursor-pointer {
+.cursor-pointer:not(:disabled):not([disabled]) {
   cursor: pointer !important;
 }
 
 button:disabled,
 a:disabled,
-[disabled] {
+[disabled],
+.cursor-not-allowed,
+[aria-disabled="true"] {
   cursor: not-allowed !important;
+}
+
+/* Study text and content selectability utility */
+.select-text-content {
+  user-select: text !important;
+  -webkit-user-select: text !important;
 }

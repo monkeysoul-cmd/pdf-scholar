@@ -115,6 +115,13 @@ export default function Sidebar() {
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
+            <button
+              onClick={() => setIsMobileOpen(false)}
+              className="flex md:hidden p-1.5 bg-white/5 hover:bg-white/15 text-zinc-400 hover:text-white border border-white/10 rounded-full transition-all cursor-pointer shrink-0 items-center justify-center"
+              title="Close Navigation"
+            >
+              <X className="w-4 h-4" />
+            </button>
           </>
         )}
       </div>
@@ -142,11 +149,13 @@ export default function Sidebar() {
                 id={`nav-btn-${item.id}`}
                 className={`w-full relative flex items-center ${
                   collapsed ? "justify-center px-0 py-3 rounded-xl" : "justify-between px-3 py-2.5 rounded-xl"
-                } text-xs font-bold uppercase tracking-wider text-left transition-all cursor-pointer ${
+                } text-xs font-bold uppercase tracking-wider text-left transition-all ${
+                  isDisabled ? "cursor-not-allowed opacity-40 text-zinc-600 bg-transparent" : "cursor-pointer"
+                } ${
                   isActive
                     ? "text-black bg-gradient-to-r from-[#00FF66] to-[#00E55B] shadow-[0_0_15px_rgba(0,255,102,0.35)] font-black"
                     : isDisabled
-                    ? "text-zinc-700 bg-transparent cursor-not-allowed opacity-50"
+                    ? ""
                     : "text-zinc-400 hover:text-white glass-card hover:border-white/20"
                 }`}
               >
@@ -322,12 +331,6 @@ export default function Sidebar() {
             >
               <div className="relative h-full shadow-2xl">
                 <SidebarInner collapsed={false} />
-                <button
-                  onClick={() => setIsMobileOpen(false)}
-                  className="absolute top-4 right-4 p-2 glass-card hover:bg-white/10 text-zinc-400 hover:text-white rounded-full transition-all z-50 cursor-pointer"
-                >
-                  <X className="w-4 h-4" />
-                </button>
               </div>
             </motion.div>
           </>

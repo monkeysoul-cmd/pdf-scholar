@@ -49,7 +49,7 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen w-screen overflow-y-auto bg-dot-grid flex flex-col items-center justify-center p-4 md:p-8 select-none relative" id="auth-view">
+    <div className="min-h-screen w-screen overflow-y-auto bg-dot-grid flex flex-col items-center justify-center p-4 md:p-8 select-text-content relative" id="auth-view">
       {/* Swapped Cyber Ambient Gradient Glows (Animations preserved) */}
       <div className="ambient-glow ambient-glow-cyan w-[400px] h-[400px] sm:w-[550px] sm:h-[550px] top-[-80px] left-[-80px] sm:top-[10%] sm:left-[15%] animate-float-slow opacity-25" />
       <div className="ambient-glow ambient-glow-green w-[350px] h-[350px] sm:w-[480px] sm:h-[480px] bottom-[-80px] right-[-80px] sm:bottom-[10%] sm:right-[15%] animate-pulse-glow" />
@@ -111,7 +111,7 @@ export default function Auth() {
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-red-500/10 text-red-400 border border-red-500/30 rounded-xl p-3.5 text-xs font-mono uppercase text-center leading-relaxed backdrop-blur-sm"
+                className="bg-red-500/10 text-red-400 border border-red-500/30 rounded-xl p-3.5 text-xs font-sans normal-case text-center leading-relaxed backdrop-blur-sm"
               >
                 {error}
               </motion.div>
@@ -122,7 +122,7 @@ export default function Auth() {
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-[#00FF66]/10 text-[#00FF66] border border-[#00FF66]/30 rounded-xl p-3.5 text-xs font-mono uppercase text-center leading-relaxed backdrop-blur-sm"
+                className="bg-[#00FF66]/10 text-[#00FF66] border border-[#00FF66]/30 rounded-xl p-3.5 text-xs font-sans normal-case text-center leading-relaxed backdrop-blur-sm"
               >
                 {message}
               </motion.div>

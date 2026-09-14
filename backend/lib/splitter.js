@@ -67,10 +67,15 @@ export class RecursiveCharacterTextSplitter {
             currentChunk = "";
           }
         } else {
-          // Calculate overlap from previous chunk if possible
+          // Calculate overlap from previous chunk if possible and ensure it doesn't exceed chunkSize
           if (currentChunk) {
             const overlapText = currentChunk.slice(-this.chunkOverlap);
-            currentChunk = overlapText + separator + part;
+            const candidateWithOverlap = overlapText + separator + part;
+            if (candidateWithOverlap.length <= this.chunkSize) {
+              currentChunk = candidateWithOverlap;
+            } else {
+              currentChunk = part;
+            }
           } else {
             currentChunk = part;
           }

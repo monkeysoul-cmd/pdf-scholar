@@ -108,7 +108,7 @@ export default function Chat() {
   }
 
   return (
-    <div className="flex-1 bg-dot-grid flex flex-col min-h-0 h-full select-none relative pt-14 md:pt-0 z-0" id="chat-view">
+    <div className="flex-1 bg-dot-grid flex flex-col min-h-0 h-full select-text-content relative pt-14 md:pt-0 z-0" id="chat-view">
       {/* Ambient Glow */}
       <div className="ambient-glow ambient-glow-green w-[500px] h-[500px] top-[20%] right-[-100px] animate-float-slow" />
       
@@ -196,7 +196,7 @@ export default function Chat() {
                     </div>
 
                     <div
-                      className={`max-w-[85%] rounded-2xl p-4.5 text-xs leading-relaxed shadow-xl border relative overflow-hidden ${
+                      className={`max-w-[85%] rounded-2xl p-4.5 text-xs leading-relaxed shadow-xl border relative overflow-hidden select-text ${
                         isUser
                           ? "bg-gradient-to-br from-[#00FF66]/20 to-[#00FF66]/5 border-[#00FF66]/30 text-white backdrop-blur-md"
                           : "glass-card text-zinc-100"
@@ -316,7 +316,7 @@ export default function Chat() {
             onChange={(e) => setInputText(e.target.value)}
             disabled={isSending}
             placeholder={`Query document context... (e.g. "Summarize core findings")`}
-            className="flex-1 text-xs p-3.5 px-4 border border-white/10 hover:border-dotted hover:border-[#00FF66] focus:border-[#00FF66] focus:ring-1 focus:ring-[#00FF66]/30 rounded-xl transition-all bg-black/40 text-white font-mono uppercase placeholder-zinc-500 outline-none shadow-inner"
+            className="flex-1 text-xs p-3.5 px-4 border border-white/10 hover:border-dotted hover:border-[#00FF66] focus:border-[#00FF66] focus:ring-1 focus:ring-[#00FF66]/30 rounded-xl transition-all bg-black/40 text-white font-mono placeholder-zinc-500 outline-none shadow-inner"
           />
           <motion.button
             whileHover={{ scale: 1.03 }}

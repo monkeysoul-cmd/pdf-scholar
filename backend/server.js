@@ -49,13 +49,10 @@ app.use((req, res, next) => {
   next();
 });
 
-// Middleware to normalize URL paths for Vercel Serverless Function rewrites
+// Middleware to normalize URL paths if rewritten
 app.use((req, res, next) => {
   if (req.url.startsWith("/api/index.js")) {
     req.url = req.url.replace("/api/index.js", "/api");
-  }
-  if (!req.url.startsWith("/api") && !req.path.startsWith("/api")) {
-    req.url = "/api" + (req.url.startsWith("/") ? "" : "/") + req.url;
   }
   next();
 });
@@ -421,8 +418,9 @@ ${contextText}`;
       },
     });
 
+    const replyText = response.text || response.candidates?.[0]?.content?.parts?.[0]?.text || "No response received from model.";
     res.json({
-      text: response.text || "No response received from model.",
+      text: replyText,
       sources: searchResults,
     });
   } catch (error) {
@@ -442,23 +440,21 @@ app.post("/api/quiz", authenticateToken, async (req, res) => {
 
     const questionCount = Math.min(20, Math.max(1, parseInt(count) || 5));
 
-    // Load document chunks
-    const db = await LocalVectorDB.get(req.user.id);
-    const doc = db.documents.find(d => d.id === documentId);
+    // Load document & chunks efficiently
+    const doc = await LocalVectorDB.getDocument(documentId, req.user.id);
     if (!doc) {
       res.status(404).json({ error: "Document not found." });
       return;
     }
 
-    const docChunks = db.chunks.filter(c => c.documentId === documentId);
-    if (docChunks.length === 0) {
+    const docChunks = await LocalVectorDB.getDocumentChunks(documentId, req.user.id, 20);
+    if (!docChunks || docChunks.length === 0) {
       res.status(400).json({ error: "No chunks found for this document." });
       return;
     }
 
-    // Join a representative subset of chunks to cover context for up to 20 questions
+    // Join chunks to cover context for questions
     const contentSample = docChunks
-      .slice(0, 20)
       .map(c => c.text)
       .join("\n\n");
 
@@ -507,7 +503,12 @@ ${contentSample}`;
       },
     });
 
-    const quizData = JSON.parse(response.text || '{"questions":[]}');
+    let rawText = response.text || response.candidates?.[0]?.content?.parts?.[0]?.text || '{"questions":[]}';
+    rawText = rawText.trim();
+    if (rawText.startsWith("```")) {
+      rawText = rawText.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim();
+    }
+    const quizData = JSON.parse(rawText);
     res.json(quizData);
   } catch (error) {
     console.error("Quiz Endpoint Error:", error);
@@ -515,9 +516,12 @@ ${contentSample}`;
   }
 });
 
-// Global 404 handler — always returns JSON
-app.use((req, res) => {
-  res.status(404).json({ error: `Route ${req.method} ${req.path} not found.` });
+// 404 handler for unmatched API routes — always returns JSON for /api/*
+app.all("/api/*", (req, res) => {
+  res.status(404).json({ error: `API route ${req.method} ${req.path} not found.` });
+});
+app.all("/api", (req, res) => {
+  res.status(404).json({ error: `API route ${req.method} ${req.path} not found.` });
 });
 
 // Global error handler — always returns JSON (never HTML)
@@ -549,19 +553,35 @@ async function start() {
         appType: "spa",
       });
       app.use(vite.middlewares);
-    } catch {
-      // Ignore if Vite dev server isn't available
+    } catch (viteErr) {
+      console.warn("Vite dev server middleware could not be loaded:", viteErr.message);
+      const distPath = path.join(process.cwd(), "dist");
+      app.use(express.static(distPath));
+      app.get("*", (req, res) => {
+        res.sendFile(path.join(distPath, "index.html"));
+      });
     }
   } else {
     const distPath = path.join(process.cwd(), "dist");
     app.use(express.static(distPath));
+    app.get("*", (req, res) => {
+      res.sendFile(path.join(distPath, "index.html"));
+    });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`PDF Scholar Server running on http://localhost:${PORT} in ${process.env.NODE_ENV || "development"} mode`);
+  // Global 404 handler for any other unhandled routes
+  app.use((req, res) => {
+    res.status(404).json({ error: `Route ${req.method} ${req.path} not found.` });
+  });
+
+  return new Promise((resolve) => {
+    const server = app.listen(PORT, "0.0.0.0", () => {
+      console.log(`PDF Scholar Server running on http://localhost:${PORT} in ${process.env.NODE_ENV || "development"} mode`);
+      resolve(server);
+    });
   });
 }
 
-start();
+app.ready = start();
 
 export default app;

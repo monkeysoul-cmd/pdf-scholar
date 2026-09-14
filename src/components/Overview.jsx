@@ -55,6 +55,12 @@ export default function Overview() {
   // Documents sorted by creation date (Newest first)
   const sortedDocuments = [...documents].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
 
+  const formatRecordDate = (dateVal) => {
+    if (!dateVal) return "Recent";
+    const d = new Date(dateVal);
+    return !isNaN(d.getTime()) ? d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : "Recent";
+  };
+
   const quizzesTaken = uniqueQuizzes.length;
   const averageScore = quizzesTaken > 0
     ? Math.round(uniqueQuizzes.reduce((acc, s) => acc + (Number(s.scorePercent) || 0), 0) / quizzesTaken)
@@ -426,9 +432,11 @@ export default function Overview() {
               <div className="space-y-2.5 max-h-[220px] overflow-y-auto pr-1">
                 {uniqueQuizzes.map((quiz, idx) => {
                   const grade = getScoreGrade(quiz.scorePercent || 0);
-                  const quizDate = new Date(quiz.timestamp || quiz.date || Date.now());
-                  const formattedQuizDate = quizDate.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
-                  const formattedQuizTime = quizDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                  const rawDate = quiz.timestamp || quiz.date;
+                  const parsedDate = rawDate ? new Date(rawDate) : null;
+                  const isValid = parsedDate && !isNaN(parsedDate.getTime());
+                  const formattedQuizDate = isValid ? parsedDate.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : "Recent";
+                  const formattedQuizTime = isValid ? parsedDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : "";
 
                   return (
                     <div key={idx} className="space-y-1 bg-white/5 p-3 rounded-xl border border-white/5">
@@ -521,7 +529,7 @@ export default function Overview() {
                     </div>
                   </div>
                   <div className="text-[10px] text-zinc-400 font-mono uppercase tracking-wider shrink-0 bg-black/40 px-2.5 py-1 rounded-lg border border-white/5">
-                    {new Date(quiz.timestamp || quiz.date || Date.now()).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                    {formatRecordDate(quiz.timestamp || quiz.date)}
                   </div>
                 </div>
               ))}
@@ -573,7 +581,7 @@ export default function Overview() {
                   <div className="text-right shrink-0">
                     <div className="text-xs font-black font-mono text-[#FFB800]">+{quiz.earnedPoints || 0} PTS</div>
                     <div className="text-[9px] font-mono text-zinc-400">
-                      {new Date(quiz.timestamp || quiz.date || Date.now()).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                      {formatRecordDate(quiz.timestamp || quiz.date)}
                     </div>
                   </div>
                 </div>
@@ -613,7 +621,7 @@ export default function Overview() {
 
   return (
     <div
-      className="flex-1 pt-14 md:pt-6 px-4 sm:px-6 md:px-10 pb-12 overflow-y-auto min-h-0 flex flex-col bg-dot-grid text-white select-none relative z-0"
+      className="flex-1 pt-14 md:pt-6 px-4 sm:px-6 md:px-10 pb-12 overflow-y-auto min-h-0 flex flex-col bg-dot-grid text-white select-text-content relative z-0"
       id="overview-view"
     >
       {/* Dynamic Cyber Ambient Glows */}
@@ -753,10 +761,13 @@ export default function Overview() {
 
                 <div className="relative z-10">
                   {stat.isGrade ? (
-                    <div className="flex items-center gap-2">
-                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-lg text-lg md:text-xl font-black uppercase tracking-wide border ${overallGrade.bg} ${overallGrade.border} ${overallGrade.color} ${overallGrade.shadow}`}>
-                        <span className="w-2 h-2 rounded-full bg-current animate-pulse drop-shadow-[0_0_5px_currentColor]" />
+                    <div className="flex items-center gap-2.5">
+                      <div className="text-3xl sm:text-4xl font-black tracking-tight text-white leading-none drop-shadow-md">
                         {stat.value}
+                      </div>
+                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-black uppercase tracking-wide border ${overallGrade.bg} ${overallGrade.border} ${overallGrade.color} ${overallGrade.shadow}`}>
+                        <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse drop-shadow-[0_0_5px_currentColor]" />
+                        {overallGrade.label}
                       </span>
                     </div>
                   ) : (
@@ -831,10 +842,10 @@ export default function Overview() {
                       borderColor: block.hasActivity ? `rgba(0, 255, 102, ${block.intensity * 0.9})` : 'rgba(255, 255, 255, 0.06)'
                     }}
                   >
-                    <span className={`text-[8px] font-mono font-black ${block.intensity > 0.4 ? "text-black" : "text-zinc-300"}`}>
+                    <span className={`text-[8px] font-mono font-black ${block.intensity > 0.4 ? "text-black" : "text-zinc-200"}`}>
                       {block.hasActivity ? `${Math.round(block.intensity * 100)}%` : `—`}
                     </span>
-                    <span className={`text-[7px] font-mono uppercase font-black tracking-tighter ${block.intensity > 0.4 ? "text-black/80" : "text-zinc-500"}`}>
+                    <span className={`text-[7px] font-mono uppercase font-black tracking-tighter ${block.intensity > 0.4 ? "text-black/85" : "text-zinc-400"}`}>
                       {block.day} {block.month}
                     </span>
                   </motion.div>

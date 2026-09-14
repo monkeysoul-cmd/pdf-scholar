@@ -49,6 +49,20 @@ export class LocalVectorDB {
     return { documents, chunks };
   }
 
+  static async getDocument(docId, userId) {
+    const database = await this.getDb();
+    return await database.collection("documents").findOne({ id: docId, userId });
+  }
+
+  static async getDocumentChunks(docId, userId, limit = 0) {
+    const database = await this.getDb();
+    const query = { documentId: docId, userId };
+    if (limit > 0) {
+      return await database.collection("chunks").find(query).limit(limit).toArray();
+    }
+    return await database.collection("chunks").find(query).toArray();
+  }
+
   static async addDocument(doc, chunks, userId) {
     const database = await this.getDb();
     
