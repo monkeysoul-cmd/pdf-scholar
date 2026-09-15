@@ -211,6 +211,22 @@ export function StateProvider({ children }) {
     });
   };
 
+  const updateLastMessage = (docId, updater) => {
+    setChatHistory(prev => {
+      const currentDocHistory = prev[docId] || [];
+      if (currentDocHistory.length === 0) return prev;
+      const lastIndex = currentDocHistory.length - 1;
+      const lastMsg = currentDocHistory[lastIndex];
+      const updatedMsg = typeof updater === "function" ? updater(lastMsg) : { ...lastMsg, ...updater };
+      const updatedHistory = [...currentDocHistory];
+      updatedHistory[lastIndex] = updatedMsg;
+      return {
+        ...prev,
+        [docId]: updatedHistory,
+      };
+    });
+  };
+
   return (
     <StateContext.Provider
       value={{
@@ -229,6 +245,7 @@ export function StateProvider({ children }) {
         fetchDocuments,
         deleteDocument,
         addMessage,
+        updateLastMessage,
         setQuestions,
         clearChat,
         login,

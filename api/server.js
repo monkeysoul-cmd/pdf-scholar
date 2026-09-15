@@ -102,7 +102,7 @@ async function generateChunkEmbedding(text) {
   }
 
   const ai = getAIClient();
-  const embeddingModels = ["gemini-embedding-2-preview", "text-embedding-004", "embedding-001"];
+  const embeddingModels = ["gemini-embedding-2-preview", "gemini-embedding-2", "gemini-embedding-001"];
   let lastErr = null;
 
   for (const model of embeddingModels) {
@@ -112,8 +112,9 @@ async function generateChunkEmbedding(text) {
         contents: text,
       });
 
-      const values = response.embedding?.values || (Array.isArray(response.embeddings) ? response.embeddings[0]?.values : undefined);
-      if (values) return values;
+      const values = response.embedding?.values || 
+                     (Array.isArray(response.embeddings) && response.embeddings[0]?.values ? response.embeddings[0].values : undefined);
+      if (values && values.length > 0) return values;
     } catch (err) {
       lastErr = err;
     }
@@ -122,8 +123,8 @@ async function generateChunkEmbedding(text) {
   throw lastErr || new Error("Failed to retrieve embeddings from Gemini API.");
 }
 
-// Helper: safe content generator with fallback models
-async function generateContentWithFallback(params, initialModel = "gemini-2.5-flash") {
+// Helper: safe content generator with fallback models (fastest first: gemini-flash-lite-latest)
+async function generateContentWithFallback(params, initialModel = "gemini-flash-lite-latest") {
   const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.GEMINI_KEY;
   if (!apiKey) {
     throw new Error("GEMINI_API_KEY environment variable is missing in Vercel deployment settings.");
@@ -132,9 +133,10 @@ async function generateContentWithFallback(params, initialModel = "gemini-2.5-fl
   const ai = getAIClient();
   const models = [
     initialModel,
+    "gemini-flash-lite-latest",
     "gemini-2.5-flash",
-    "gemini-2.0-flash",
-    "gemini-1.5-flash"
+    "gemini-3.5-flash",
+    "gemini-flash-latest"
   ];
   // Remove duplicates while keeping order
   const uniqueModels = [...new Set(models)];
@@ -157,6 +159,43 @@ async function generateContentWithFallback(params, initialModel = "gemini-2.5-fl
   }
 
   throw lastError || new Error("All fallback models failed.");
+}
+
+// Helper: safe streaming content generator with fallback models
+async function generateContentStreamWithFallback(params, initialModel = "gemini-flash-lite-latest") {
+  const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.GEMINI_KEY;
+  if (!apiKey) {
+    throw new Error("GEMINI_API_KEY environment variable is missing in Vercel deployment settings.");
+  }
+
+  const ai = getAIClient();
+  const models = [
+    initialModel,
+    "gemini-flash-lite-latest",
+    "gemini-2.5-flash",
+    "gemini-3.5-flash",
+    "gemini-flash-latest"
+  ];
+  const uniqueModels = [...new Set(models)];
+
+  let lastError = null;
+
+  for (const model of uniqueModels) {
+    try {
+      console.log(`Attempting content stream using model: ${model}...`);
+      const stream = await ai.models.generateContentStream({
+        ...params,
+        model,
+      });
+      console.log(`Successfully opened stream with model: ${model}`);
+      return stream;
+    } catch (error) {
+      lastError = error;
+      console.warn(`Model stream ${model} failed: ${error.message || error}. Trying next fallback...`);
+    }
+  }
+
+  throw lastError || new Error("All fallback streaming models failed.");
 }
 
 // Authentication Routes
@@ -355,10 +394,10 @@ app.post("/api/ingest", authenticateToken, async (req, res) => {
   }
 });
 
-// 4. RAG Chat Endpoint
+// 4. RAG Chat Endpoint (with Streaming & Fast Response Support)
 app.post("/api/chat", authenticateToken, async (req, res) => {
   try {
-    const { documentId, message, history } = req.body;
+    const { documentId, message, history, stream: shouldStream } = req.body;
     if (!message) {
       res.status(400).json({ error: "Missing message parameter." });
       return;
@@ -374,9 +413,25 @@ app.post("/api/chat", authenticateToken, async (req, res) => {
 
     const searchResults = await LocalVectorDB.similaritySearch(queryEmbedding, 3, documentId, req.user.id);
 
+    // Check if client requested streaming
+    const isStream = shouldStream === true || req.headers.accept?.includes("text/event-stream");
+
     if (searchResults.length === 0) {
+      const emptyMsg = "I couldn't find any documents or chunks to base my answer on. Please upload a PDF first.";
+      if (isStream) {
+        res.writeHead(200, {
+          "Content-Type": "text/event-stream",
+          "Cache-Control": "no-cache, no-transform",
+          "Connection": "keep-alive",
+        });
+        res.write(`data: ${JSON.stringify({ type: "sources", sources: [] })}\n\n`);
+        res.write(`data: ${JSON.stringify({ type: "token", text: emptyMsg })}\n\n`);
+        res.write(`data: ${JSON.stringify({ type: "done" })}\n\n`);
+        res.end();
+        return;
+      }
       res.json({
-        text: "I couldn't find any documents or chunks to base my answer on. Please upload a PDF first.",
+        text: emptyMsg,
         sources: [],
       });
       return;
@@ -400,6 +455,48 @@ ${contextText}`;
       parts: [{ text: h.text }],
     }));
 
+    // Handle streaming vs non-streaming responses
+    if (isStream) {
+      res.writeHead(200, {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache, no-transform",
+        "Connection": "keep-alive",
+      });
+
+      // Send matching source citations immediately!
+      res.write(`data: ${JSON.stringify({ type: "sources", sources: searchResults })}\n\n`);
+
+      try {
+        const stream = await generateContentStreamWithFallback({
+          contents: [
+            ...formattedHistory,
+            { role: "user", parts: [{ text: message }] },
+          ],
+          config: {
+            systemInstruction,
+            temperature: 0.1,
+            maxOutputTokens: 1024,
+          },
+        }, "gemini-flash-lite-latest");
+
+        for await (const chunk of stream) {
+          if (chunk.text) {
+            res.write(`data: ${JSON.stringify({ type: "token", text: chunk.text })}\n\n`);
+          }
+        }
+
+        res.write(`data: ${JSON.stringify({ type: "done" })}\n\n`);
+        res.end();
+        return;
+      } catch (streamErr) {
+        console.error("Chat streaming error:", streamErr);
+        res.write(`data: ${JSON.stringify({ type: "error", error: streamErr.message || "Error generating response." })}\n\n`);
+        res.end();
+        return;
+      }
+    }
+
+    // Non-streaming fallback path (high-speed gemini-flash-lite-latest)
     const response = await generateContentWithFallback({
       contents: [
         ...formattedHistory,
@@ -408,10 +505,10 @@ ${contextText}`;
       config: {
         systemInstruction,
         temperature: 0.1,
+        maxOutputTokens: 1024,
       },
-    });
+    }, "gemini-flash-lite-latest");
 
-    res.json({
     const replyText = response.text || response.candidates?.[0]?.content?.parts?.[0]?.text || "No response received from model.";
     res.json({
       text: replyText,
