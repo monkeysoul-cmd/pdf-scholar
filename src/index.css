@@ -65,14 +65,92 @@ body,
   mix-blend-mode: overlay;
 }
 
-/* Glass card utility */
-.glass-card {
-  background-color: var(--card-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--card-border);
-  box-shadow: inset 0 1px 0 0 rgba(255, 255, 255, 0.06),
-              0 8px 32px -8px rgba(0, 0, 0, 0.7);
+/* Premium Translucent Glass Tile System */
+.glass-card,
+.glass-tile {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.015) 100%), rgba(11, 12, 18, 0.65);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.16),
+              inset 0 0 20px 0 rgba(255, 255, 255, 0.012),
+              0 12px 32px -8px rgba(0, 0, 0, 0.7);
+  position: relative;
+}
+
+/* Translucent Glass Tile with Interactive Hover & Lift */
+.glass-tile-interactive {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.glass-tile-interactive:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.025) 100%), rgba(14, 15, 22, 0.72);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.25),
+              inset 0 0 24px 0 rgba(255, 255, 255, 0.02),
+              0 18px 40px -10px rgba(0, 0, 0, 0.8);
+  transform: translateY(-2px);
+}
+
+/* Color Accent Glass Variants */
+.glass-tile-green {
+  background: linear-gradient(135deg, rgba(0, 255, 102, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%), rgba(10, 15, 12, 0.65);
+  border-color: rgba(0, 255, 102, 0.22);
+  box-shadow: inset 0 1px 1px 0 rgba(0, 255, 102, 0.25),
+              0 12px 32px -8px rgba(0, 0, 0, 0.7),
+              0 0 24px -6px rgba(0, 255, 102, 0.15);
+}
+.glass-tile-green:hover {
+  border-color: rgba(0, 255, 102, 0.42);
+  box-shadow: inset 0 1px 1px 0 rgba(0, 255, 102, 0.4),
+              0 18px 40px -10px rgba(0, 0, 0, 0.8),
+              0 0 32px -4px rgba(0, 255, 102, 0.28);
+}
+
+.glass-tile-cyan {
+  background: linear-gradient(135deg, rgba(0, 229, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%), rgba(10, 14, 18, 0.65);
+  border-color: rgba(0, 229, 255, 0.22);
+  box-shadow: inset 0 1px 1px 0 rgba(0, 229, 255, 0.25),
+              0 12px 32px -8px rgba(0, 0, 0, 0.7),
+              0 0 24px -6px rgba(0, 229, 255, 0.15);
+}
+.glass-tile-cyan:hover {
+  border-color: rgba(0, 229, 255, 0.42);
+  box-shadow: inset 0 1px 1px 0 rgba(0, 229, 255, 0.4),
+              0 18px 40px -10px rgba(0, 0, 0, 0.8),
+              0 0 32px -4px rgba(0, 229, 255, 0.28);
+}
+
+.glass-tile-amber {
+  background: linear-gradient(135deg, rgba(255, 184, 0, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%), rgba(18, 14, 10, 0.65);
+  border-color: rgba(255, 184, 0, 0.22);
+  box-shadow: inset 0 1px 1px 0 rgba(255, 184, 0, 0.25),
+              0 12px 32px -8px rgba(0, 0, 0, 0.7),
+              0 0 24px -6px rgba(255, 184, 0, 0.15);
+}
+.glass-tile-amber:hover {
+  border-color: rgba(255, 184, 0, 0.42);
+  box-shadow: inset 0 1px 1px 0 rgba(255, 184, 0, 0.4),
+              0 18px 40px -10px rgba(0, 0, 0, 0.8),
+              0 0 32px -4px rgba(255, 184, 0, 0.28);
+}
+
+/* Glass Pill Badge Utility */
+.glass-pill {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* Top Specular Line Bevel */
+.specular-highlight {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.28) 50%, transparent 100%);
+  pointer-events: none;
 }
 
 /* Ambient glow orb utility */

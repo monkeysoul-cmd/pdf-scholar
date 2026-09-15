@@ -127,7 +127,8 @@ export default function Overview() {
       subtitle: "Files in your library",
       badge: `${totalDocuments} Active`,
       color: "from-[#00FF66]/50",
-      glow: "group-hover:shadow-[0_0_30px_rgba(0,255,102,0.2)]",
+      glow: "hover:shadow-[0_0_35px_rgba(0,255,102,0.28)]",
+      tileClass: "glass-tile-green",
       iconColor: "text-[#00FF66]"
     },
     {
@@ -138,7 +139,8 @@ export default function Overview() {
       subtitle: "Total pages analyzed",
       badge: "Deep Parsed",
       color: "from-[#00E5FF]/50",
-      glow: "group-hover:shadow-[0_0_30px_rgba(0,229,255,0.2)]",
+      glow: "hover:shadow-[0_0_35px_rgba(0,229,255,0.28)]",
+      tileClass: "glass-tile-cyan",
       iconColor: "text-[#00E5FF]"
     },
     {
@@ -149,7 +151,8 @@ export default function Overview() {
       subtitle: "Key concepts indexed",
       badge: "RAG Indexed",
       color: "from-[#FFB800]/50",
-      glow: "group-hover:shadow-[0_0_30px_rgba(255,184,0,0.2)]",
+      glow: "hover:shadow-[0_0_35px_rgba(255,184,0,0.28)]",
+      tileClass: "glass-tile-amber",
       iconColor: "text-[#FFB800]"
     }
   ];
@@ -164,7 +167,8 @@ export default function Overview() {
       badge: overallGrade.label,
       isGrade: true,
       color: "from-[#00FF66]/50",
-      glow: "group-hover:shadow-[0_0_30px_rgba(0,255,102,0.2)]",
+      glow: "hover:shadow-[0_0_35px_rgba(0,255,102,0.28)]",
+      tileClass: "glass-tile-green",
       iconColor: "text-[#00FF66]"
     },
     {
@@ -175,7 +179,8 @@ export default function Overview() {
       subtitle: "Completed study sessions",
       badge: quizzesTaken > 0 ? `${quizzesTaken} Runs` : "Ready",
       color: "from-[#00E5FF]/50",
-      glow: "group-hover:shadow-[0_0_30px_rgba(0,229,255,0.2)]",
+      glow: "hover:shadow-[0_0_35px_rgba(0,229,255,0.28)]",
+      tileClass: "glass-tile-cyan",
       iconColor: "text-[#00E5FF]"
     },
     {
@@ -186,7 +191,8 @@ export default function Overview() {
       subtitle: "Total points earned",
       badge: "Scored",
       color: "from-[#FFB800]/50",
-      glow: "group-hover:shadow-[0_0_30px_rgba(255,184,0,0.2)]",
+      glow: "hover:shadow-[0_0_35px_rgba(255,184,0,0.28)]",
+      tileClass: "glass-tile-amber",
       iconColor: "text-[#FFB800]"
     }
   ];
@@ -690,22 +696,25 @@ export default function Overview() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.08 }}
                 onClick={() => setActiveModal(stat.id)}
-                className={`glass-card p-5 sm:p-6 rounded-xl relative group overflow-hidden shadow-xl transition-all hover:scale-[1.01] hover:border-dotted hover:border-[#00FF66] cursor-pointer ${stat.glow}`}
+                className={`glass-tile glass-tile-interactive ${stat.tileClass || ""} p-5 sm:p-6 rounded-2xl relative group overflow-hidden shadow-2xl cursor-pointer ${stat.glow}`}
               >
+                {/* Top Specular Light Bevel */}
+                <div className="specular-highlight" />
+
                 {/* Accent Top Bar */}
                 <div className={`absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r ${stat.color} to-transparent`} />
                 
-                <div className="flex items-center justify-between mb-3 relative z-10">
-                  <span className="text-[10px] font-mono font-bold uppercase text-zinc-400 tracking-wider">
+                <div className="flex items-center justify-between mb-3.5 relative z-10">
+                  <span className="text-[10px] font-mono font-bold uppercase text-zinc-300 tracking-wider">
                     {stat.label}
                   </span>
                   <div className="flex items-center gap-2">
                     {stat.badge && (
-                      <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-md uppercase tracking-wider bg-white/5 border border-white/10 text-zinc-300">
+                      <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-md uppercase tracking-wider glass-pill text-zinc-200">
                         {stat.badge}
                       </span>
                     )}
-                    <div className={`w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center ${stat.iconColor} group-hover:bg-white/10 transition-colors shadow-inner`}>
+                    <div className={`w-8 h-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center ${stat.iconColor} group-hover:scale-110 group-hover:bg-white/10 transition-all shadow-inner`}>
                       <Icon className="w-4 h-4 drop-shadow-[0_0_8px_currentColor]" />
                     </div>
                   </div>
@@ -715,7 +724,7 @@ export default function Overview() {
                   <div className="text-3xl sm:text-4xl font-black tracking-tight text-white leading-none drop-shadow-md">
                     {stat.value}
                   </div>
-                  <div className="text-[10px] font-mono text-zinc-400 mt-2 uppercase tracking-wider flex items-center justify-between">
+                  <div className="text-[10px] font-mono text-zinc-400 mt-2.5 uppercase tracking-wider flex items-center justify-between">
                     <span>{stat.subtitle}</span>
                     <span className={`${stat.iconColor} font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5`}>
                       View Graph <ChevronRight className="w-3 h-3" />
@@ -738,22 +747,25 @@ export default function Overview() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: (index + 3) * 0.08 }}
                 onClick={() => setActiveModal(stat.id)}
-                className={`glass-card p-5 sm:p-6 rounded-xl relative group overflow-hidden shadow-xl transition-all hover:scale-[1.01] hover:border-dotted hover:border-[#00FF66] cursor-pointer ${stat.glow}`}
+                className={`glass-tile glass-tile-interactive ${stat.tileClass || ""} p-5 sm:p-6 rounded-2xl relative group overflow-hidden shadow-2xl cursor-pointer ${stat.glow}`}
               >
+                {/* Top Specular Light Bevel */}
+                <div className="specular-highlight" />
+
                 {/* Accent Top Bar */}
                 <div className={`absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r ${stat.color} to-transparent`} />
                 
-                <div className="flex items-center justify-between mb-3 relative z-10">
-                  <span className="text-[10px] font-mono font-bold uppercase text-zinc-400 tracking-wider">
+                <div className="flex items-center justify-between mb-3.5 relative z-10">
+                  <span className="text-[10px] font-mono font-bold uppercase text-zinc-300 tracking-wider">
                     {stat.label}
                   </span>
                   <div className="flex items-center gap-2">
                     {stat.badge && (
-                      <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-md uppercase tracking-wider bg-white/5 border border-white/10 text-zinc-300">
+                      <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-md uppercase tracking-wider glass-pill text-zinc-200">
                         {stat.badge}
                       </span>
                     )}
-                    <div className={`w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center ${stat.iconColor} group-hover:bg-white/10 transition-colors shadow-inner`}>
+                    <div className={`w-8 h-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center ${stat.iconColor} group-hover:scale-110 group-hover:bg-white/10 transition-all shadow-inner`}>
                       <Icon className="w-4 h-4 drop-shadow-[0_0_8px_currentColor]" />
                     </div>
                   </div>
@@ -775,7 +787,7 @@ export default function Overview() {
                       {stat.value}
                     </div>
                   )}
-                  <div className="text-[10px] font-mono text-zinc-400 mt-2 uppercase tracking-wider flex items-center justify-between">
+                  <div className="text-[10px] font-mono text-zinc-400 mt-2.5 uppercase tracking-wider flex items-center justify-between">
                     <span>{stat.subtitle}</span>
                     <span className={`${stat.iconColor} font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-0.5`}>
                       View Graph <ChevronRight className="w-3 h-3" />
@@ -795,8 +807,9 @@ export default function Overview() {
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="lg:col-span-7 glass-card bg-noise rounded-xl p-5 sm:p-6 flex flex-col justify-between"
+          className="lg:col-span-7 glass-tile bg-noise rounded-2xl p-5 sm:p-6 flex flex-col justify-between shadow-2xl relative overflow-hidden border border-white/10"
         >
+          <div className="specular-highlight" />
           <div>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 border-b border-white/5 pb-4">
               <div className="flex items-center gap-2">
@@ -834,7 +847,7 @@ export default function Overview() {
                     whileHover={{ scale: 1.06, y: -2 }}
                     onClick={() => { setSelectedHeatmapCell(isSelected ? null : block.index); setActiveModal("chunks"); }}
                     title={`Date: ${block.date} • Semantic Density: ${Math.round(block.intensity * 100)}%`}
-                    className={`h-12 rounded-lg flex flex-col items-center justify-between p-1 border cursor-pointer relative group transition-all ${
+                    className={`h-12 rounded-xl flex flex-col items-center justify-between p-1 border cursor-pointer relative group transition-all ${
                       isSelected ? "ring-2 ring-[#00FF66] shadow-[0_0_15px_rgba(0,255,102,0.4)]" : "border-white/5"
                     }`}
                     style={{
@@ -875,8 +888,9 @@ export default function Overview() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25 }}
           onClick={() => setActiveModal("pages")}
-          className="lg:col-span-5 glass-card bg-noise rounded-xl p-5 sm:p-6 flex flex-col justify-between cursor-pointer hover:border-dotted hover:border-[#00E5FF]"
+          className="lg:col-span-5 glass-tile glass-tile-interactive glass-tile-cyan bg-noise rounded-2xl p-5 sm:p-6 flex flex-col justify-between cursor-pointer shadow-2xl relative overflow-hidden"
         >
+          <div className="specular-highlight" />
           <div>
             <div className="flex items-center justify-between gap-3 mb-5 border-b border-white/5 pb-4">
               <div className="flex items-center gap-2">
