@@ -1,22 +1,55 @@
 /**
  * Recursive character splitter for chunking document text for RAG.
+ * Supports both raw text chunking and page-aware chunking with exact page index attribution.
  */
 export class RecursiveCharacterTextSplitter {
   constructor(options = {}) {
-    this.chunkSize = options.chunkSize ?? 1000;
-    this.chunkOverlap = options.chunkOverlap ?? 200;
-    this.separators = options.separators ?? ["\n\n", "\n", " ", ""];
+    this.chunkSize = options.chunkSize ?? 800;
+    this.chunkOverlap = options.chunkOverlap ?? 150;
+    this.separators = options.separators ?? ["\n\n", "\n", ". ", " ", ""];
   }
 
+  /**
+   * Split text into chunks
+   */
   splitText(text) {
     return this.split(text, this.separators);
   }
 
-  split(text, separators) {
-    if (text.length <= this.chunkSize) {
-      return [text];
+  /**
+   * Split pages array into chunks preserving exact page index attribution.
+   * @param {Array<{pageIndex: number, text: string}>} pages
+   * @returns {Array<{text: string, pageIndex: number}>}
+   */
+  splitPages(pages) {
+    if (!Array.isArray(pages) || pages.length === 0) return [];
+
+    const chunkItems = [];
+
+    for (const page of pages) {
+      const pageText = (page.text || "").trim();
+      if (!pageText) continue;
+
+      const chunks = this.split(pageText, this.separators);
+      for (const chunkText of chunks) {
+        if (chunkText.trim().length > 0) {
+          chunkItems.push({
+            text: chunkText.trim(),
+            pageIndex: page.pageIndex || 1,
+          });
+        }
+      }
     }
 
+    return chunkItems;
+  }
+
+  split(text, separators) {
+    if (!text || text.length <= this.chunkSize) {
+      return text ? [text.trim()] : [];
+    }
+
+    // Find the first separator that appears in the text
     let separator = separators[separators.length - 1];
     let nextSeparators = [];
 

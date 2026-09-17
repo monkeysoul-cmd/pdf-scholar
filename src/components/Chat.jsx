@@ -88,9 +88,13 @@ export default function Chat() {
                 const eventData = JSON.parse(trimmed.slice(6));
                 if (eventData.type === "sources") {
                   currentSources = eventData.sources || [];
+                  const retrievalTimeMs = eventData.retrievalTimeMs;
+                  const retrievalMethod = eventData.retrievalMethod;
                   updateLastMessage(selectedDocumentId, msg => ({
                     ...msg,
-                    sources: currentSources
+                    sources: currentSources,
+                    retrievalTimeMs,
+                    retrievalMethod,
                   }));
                 } else if (eventData.type === "token") {
                   accumulatedText += eventData.text;
@@ -139,7 +143,9 @@ export default function Chat() {
           updateLastMessage(selectedDocumentId, msg => ({
             ...msg,
             text: data.text,
-            sources: data.sources || []
+            sources: data.sources || [],
+            retrievalTimeMs: data.retrievalTimeMs,
+            retrievalMethod: data.retrievalMethod,
           }));
         } else {
           updateLastMessage(selectedDocumentId, msg => ({
@@ -301,9 +307,18 @@ export default function Chat() {
                       {/* Collapsible Source Citation List */}
                       {!isUser && msg.sources && msg.sources.length > 0 && (
                         <div className="border-t border-white/10 mt-4 pt-3.5 space-y-2">
-                          <div className="flex items-center gap-1.5 text-[9px] font-mono font-bold text-zinc-400 uppercase tracking-widest mb-2">
-                            <BookOpen className="w-3.5 h-3.5 text-zinc-400" />
-                            <span>Matching Sections ({msg.sources.length})</span>
+                          <div className="flex flex-wrap items-center justify-between gap-2 text-[9px] font-mono font-bold text-zinc-400 uppercase tracking-widest mb-2">
+                            <div className="flex items-center gap-1.5">
+                              <BookOpen className="w-3.5 h-3.5 text-[#00FF66]" />
+                              <span>Matching Sections ({msg.sources.length})</span>
+                            </div>
+                            {(msg.retrievalTimeMs !== undefined || msg.retrievalMethod) && (
+                              <div className="flex items-center gap-1.5 text-[9px] font-mono text-[#00FF66] bg-[#00FF66]/10 border border-[#00FF66]/20 px-2 py-0.5 rounded-md">
+                                <span>⚡ {msg.retrievalTimeMs || 1}ms</span>
+                                <span>•</span>
+                                <span>{msg.retrievalMethod || "Hybrid Vector Search"}</span>
+                              </div>
+                            )}
                           </div>
                           
                           <div className="flex flex-wrap gap-2">
