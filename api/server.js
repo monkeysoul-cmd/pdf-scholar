@@ -27,7 +27,7 @@ import express from "express";
 import path from "path";
 import { GoogleGenAI, Type } from "@google/genai";
 import { RecursiveCharacterTextSplitter } from "./lib/splitter.js";
-import { LocalVectorDB } from "./lib/local-vector-db.js";
+import { VectorDB, LocalVectorDB } from "./lib/vector-db.js";
 import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -49,13 +49,10 @@ app.use((req, res, next) => {
   next();
 });
 
-// Middleware to normalize URL paths for Vercel Serverless Function rewrites
+// Middleware to normalize URL paths if rewritten
 app.use((req, res, next) => {
   if (req.url.startsWith("/api/index.js")) {
     req.url = req.url.replace("/api/index.js", "/api");
-  }
-  if (!req.url.startsWith("/api") && !req.path.startsWith("/api")) {
-    req.url = "/api" + (req.url.startsWith("/") ? "" : "/") + req.url;
   }
   next();
 });
@@ -94,12 +91,16 @@ function getAIClient() {
   });
 }
 
-// Helper: safe embedding generator with model fallbacks
+// Helper: safe embedding generator with model fallbacks & cache
 async function generateChunkEmbedding(text) {
   const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.GEMINI_KEY;
   if (!apiKey) {
     throw new Error("GEMINI_API_KEY environment variable is missing in Vercel deployment settings.");
   }
+
+  // Check in-memory query embedding cache (0ms instant retrieval)
+  const cached = VectorDB.getCachedEmbedding(text);
+  if (cached) return Array.from(cached);
 
   const ai = getAIClient();
   const embeddingModels = ["gemini-embedding-2-preview", "gemini-embedding-2", "gemini-embedding-001"];
@@ -114,7 +115,10 @@ async function generateChunkEmbedding(text) {
 
       const values = response.embedding?.values || 
                      (Array.isArray(response.embeddings) && response.embeddings[0]?.values ? response.embeddings[0].values : undefined);
-      if (values && values.length > 0) return values;
+      if (values && values.length > 0) {
+        VectorDB.setCachedEmbedding(text, values);
+        return values;
+      }
     } catch (err) {
       lastErr = err;
     }
@@ -138,7 +142,6 @@ async function generateContentWithFallback(params, initialModel = "gemini-flash-
     "gemini-3.5-flash",
     "gemini-flash-latest"
   ];
-  // Remove duplicates while keeping order
   const uniqueModels = [...new Set(models)];
 
   let lastError = null;
@@ -209,6 +212,7 @@ app.post("/api/auth/register", async (req, res) => {
 
     const database = await LocalVectorDB.getDb();
     
+    // Check if user already exists
     const existingUser = await database.collection("users").findOne({ username: username.toLowerCase() });
     if (existingUser) {
       return res.status(400).json({ error: "Username is already taken." });
@@ -296,10 +300,13 @@ app.post("/api/ingest", authenticateToken, async (req, res) => {
       return;
     }
 
+    // Convert base64 to Buffer
     const buffer = Buffer.from(pdfBase64, "base64");
 
+    // Parse PDF text and meta with page-aware extraction
     let text = "";
     let pageCount = 1;
+    let extractedPages = [];
     try {
       let pdf;
       try {
@@ -311,9 +318,40 @@ app.post("/api/ingest", authenticateToken, async (req, res) => {
       }
 
       if (typeof pdf === "function") {
-        const parsed = await pdf(buffer);
+        const pageTextList = [];
+        const options = {
+          pagerender: function (pageData) {
+            return pageData.getTextContent({ normalizeWhitespace: false, disableCombineTextItems: false })
+              .then(function (textContent) {
+                let lastY, pageText = "";
+                for (let item of textContent.items) {
+                  if (lastY === item.transform[5] || !lastY) {
+                    pageText += item.str;
+                  } else {
+                    pageText += "\n" + item.str;
+                  }
+                  lastY = item.transform[5];
+                }
+                pageTextList.push({
+                  pageIndex: pageData.pageIndex + 1,
+                  text: pageText,
+                });
+                return pageText;
+              });
+          }
+        };
+
+        let parsed;
+        try {
+          parsed = await pdf(buffer, options);
+        } catch (renderErr) {
+          console.warn("Custom page rendering fallback:", renderErr.message);
+          parsed = await pdf(buffer);
+        }
+
         text = parsed.text || "";
-        pageCount = parsed.numpages || 1;
+        pageCount = parsed.numpages || pageTextList.length || 1;
+        extractedPages = pageTextList.sort((a, b) => a.pageIndex - b.pageIndex);
       } else if (pdf && pdf.PDFParse) {
         const parser = new pdf.PDFParse({ data: buffer });
         const parsedPdf = await parser.getText();
@@ -334,55 +372,67 @@ app.post("/api/ingest", authenticateToken, async (req, res) => {
       return;
     }
 
+    // Split text into chunks using page-aware splitting
     const splitter = new RecursiveCharacterTextSplitter({
       chunkSize: 800,
-      chunkOverlap: 200,
+      chunkOverlap: 150,
     });
-    const rawChunks = splitter.splitText(text);
 
-    if (rawChunks.length === 0) {
+    let rawChunksWithPages = [];
+    if (extractedPages.length > 0) {
+      rawChunksWithPages = splitter.splitPages(extractedPages);
+    }
+
+    // Graceful fallback if page extraction yielded no items
+    if (rawChunksWithPages.length === 0) {
+      const plainChunks = splitter.splitText(text);
+      rawChunksWithPages = plainChunks.map((chunkText, idx) => ({
+        text: chunkText,
+        pageIndex: Math.min(pageCount, Math.max(1, Math.ceil((idx / plainChunks.length) * pageCount)))
+      }));
+    }
+
+    if (rawChunksWithPages.length === 0) {
       res.status(400).json({ error: "Failed to split text into readable chunks." });
       return;
     }
 
+    // Create Document ID and Metadata
     const docId = `doc_${Date.now()}`;
     const docMeta = {
       id: docId,
       name: filename,
       pageCount,
-      chunkCount: rawChunks.length,
+      chunkCount: rawChunksWithPages.length,
       uploadedAt: new Date().toISOString(),
       size: size || buffer.length,
     };
 
     const chunkRecords = [];
-    console.log(`Generating embeddings for ${rawChunks.length} chunks of document "${filename}"...`);
+    console.log(`Generating embeddings for ${rawChunksWithPages.length} chunks of document "${filename}"...`);
 
-    // Process chunk embeddings in parallel batches of 5 to avoid Vercel serverless function timeouts
-    const BATCH_SIZE = 5;
-    for (let i = 0; i < rawChunks.length; i += BATCH_SIZE) {
-      const batch = rawChunks.slice(i, i + BATCH_SIZE);
+    // Process chunk embeddings with concurrency batching
+    const BATCH_SIZE = 8;
+    for (let i = 0; i < rawChunksWithPages.length; i += BATCH_SIZE) {
+      const batch = rawChunksWithPages.slice(i, i + BATCH_SIZE);
       const batchResults = await Promise.all(
-        batch.map(async (chunkText, batchIdx) => {
+        batch.map(async (item, batchIdx) => {
           const actualIndex = i + batchIdx;
-          const embedding = await generateChunkEmbedding(chunkText);
-          const pageIndex = Math.min(
-            pageCount,
-            Math.max(1, Math.ceil((actualIndex / rawChunks.length) * pageCount))
-          );
+          const embedding = await generateChunkEmbedding(item.text);
           return {
             documentId: docId,
             documentName: filename,
-            text: chunkText,
+            text: item.text,
             embedding,
-            pageIndex,
+            pageIndex: item.pageIndex,
           };
         })
       );
       chunkRecords.push(...batchResults);
     }
 
-    await LocalVectorDB.addDocument(docMeta, chunkRecords, req.user.id);
+    // Save to Vector DB (In-Memory Index + MongoDB Atlas)
+    await VectorDB.addDocument(docMeta, chunkRecords, req.user.id);
 
     res.json({
       success: true,
@@ -394,7 +444,7 @@ app.post("/api/ingest", authenticateToken, async (req, res) => {
   }
 });
 
-// 4. RAG Chat Endpoint (with Streaming & Fast Response Support)
+// 4. RAG Chat Endpoint (with Hybrid Vector Retrieval & Fast Streaming)
 app.post("/api/chat", authenticateToken, async (req, res) => {
   try {
     const { documentId, message, history, stream: shouldStream } = req.body;
@@ -403,6 +453,7 @@ app.post("/api/chat", authenticateToken, async (req, res) => {
       return;
     }
 
+    // 1. Generate query embedding (cached if repeated)
     let queryEmbedding;
     try {
       queryEmbedding = await generateChunkEmbedding(message);
@@ -411,7 +462,17 @@ app.post("/api/chat", authenticateToken, async (req, res) => {
       return;
     }
 
-    const searchResults = await LocalVectorDB.similaritySearch(queryEmbedding, 3, documentId, req.user.id);
+    // 2. High-Performance Hybrid Similarity Search (Dense Vector + BM25 Lexical)
+    const searchResult = await VectorDB.similaritySearch(
+      queryEmbedding,
+      4,
+      documentId,
+      req.user.id,
+      { queryText: message }
+    );
+    const searchResults = searchResult.results || [];
+    const retrievalTimeMs = searchResult.retrievalTimeMs || 1;
+    const retrievalMethod = searchResult.method || "Hybrid Vector Search";
 
     // Check if client requested streaming
     const isStream = shouldStream === true || req.headers.accept?.includes("text/event-stream");
@@ -424,7 +485,7 @@ app.post("/api/chat", authenticateToken, async (req, res) => {
           "Cache-Control": "no-cache, no-transform",
           "Connection": "keep-alive",
         });
-        res.write(`data: ${JSON.stringify({ type: "sources", sources: [] })}\n\n`);
+        res.write(`data: ${JSON.stringify({ type: "sources", sources: [], retrievalTimeMs, retrievalMethod })}\n\n`);
         res.write(`data: ${JSON.stringify({ type: "token", text: emptyMsg })}\n\n`);
         res.write(`data: ${JSON.stringify({ type: "done" })}\n\n`);
         res.end();
@@ -433,10 +494,13 @@ app.post("/api/chat", authenticateToken, async (req, res) => {
       res.json({
         text: emptyMsg,
         sources: [],
+        retrievalTimeMs,
+        retrievalMethod,
       });
       return;
     }
 
+    // 3. Assemble document context
     const contextText = searchResults
       .map((r, i) => `[Source ${i + 1}] (Page ${r.chunk.pageIndex}):\n${r.chunk.text}`)
       .join("\n\n");
@@ -450,12 +514,13 @@ Be concise, clear, and perfectly grounded. Always cite your sources by mentionin
 Here is the Ground-Truth Document Context:
 ${contextText}`;
 
+    // 4. Format chat history for Gemini
     const formattedHistory = (history || []).map((h) => ({
       role: h.role === "assistant" ? "model" : "user",
       parts: [{ text: h.text }],
     }));
 
-    // Handle streaming vs non-streaming responses
+    // 5. Handle streaming vs non-streaming responses
     if (isStream) {
       res.writeHead(200, {
         "Content-Type": "text/event-stream",
@@ -463,8 +528,13 @@ ${contextText}`;
         "Connection": "keep-alive",
       });
 
-      // Send matching source citations immediately!
-      res.write(`data: ${JSON.stringify({ type: "sources", sources: searchResults })}\n\n`);
+      // Send matching source citations with retrieval telemetry immediately!
+      res.write(`data: ${JSON.stringify({
+        type: "sources",
+        sources: searchResults,
+        retrievalTimeMs,
+        retrievalMethod,
+      })}\n\n`);
 
       try {
         const stream = await generateContentStreamWithFallback({
@@ -513,6 +583,8 @@ ${contextText}`;
     res.json({
       text: replyText,
       sources: searchResults,
+      retrievalTimeMs,
+      retrievalMethod,
     });
   } catch (error) {
     console.error("Chat Endpoint Error:", error);
