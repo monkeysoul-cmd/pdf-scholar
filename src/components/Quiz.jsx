@@ -76,7 +76,17 @@ export default function Quiz() {
 
       const data = await res.json();
       if (res.ok && data.questions) {
-        setQuestions(data.questions);
+        const normalized = data.questions.map((q, idx) => {
+          const isMC = Boolean(q.type && (q.type.toLowerCase().includes("choice") || q.type.toLowerCase().includes("mc")));
+          return {
+            ...q,
+            id: q.id || `q_${idx + 1}`,
+            type: isMC ? "multiple-choice" : "short-answer",
+            options: isMC && Array.isArray(q.options) ? q.options : [],
+            points: Number(q.points) || (isMC ? 10 : 15)
+          };
+        });
+        setQuestions(normalized);
       } else {
         alert(data.error || "Failed to generate quiz questions.");
       }
@@ -139,8 +149,9 @@ export default function Quiz() {
     let saPointsTotal = 0;
 
     quizQuestions.forEach(q => {
-      const qPoints = q.points || (q.type === "multiple-choice" ? 10 : 15);
-      if (q.type === "multiple-choice") {
+      const isMC = q.type === "multiple-choice" || Boolean(q.type?.toLowerCase().includes("choice"));
+      const qPoints = q.points || (isMC ? 10 : 15);
+      if (isMC) {
         mcTotal++;
         mcPointsTotal += qPoints;
         if (answers[q.id]?.trim() === q.correctAnswer?.trim()) {
@@ -187,7 +198,8 @@ export default function Quiz() {
   };
 
   const unansweredCount = quizQuestions.filter(q => {
-    if (q.type === "multiple-choice") {
+    const isMC = q.type === "multiple-choice" || Boolean(q.type?.toLowerCase().includes("choice"));
+    if (isMC) {
       return !answers[q.id];
     } else {
       return !shortAnswerSelfGrades[q.id];

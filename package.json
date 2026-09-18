@@ -7,7 +7,8 @@
     "dev": "node --watch-path=backend backend/server.js",
     "build": "vite build",
     "start": "node backend/server.js",
-    "clean": "rm -rf dist"
+    "test": "node backend/test-rag.js",
+    "clean": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\""
   },
   "dependencies": {
     "@google/genai": "^2.4.0",

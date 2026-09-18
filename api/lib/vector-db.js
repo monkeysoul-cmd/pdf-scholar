@@ -476,10 +476,12 @@ export class VectorDB {
 
     // 2. Compute Dense Vector Similarity (Float32Array Dot Product)
     const denseScores = new Array(N);
+    const denseSimByIndex = new Float32Array(N);
     for (let i = 0; i < N; i++) {
       const chunkVec = chunks[i].normalizedEmbedding;
       const sim = chunkVec ? fastDotProduct(normQueryVec, chunkVec) : 0;
       denseScores[i] = { index: i, score: sim };
+      denseSimByIndex[i] = sim;
     }
 
     // Sort dense rankings
@@ -526,7 +528,7 @@ export class VectorDB {
       const chunk = chunks[i];
       const { normalizedEmbedding, embedding, ...cleanChunk } = chunk;
 
-      const denseSim = denseScores.find(d => d.index === i)?.score || 0;
+      const denseSim = denseSimByIndex[i];
       const bm25Sim = bm25Scores ? bm25Scores[i] : 0;
       const rrf = rrfScores[i];
 

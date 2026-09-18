@@ -103,7 +103,7 @@ async function generateChunkEmbedding(text) {
   if (cached) return Array.from(cached);
 
   const ai = getAIClient();
-  const embeddingModels = ["gemini-embedding-2-preview", "gemini-embedding-2", "gemini-embedding-001"];
+  const embeddingModels = ["text-embedding-004", "embedding-001", "gemini-embedding-2-preview", "gemini-embedding-001"];
   let lastErr = null;
 
   for (const model of embeddingModels) {
@@ -138,11 +138,13 @@ async function generateContentWithFallback(params, initialModel = "gemini-flash-
   const models = [
     initialModel,
     "gemini-flash-lite-latest",
+    "gemini-2.0-flash",
+    "gemini-1.5-flash",
+    "gemini-2.0-flash-lite",
     "gemini-2.5-flash",
-    "gemini-3.5-flash",
     "gemini-flash-latest"
   ];
-  const uniqueModels = [...new Set(models)];
+  const uniqueModels = [...new Set(models.filter(Boolean))];
 
   let lastError = null;
 
@@ -175,11 +177,13 @@ async function generateContentStreamWithFallback(params, initialModel = "gemini-
   const models = [
     initialModel,
     "gemini-flash-lite-latest",
+    "gemini-2.0-flash",
+    "gemini-1.5-flash",
+    "gemini-2.0-flash-lite",
     "gemini-2.5-flash",
-    "gemini-3.5-flash",
     "gemini-flash-latest"
   ];
-  const uniqueModels = [...new Set(models)];
+  const uniqueModels = [...new Set(models.filter(Boolean))];
 
   let lastError = null;
 
@@ -514,11 +518,21 @@ Be concise, clear, and perfectly grounded. Always cite your sources by mentionin
 Here is the Ground-Truth Document Context:
 ${contextText}`;
 
-    // 4. Format chat history for Gemini
-    const formattedHistory = (history || []).map((h) => ({
-      role: h.role === "assistant" ? "model" : "user",
-      parts: [{ text: h.text }],
-    }));
+    // 4. Format and sanitize chat history for Gemini
+    const sanitizedHistory = (history || [])
+      .filter((h) => h && typeof h.text === "string" && h.text.trim().length > 0)
+      .map((h) => ({
+        role: h.role === "assistant" || h.role === "model" ? "model" : "user",
+        parts: [{ text: h.text.trim() }],
+      }));
+
+    // Prevent duplicating the new user message if client already included it in history
+    if (sanitizedHistory.length > 0) {
+      const last = sanitizedHistory[sanitizedHistory.length - 1];
+      if (last.role === "user" && last.parts[0]?.text === message.trim()) {
+        sanitizedHistory.pop();
+      }
+    }
 
     // 5. Handle streaming vs non-streaming responses
     if (isStream) {
@@ -539,7 +553,7 @@ ${contextText}`;
       try {
         const stream = await generateContentStreamWithFallback({
           contents: [
-            ...formattedHistory,
+            ...sanitizedHistory,
             { role: "user", parts: [{ text: message }] },
           ],
           config: {
@@ -569,7 +583,7 @@ ${contextText}`;
     // Non-streaming fallback path (high-speed gemini-flash-lite-latest)
     const response = await generateContentWithFallback({
       contents: [
-        ...formattedHistory,
+        ...sanitizedHistory,
         { role: "user", parts: [{ text: message }] },
       ],
       config: {
@@ -671,8 +685,25 @@ ${contentSample}`;
     if (rawText.startsWith("```")) {
       rawText = rawText.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim();
     }
-    const quizData = JSON.parse(rawText);
-    res.json(quizData);
+    const parsedData = JSON.parse(rawText);
+    const rawQuestions = Array.isArray(parsedData.questions) ? parsedData.questions : [];
+
+    // Normalize and sanitize questions defensively
+    const questions = rawQuestions.map((q, idx) => {
+      const isMC = Boolean(q.type && (q.type.toLowerCase().includes("choice") || q.type.toLowerCase().includes("mc")));
+      const cleanOptions = Array.isArray(q.options) ? q.options.map(opt => String(opt).trim()) : [];
+      return {
+        id: q.id || `q_${idx + 1}`,
+        type: isMC ? "multiple-choice" : "short-answer",
+        question: q.question || `Question ${idx + 1}`,
+        points: Number(q.points) || (isMC ? 10 : 15),
+        options: isMC ? cleanOptions : [],
+        correctAnswer: String(q.correctAnswer || "").trim(),
+        explanation: String(q.explanation || "").trim(),
+      };
+    });
+
+    res.json({ questions });
   } catch (error) {
     console.error("Quiz Endpoint Error:", error);
     res.status(500).json({ error: error.message || "Internal server error during quiz generation." });
