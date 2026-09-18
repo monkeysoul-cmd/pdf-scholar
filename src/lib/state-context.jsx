@@ -19,7 +19,9 @@ export function StateProvider({ children }) {
   
   const [chatHistory, setChatHistory] = useState(() => {
     try {
-      const saved = localStorage.getItem("pdf_scholar_chat_history");
+      const saved = user?.id
+        ? localStorage.getItem(`pdf_scholar_chat_history_${user.id}`) || localStorage.getItem("pdf_scholar_chat_history")
+        : localStorage.getItem("pdf_scholar_chat_history");
       return saved ? JSON.parse(saved) : {};
     } catch {
       return {};
@@ -29,17 +31,43 @@ export function StateProvider({ children }) {
   const [isLoadingDocs, setIsLoadingDocs] = useState(false);
   const [quizScores, setQuizScores] = useState(() => {
     try {
-      const saved = localStorage.getItem("pdf_scholar_quiz_scores");
+      const saved = user?.id
+        ? localStorage.getItem(`pdf_scholar_quiz_scores_${user.id}`) || localStorage.getItem("pdf_scholar_quiz_scores")
+        : localStorage.getItem("pdf_scholar_quiz_scores");
       return saved ? JSON.parse(saved) : [];
     } catch {
       return [];
     }
   });
 
-  // Sync quiz scores to localStorage
+  // Switch or reload chat history & quiz scores when active user changes
   useEffect(() => {
-    localStorage.setItem("pdf_scholar_quiz_scores", JSON.stringify(quizScores));
-  }, [quizScores]);
+    if (user?.id) {
+      try {
+        const savedHistory = localStorage.getItem(`pdf_scholar_chat_history_${user.id}`) || localStorage.getItem("pdf_scholar_chat_history");
+        setChatHistory(savedHistory ? JSON.parse(savedHistory) : {});
+      } catch {
+        setChatHistory({});
+      }
+
+      try {
+        const savedScores = localStorage.getItem(`pdf_scholar_quiz_scores_${user.id}`) || localStorage.getItem("pdf_scholar_quiz_scores");
+        setQuizScores(savedScores ? JSON.parse(savedScores) : []);
+      } catch {
+        setQuizScores([]);
+      }
+    } else {
+      setChatHistory({});
+      setQuizScores([]);
+    }
+  }, [user?.id]);
+
+  // Sync quiz scores to localStorage per user
+  useEffect(() => {
+    if (user?.id) {
+      localStorage.setItem(`pdf_scholar_quiz_scores_${user.id}`, JSON.stringify(quizScores));
+    }
+  }, [quizScores, user?.id]);
 
   const saveQuizResult = (result) => {
     const nowIso = new Date().toISOString();
@@ -54,10 +82,12 @@ export function StateProvider({ children }) {
     setQuizScores(prev => [newEntry, ...prev]);
   };
 
-  // Sync chat history to localStorage
+  // Sync chat history to localStorage per user
   useEffect(() => {
-    localStorage.setItem("pdf_scholar_chat_history", JSON.stringify(chatHistory));
-  }, [chatHistory]);
+    if (user?.id) {
+      localStorage.setItem(`pdf_scholar_chat_history_${user.id}`, JSON.stringify(chatHistory));
+    }
+  }, [chatHistory, user?.id]);
 
   const authenticatedFetch = async (url, options = {}) => {
     const headers = {
@@ -153,6 +183,8 @@ export function StateProvider({ children }) {
     setDocuments([]);
     setSelectedDocumentId(null);
     setQuizQuestions([]);
+    setChatHistory({});
+    setQuizScores([]);
     localStorage.removeItem("pdf_scholar_token");
     localStorage.removeItem("pdf_scholar_user");
   };

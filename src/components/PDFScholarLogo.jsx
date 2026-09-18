@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useId } from "react";
 
 /**
  * Ultra-Premium PDF Scholar Hub Brand Logo.
@@ -7,6 +7,11 @@ import React from "react";
  * an AI neural node, and a scholar cap silhouette.
  */
 export default function PDFScholarLogo({ className = "w-5 h-5", ...props }) {
+  const rawId = useId();
+  const safeId = rawId ? rawId.replace(/:/g, "_") : "default";
+  const gradientId = `logoGradient_${safeId}`;
+  const filterId = `neonGlow_${safeId}`;
+
   return (
     <svg
       viewBox="0 0 24 24"
@@ -16,11 +21,11 @@ export default function PDFScholarLogo({ className = "w-5 h-5", ...props }) {
       {...props}
     >
       <defs>
-        <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="currentColor" stopOpacity="1" />
           <stop offset="100%" stopColor="currentColor" stopOpacity="0.4" />
         </linearGradient>
-        <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
+        <filter id={filterId} x="-20%" y="-20%" width="140%" height="140%">
           <feGaussianBlur stdDeviation="1.5" result="blur" />
           <feComposite in="SourceGraphic" in2="blur" operator="over" />
         </filter>
@@ -29,11 +34,11 @@ export default function PDFScholarLogo({ className = "w-5 h-5", ...props }) {
       {/* Neural Node / Scholar Cap Diamond */}
       <path
         d="M12 2L2 7l10 5 10-5-10-5z"
-        fill="url(#logoGradient)"
+        fill={`url(#${gradientId})`}
         stroke="currentColor"
         strokeWidth="1.5"
         strokeLinejoin="round"
-        filter="url(#neonGlow)"
+        filter={`url(#${filterId})`}
       />
       
       {/* Document Fold & Depth Lines */}
@@ -59,7 +64,7 @@ export default function PDFScholarLogo({ className = "w-5 h-5", ...props }) {
         cy="7"
         r="2"
         fill="currentColor"
-        filter="url(#neonGlow)"
+        filter={`url(#${filterId})`}
       />
     </svg>
   );

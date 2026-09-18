@@ -45,10 +45,6 @@ export default function Chat() {
 
     try {
       const currentHistory = chatHistory[selectedDocumentId] || [];
-      const historyPayload = [
-        ...currentHistory,
-        { role: "user", text: userMessage }
-      ];
 
       const res = await authenticatedFetch("/api/chat", {
         method: "POST",
@@ -59,7 +55,7 @@ export default function Chat() {
         body: JSON.stringify({
           documentId: selectedDocumentId,
           message: userMessage,
-          history: historyPayload,
+          history: currentHistory,
           stream: true
         }),
       });
