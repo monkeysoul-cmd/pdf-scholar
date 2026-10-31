@@ -49,7 +49,7 @@ Create a file named `.env` in the root of the project directory and specify the 
 ```env
 GEMINI_API_KEY="YOUR_API_KEY_HERE"
 ```
-*(Optionally, you can also copy `.env.example` as a template).*
+
 
 ### 3. Start the Development Server
 To launch both the API server and the front-end Vite HMR server:
