@@ -53,7 +53,7 @@ export default function Overview() {
   ).sort((a, b) => new Date(b.timestamp || b.date || 0) - new Date(a.timestamp || a.date || 0));
 
   // Documents sorted by creation date (Newest first)
-  const sortedDocuments = [...documents].sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+  const sortedDocuments = [...documents].sort((a, b) => new Date(b.uploadedAt || b.createdAt || 0) - new Date(a.uploadedAt || a.createdAt || 0));
 
   const formatRecordDate = (dateVal) => {
     if (!dateVal) return "Recent";
@@ -310,7 +310,7 @@ export default function Overview() {
                     <div className="text-[10px] text-zinc-400 font-mono mt-0.5">{doc.chunkCount || 0} Chunks • Indexed Vector Matrix</div>
                   </div>
                   <div className="text-[10px] text-zinc-400 font-mono uppercase tracking-wider shrink-0 bg-black/40 px-2.5 py-1 rounded-lg border border-white/5">
-                    {new Date(doc.createdAt || Date.now()).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                    {new Date(doc.uploadedAt || doc.createdAt || Date.now()).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
                   </div>
                 </div>
               ))}
