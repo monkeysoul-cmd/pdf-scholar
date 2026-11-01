@@ -111,7 +111,7 @@ async function generateChunkEmbedding(text) {
   if (cached) return Array.from(cached);
 
   const ai = getAIClient();
-  const embeddingModels = ["text-embedding-004", "embedding-001", "gemini-embedding-2-preview", "gemini-embedding-001"];
+  const embeddingModels = ["gemini-embedding-001", "gemini-embedding-2-preview", "text-embedding-004", "embedding-001"];
   let lastErr = null;
 
   for (const model of embeddingModels) {
@@ -146,9 +146,9 @@ async function generateContentWithFallback(params, initialModel = "gemini-flash-
   const models = [
     initialModel,
     "gemini-flash-lite-latest",
-    "gemini-2.0-flash",
-    "gemini-1.5-flash",
-    "gemini-2.0-flash-lite",
+    "gemini-2.5-flash",
+
+
     "gemini-2.5-flash",
     "gemini-flash-latest"
   ];
@@ -185,9 +185,9 @@ async function generateContentStreamWithFallback(params, initialModel = "gemini-
   const models = [
     initialModel,
     "gemini-flash-lite-latest",
-    "gemini-2.0-flash",
-    "gemini-1.5-flash",
-    "gemini-2.0-flash-lite",
+    "gemini-2.5-flash",
+
+
     "gemini-2.5-flash",
     "gemini-flash-latest"
   ];
@@ -502,6 +502,7 @@ app.post("/api/chat", authenticateToken, async (req, res) => {
         res.write(`data: ${JSON.stringify({ type: "sources", sources: [], retrievalTimeMs, retrievalMethod })}\n\n`);
         res.write(`data: ${JSON.stringify({ type: "token", text: emptyMsg })}\n\n`);
         res.write(`data: ${JSON.stringify({ type: "done" })}\n\n`);
+
         res.end();
         return;
       }
@@ -573,13 +574,18 @@ ${contextText}`;
           },
         }, "gemini-flash-lite-latest");
 
+        let isClosed = false;
+        req.on("close", () => { isClosed = true; });
+
         for await (const chunk of stream) {
+          if (isClosed) break;
           if (chunk.text) {
             res.write(`data: ${JSON.stringify({ type: "token", text: chunk.text })}\n\n`);
           }
         }
 
         res.write(`data: ${JSON.stringify({ type: "done" })}\n\n`);
+
         res.end();
         return;
       } catch (streamErr) {

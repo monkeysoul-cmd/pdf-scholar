@@ -54,6 +54,7 @@ export default function Upload() {
     if (e.target.files && e.target.files[0]) {
       handleUpload(e.target.files[0]);
     }
+    e.target.value = "";
   };
 
   const showError = (msg) => {
@@ -62,8 +63,17 @@ export default function Upload() {
   };
 
   const handleUpload = async (pdfFile) => {
-    if (pdfFile.type !== "application/pdf") {
+    const isPdf = pdfFile.type === "application/pdf" || 
+                  pdfFile.type === "application/x-pdf" || 
+                  pdfFile.name?.toLowerCase().endsWith(".pdf");
+    if (!isPdf) {
       showError("Invalid file format. Please upload a PDF document.");
+      return;
+    }
+
+    const MAX_FILE_SIZE = 25 * 1024 * 1024;
+    if (pdfFile.size > MAX_FILE_SIZE) {
+      showError("File size exceeds 25MB limit. Please upload a smaller PDF.");
       return;
     }
 

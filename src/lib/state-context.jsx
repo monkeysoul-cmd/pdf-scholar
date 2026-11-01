@@ -116,8 +116,8 @@ export function StateProvider({ children }) {
       const data = await res.json();
       if (data.documents) {
         setDocuments(data.documents);
-        if (data.documents.length > 0 && !selectedDocumentId) {
-          setSelectedDocumentId(data.documents[0].id);
+        if (data.documents.length > 0) {
+          setSelectedDocumentId(prevId => (prevId && data.documents.some(d => d.id === prevId) ? prevId : (data.documents[0]?.id || null)));
         }
       }
     } catch (err) {
@@ -198,10 +198,11 @@ export function StateProvider({ children }) {
     try {
       const res = await authenticatedFetch(`/api/documents/${docId}`, { method: "DELETE" });
       if (res.ok) {
-        setDocuments(prev => prev.filter(d => d.id !== docId));
-        if (selectedDocumentId === docId) {
-          setSelectedDocumentId(null);
-        }
+        setDocuments(prev => {
+          const next = prev.filter(d => d.id !== docId);
+          setSelectedDocumentId(curr => (curr === docId ? (next[0]?.id || null) : curr));
+          return next;
+        });
         setChatHistory(prev => {
           const updated = { ...prev };
           delete updated[docId];
