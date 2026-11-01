@@ -41,6 +41,7 @@ export default function Quiz() {
   const [shortAnswerSelfGrades, setShortAnswerSelfGrades] = useState({});
   const [showResults, setShowResults] = useState(false);
   const [showConfirmSubmitModal, setShowConfirmSubmitModal] = useState(false);
+  const [quizError, setQuizError] = useState("");
   const containerRef = useRef(null);
 
   const activeDoc = documents.find(d => d.id === selectedDocumentId);
@@ -57,6 +58,7 @@ export default function Quiz() {
   const generateQuiz = async () => {
     if (!selectedDocumentId) return;
     setIsGenerating(true);
+    setQuizError("");
     setShowResults(false);
     setShowConfirmSubmitModal(false);
     setAnswers({});
@@ -88,11 +90,11 @@ export default function Quiz() {
         });
         setQuestions(normalized);
       } else {
-        alert(data.error || "Failed to generate quiz questions.");
+        setQuizError(data.error || "Failed to generate quiz questions.");
       }
     } catch (err) {
       console.error(err);
-      alert("Failed to synthesize quiz. Please check server connection.");
+      setQuizError(err.message || "Failed to synthesize quiz. Please check server connection.");
     } finally {
       setIsGenerating(false);
     }
@@ -313,6 +315,23 @@ export default function Quiz() {
           </div>
         )}
       </div>
+
+      {/* Error Banner */}
+      {quizError && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-mono flex items-center justify-between gap-3 relative z-10 max-w-xl mx-auto"
+        >
+          <span>{quizError}</span>
+          <button
+            onClick={() => setQuizError("")}
+            className="text-zinc-400 hover:text-white font-bold px-2 py-1 cursor-pointer"
+          >
+            ✕
+          </button>
+        </motion.div>
+      )}
 
       {/* Generating Loader */}
       {isGenerating && (

@@ -192,6 +192,22 @@ export default function Sidebar() {
               )}
             </div>
           )}
+          {documents.length > 1 && !collapsed && (
+            <div className="mb-2 px-1">
+              <select
+                value={selectedDocumentId || ""}
+                onChange={(e) => selectDocument(e.target.value)}
+                className="w-full bg-black/70 border border-white/10 hover:border-[#00FF66]/40 focus:border-[#00FF66] text-[10px] font-mono text-zinc-300 rounded-lg py-1.5 px-2 outline-none cursor-pointer transition-all"
+                title="Switch document"
+              >
+                {documents.map((d) => (
+                  <option key={d.id} value={d.id} className="bg-zinc-950 text-white">
+                    {d.name.length > 22 ? `${d.name.slice(0, 20)}...` : d.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
           <AnimatePresence mode="wait">
             {activeDoc ? (
               collapsed ? (

@@ -29,7 +29,7 @@ import PDFScholarLogo from "./PDFScholarLogo";
 import { motion, AnimatePresence } from "motion/react";
 
 export default function Overview() {
-  const { documents = [], quizScores = [], setTab } = useAppState();
+  const { documents = [], quizScores = [], setTab, selectDocument, selectedDocumentId } = useAppState();
   const [activeModal, setActiveModal] = useState(null);
   const [selectedHeatmapCell, setSelectedHeatmapCell] = useState(null);
   
@@ -61,9 +61,18 @@ export default function Overview() {
     return !isNaN(d.getTime()) ? d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : "Recent";
   };
 
+  const parsePercent = (val) => {
+    if (typeof val === "number") return isNaN(val) ? 0 : val;
+    if (typeof val === "string") {
+      const parsed = parseFloat(val.replace("%", "").trim());
+      return isNaN(parsed) ? 0 : parsed;
+    }
+    return 0;
+  };
+
   const quizzesTaken = uniqueQuizzes.length;
   const averageScore = quizzesTaken > 0
-    ? Math.round(uniqueQuizzes.reduce((acc, s) => acc + (Number(s.scorePercent) || 0), 0) / quizzesTaken)
+    ? Math.round(uniqueQuizzes.reduce((acc, s) => acc + parsePercent(s.scorePercent), 0) / quizzesTaken)
     : 0;
   const totalPointsEarned = uniqueQuizzes.reduce((acc, s) => acc + (Number(s.earnedPoints) || 0), 0);
 
@@ -304,7 +313,20 @@ export default function Overview() {
                 Recently Uploaded PDFs (Sorted by Date)
               </div>
               {sortedDocuments.map((doc, idx) => (
-                <div key={idx} className="bg-white/5 p-3.5 rounded-xl border border-white/10 flex justify-between items-center hover:border-[#00FF66]/40 transition-colors">
+                <div
+                  key={idx}
+                  onClick={() => {
+                    selectDocument(doc.id);
+                    setActiveModal(null);
+                    setTab("chat");
+                  }}
+                  className={`p-3.5 rounded-xl border flex justify-between items-center transition-all cursor-pointer ${
+                    doc.id === selectedDocumentId
+                      ? "bg-white/10 border-[#00FF66] shadow-[0_0_12px_rgba(0,255,102,0.2)]"
+                      : "bg-white/5 border-white/10 hover:border-[#00FF66]/50 hover:bg-white/10"
+                  }`}
+                  title="Click to select document and open chat"
+                >
                   <div className="min-w-0 pr-4">
                     <div className="font-bold text-xs text-white truncate">{doc.name}</div>
                     <div className="text-[10px] text-zinc-400 font-mono mt-0.5">{doc.chunkCount || 0} Chunks • Indexed Vector Matrix</div>
