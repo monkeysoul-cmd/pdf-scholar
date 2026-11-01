@@ -1,8 +1,53 @@
 import { MongoClient } from "mongodb";
+import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Resilient .env loading from current directory and parent project roots
+dotenv.config({ path: path.resolve(process.cwd(), ".env") });
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
+dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
 // Global singleton connections
 let client = null;
 let db = null;
+
+// In-Memory User Store fallback when MongoDB is unreachable
+class InMemoryUserStore {
+  constructor() {
+    this.users = new Map(); // username.toLowerCase() -> userDoc
+  }
+
+  async findOne(query) {
+    if (!query) return null;
+    if (query.username) {
+      return this.users.get(query.username.toLowerCase()) || null;
+    }
+    if (query._id) {
+      for (const u of this.users.values()) {
+        if (u._id === query._id || u._id?.toString() === query._id?.toString()) {
+          return u;
+        }
+      }
+    }
+    return null;
+  }
+
+  async insertOne(doc) {
+    const id = doc._id || `user_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+    const userDoc = {
+      ...doc,
+      _id: id,
+    };
+    this.users.set(doc.username.toLowerCase(), userDoc);
+    return { insertedId: id };
+  }
+}
+
+const memoryUserStore = new InMemoryUserStore();
 
 // LRU Embedding Cache (query string -> Float32Array)
 class LRUCache {
@@ -273,6 +318,26 @@ export class VectorDB {
   }
 
   /**
+   * Safe User Collection Getter:
+   * Returns MongoDB 'users' collection if connected, or InMemoryUserStore fallback
+   */
+  static async getUserCollection() {
+    try {
+      const database = await this.getDb();
+      if (database) {
+        return database.collection("users");
+      }
+    } catch (e) {
+      console.warn("Could not retrieve MongoDB users collection:", e.message);
+    }
+    return memoryUserStore;
+  }
+
+  static async getUserStore() {
+    return await this.getUserCollection();
+  }
+
+  /**
    * Caching helper for query embeddings
    */
   static getCachedEmbedding(text) {
@@ -289,7 +354,17 @@ export class VectorDB {
   static async get(userId) {
     const database = await this.getDb();
     if (!database) {
-      return { documents: [], chunks: [] };
+      const documents = [];
+      const chunks = [];
+      for (const [key, store] of memoryDocStore.stores.entries()) {
+        if (key.startsWith(`${userId}:`) && store.doc) {
+          documents.push(store.doc);
+          if (Array.isArray(store.chunks)) {
+            chunks.push(...store.chunks);
+          }
+        }
+      }
+      return { documents, chunks };
     }
     const documents = await database.collection("documents").find({ userId }).toArray();
     const chunks = await database.collection("chunks").find({ userId }).toArray();
@@ -298,18 +373,31 @@ export class VectorDB {
 
   static async getDocument(docId, userId) {
     const database = await this.getDb();
-    if (!database) return null;
-    return await database.collection("documents").findOne({ id: docId, userId });
+    if (!database) {
+      const store = memoryDocStore.get(userId, docId);
+      return store ? store.doc : null;
+    }
+    const doc = await database.collection("documents").findOne({ id: docId, userId });
+    if (doc) return doc;
+    const store = memoryDocStore.get(userId, docId);
+    return store ? store.doc : null;
   }
 
   static async getDocumentChunks(docId, userId, limit = 0) {
     const database = await this.getDb();
-    if (!database) return [];
-    const query = { documentId: docId, userId };
-    if (limit > 0) {
-      return await database.collection("chunks").find(query).limit(limit).toArray();
+    if (!database) {
+      const store = memoryDocStore.get(userId, docId);
+      if (!store || !Array.isArray(store.chunks)) return [];
+      return limit > 0 ? store.chunks.slice(0, limit) : store.chunks;
     }
-    return await database.collection("chunks").find(query).toArray();
+    const query = { documentId: docId, userId };
+    const chunks = limit > 0
+      ? await database.collection("chunks").find(query).limit(limit).toArray()
+      : await database.collection("chunks").find(query).toArray();
+    if (chunks && chunks.length > 0) return chunks;
+    const store = memoryDocStore.get(userId, docId);
+    if (!store || !Array.isArray(store.chunks)) return [];
+    return limit > 0 ? store.chunks.slice(0, limit) : store.chunks;
   }
 
   /**
@@ -394,7 +482,22 @@ export class VectorDB {
 
     // Hydrate from MongoDB Atlas
     const database = await this.getDb();
-    if (!database) return null;
+    if (!database) {
+      if (!documentId) {
+        const allChunks = [];
+        for (const [key, st] of memoryDocStore.stores.entries()) {
+          if (key.startsWith(`${userId}:`) && Array.isArray(st.chunks)) {
+            allChunks.push(...st.chunks);
+          }
+        }
+        if (allChunks.length === 0) return null;
+        return {
+          chunks: allChunks,
+          bm25Data: buildBM25Index(allChunks),
+        };
+      }
+      return null;
+    }
 
     const query = { userId };
     if (documentId) query.documentId = documentId;

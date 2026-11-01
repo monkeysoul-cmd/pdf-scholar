@@ -32,7 +32,15 @@ import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-dotenv.config();
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Resilient .env loading from current directory and parent project roots
+dotenv.config({ path: path.resolve(process.cwd(), ".env") });
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
+dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -214,16 +222,16 @@ app.post("/api/auth/register", async (req, res) => {
       return res.status(400).json({ error: "Username and password are required." });
     }
 
-    const database = await LocalVectorDB.getDb();
+    const users = await LocalVectorDB.getUserCollection();
     
     // Check if user already exists
-    const existingUser = await database.collection("users").findOne({ username: username.toLowerCase() });
+    const existingUser = await users.findOne({ username: username.toLowerCase() });
     if (existingUser) {
       return res.status(400).json({ error: "Username is already taken." });
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
-    await database.collection("users").insertOne({
+    await users.insertOne({
       username: username.toLowerCase(),
       passwordHash,
       createdAt: new Date()
@@ -244,8 +252,8 @@ app.post("/api/auth/login", async (req, res) => {
       return res.status(400).json({ error: "Username and password are required." });
     }
 
-    const database = await LocalVectorDB.getDb();
-    const user = await database.collection("users").findOne({ username: username.toLowerCase() });
+    const users = await LocalVectorDB.getUserCollection();
+    const user = await users.findOne({ username: username.toLowerCase() });
     if (!user) {
       return res.status(400).json({ error: "Invalid username or password." });
     }
@@ -255,7 +263,8 @@ app.post("/api/auth/login", async (req, res) => {
       return res.status(400).json({ error: "Invalid username or password." });
     }
 
-    const token = jwt.sign({ id: user._id.toString(), username: user.username }, JWT_SECRET, {
+    const userId = user._id ? user._id.toString() : (user.id || `user_${user.username}`);
+    const token = jwt.sign({ id: userId, username: user.username }, JWT_SECRET, {
       expiresIn: "7d"
     });
 
@@ -263,7 +272,7 @@ app.post("/api/auth/login", async (req, res) => {
       success: true,
       token,
       user: {
-        id: user._id.toString(),
+        id: userId,
         username: user.username
       }
     });
@@ -409,6 +418,7 @@ app.post("/api/ingest", authenticateToken, async (req, res) => {
       pageCount,
       chunkCount: rawChunksWithPages.length,
       uploadedAt: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
       size: size || buffer.length,
     };
 
@@ -743,20 +753,21 @@ async function start() {
     try {
       const { createServer: createViteServer } = await import("vite");
       const vite = await createViteServer({
+        root: path.resolve(__dirname, ".."),
         server: { middlewareMode: true },
         appType: "spa",
       });
       app.use(vite.middlewares);
     } catch (viteErr) {
       console.warn("Vite dev server middleware could not be loaded:", viteErr.message);
-      const distPath = path.join(process.cwd(), "dist");
+      const distPath = path.resolve(__dirname, "../dist");
       app.use(express.static(distPath));
       app.get("*", (req, res) => {
         res.sendFile(path.join(distPath, "index.html"));
       });
     }
   } else {
-    const distPath = path.join(process.cwd(), "dist");
+    const distPath = path.resolve(__dirname, "../dist");
     app.use(express.static(distPath));
     app.get("*", (req, res) => {
       res.sendFile(path.join(distPath, "index.html"));
