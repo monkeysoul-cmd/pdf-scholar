@@ -145,42 +145,39 @@ export default function Upload() {
   };
 
   return (
-    <div className="flex-1 pt-16 md:pt-0 px-4 sm:px-8 pb-8 bg-dot-grid overflow-y-auto min-h-0 flex flex-col items-center justify-center relative select-text-content z-0" id="upload-view">
-      {/* Ambient Glow */}
-      <div className="ambient-glow ambient-glow-green w-[400px] h-[400px] top-[10%] left-[20%] animate-float-slow" />
-
+    <div className="flex-1 pt-16 md:pt-0 px-4 sm:px-8 pb-8 bg-tactical-grid overflow-y-auto min-h-0 flex flex-col items-center justify-center relative select-text-content z-0" id="upload-view">
       <motion.div
-        initial={{ opacity: 0, y: 25, scale: 0.96 }}
+        initial={{ opacity: 0, y: 15, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
-        className="max-w-2xl w-full glass-card bg-noise rounded-2xl p-6 sm:p-8 md:p-12 relative z-10 my-auto overflow-hidden shadow-2xl"
+        className="max-w-2xl w-full terminal-panel hud-bracket hud-bracket-accent laser-top bg-noise rounded-xl p-6 sm:p-8 md:p-10 relative z-10 my-auto shadow-2xl"
       >
         {/* Header */}
-        <div className="text-center mb-9">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-white/80 text-[10px] font-mono font-bold uppercase tracking-wider mb-4 shadow-inner">
-            <VectorAIIcon className="w-3 h-3 text-emerald-400 drop-shadow-[0_0_5px_currentColor]" /> Vector AI Document Reader
+        <div className="text-center mb-8">
+          <div className="terminal-badge terminal-badge-green mb-3">
+            INGESTION_BAY // PDF_PARSER_v2
           </div>
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-white uppercase drop-shadow-sm">
-            Upload Your Study PDF
+          <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white uppercase drop-shadow-sm">
+            MOUNT TARGET DOCUMENT
           </h2>
-          <p className="text-xs text-zinc-400 max-w-md mx-auto uppercase font-mono mt-2">
-            Upload your notes, textbook chapters, or research papers to start studying.
+          <p className="text-[11px] text-zinc-400 max-w-md mx-auto uppercase font-mono mt-1.5">
+            LOAD RESEARCH PAPERS, TEXTBOOKS, OR NOTES INTO THE VECTOR STORE
           </p>
         </div>
 
         {/* Upload Drop Zone */}
         {status === "idle" && (
           <motion.div
-            whileHover={{ scale: 1.01 }}
-            whileTap={{ scale: 0.99 }}
+            whileHover={{ scale: 1.005 }}
+            whileTap={{ scale: 0.995 }}
             onDragEnter={handleDrag}
             onDragOver={handleDrag}
             onDragLeave={handleDrag}
             onDrop={handleDrop}
             onClick={triggerFileSelect}
-            className={`border-2 border-dashed rounded-2xl p-6 sm:p-10 md:p-12 text-center cursor-pointer transition-all relative overflow-hidden group ${
+            className={`hud-bracket border border-dashed rounded-lg p-6 sm:p-10 md:p-12 text-center cursor-pointer transition-all relative overflow-hidden group ${
               dragActive
-                ? "border-emerald-400 bg-emerald-500/10 shadow-[0_0_30px_rgba(16,185,129,0.2)] animate-border-glow"
-                : "border-zinc-700 hover:border-emerald-400/60 hover:bg-white/5"
+                ? "border-[#00FF66] bg-[#00FF66]/10 shadow-[0_0_20px_rgba(0,255,102,0.2)]"
+                : "border-white/15 hover:border-[#00FF66]/60 bg-black/40 hover:bg-white/[0.02]"
             }`}
             id="drop-zone"
           >
@@ -191,38 +188,34 @@ export default function Upload() {
               accept="application/pdf"
               className="hidden"
             />
-            <motion.div
-              animate={{ y: [0, -4, 0] }}
-              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-              className="w-16 h-16 bg-white/5 border border-white/10 text-emerald-400 flex items-center justify-center mx-auto mb-5 rounded-2xl shadow-inner relative z-10"
-            >
-              <UploadCloud className="w-8 h-8 drop-shadow-[0_0_8px_currentColor]" />
-            </motion.div>
-            <h3 className="font-extrabold text-white text-sm uppercase tracking-wider">
-              Choose a PDF or Drag It Here
+            <div className="w-14 h-14 bg-white/[0.04] border border-white/10 text-[#00FF66] flex items-center justify-center mx-auto mb-4 rounded-lg shadow-inner relative z-10 group-hover:border-[#00FF66]/50 transition-colors">
+              <UploadCloud className="w-7 h-7 drop-shadow-[0_0_8px_currentColor]" />
+            </div>
+            <h3 className="font-mono font-bold text-white text-xs sm:text-sm uppercase tracking-wider">
+              DRAG & DROP PDF OR [ BROWSE SYSTEM ]
             </h3>
-            <p className="text-zinc-500 text-[10px] mt-2 font-mono uppercase">
-              Max Size: 10MB • Format: PDF Only
+            <p className="text-zinc-500 text-[10px] mt-2 font-mono uppercase tracking-wide">
+              MAX_SIZE: 10.0 MB // ENCODING: PDF_STREAMS // 3,072-DIM CHUNKING
             </p>
           </motion.div>
         )}
 
         {/* Stepper Progress */}
         {(status === "reading" || status === "processing") && (
-          <div className="space-y-6" id="progress-stepper">
-            <div className="glass-card bg-noise rounded-xl p-5 flex items-center gap-4 border-l-2 border-l-emerald-400">
-              <Loader2 className="w-5 h-5 text-emerald-400 animate-spin shrink-0" />
+          <div className="space-y-4" id="progress-stepper">
+            <div className="terminal-panel rounded-lg p-4 flex items-center gap-4 border-l-2 border-l-[#00FF66]">
+              <Loader2 className="w-5 h-5 text-[#00FF66] animate-spin shrink-0" />
               <div className="min-w-0 flex-1">
-                <span className="text-xs font-bold text-white block truncate uppercase tracking-wider">
-                  Processing: {file?.name}
+                <span className="text-xs font-mono font-bold text-white block truncate uppercase tracking-wider">
+                  PARSING // {file?.name}
                 </span>
                 <span className="text-[10px] text-zinc-400 font-mono uppercase">
-                  Reading your document with Vector AI... Just a moment
+                  EXTRACTING VECTOR TOKENS & GENERATING EMBEDDINGS...
                 </span>
               </div>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {steps.map((step, index) => {
                 const Icon = step.icon;
                 const isCompleted = index < currentStep;
@@ -231,20 +224,20 @@ export default function Upload() {
                 return (
                   <motion.div
                     key={index}
-                    initial={{ opacity: 0, x: -10 }}
+                    initial={{ opacity: 0, x: -6 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className={`flex items-start gap-4 p-4 rounded-xl border transition-all ${
+                    transition={{ delay: index * 0.08 }}
+                    className={`flex items-start gap-3.5 p-3.5 rounded-lg border transition-all ${
                       isCompleted
-                        ? "bg-white/5 border-white/10 text-white"
+                        ? "bg-white/[0.02] border-white/10 text-white"
                         : isActive
-                        ? "glass-card border-emerald-500/50 shadow-[0_0_20px_rgba(16,185,129,0.15)] border-l-2 border-l-emerald-400"
+                        ? "terminal-panel border-[#00FF66]/50 shadow-[0_0_15px_rgba(0,255,102,0.1)] border-l-2 border-l-[#00FF66]"
                         : "bg-transparent border-white/5 opacity-40"
                     }`}
                   >
-                    <div className={`p-2 rounded-lg shrink-0 ${
+                    <div className={`p-2 rounded shrink-0 font-mono ${
                       isCompleted
-                        ? "bg-emerald-500 text-black"
+                        ? "bg-[#00FF66] text-black"
                         : isActive
                         ? "bg-white text-black animate-pulse"
                         : "bg-zinc-900 text-zinc-600 border border-zinc-800"
@@ -253,13 +246,13 @@ export default function Upload() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <h4 className={`text-xs font-bold uppercase tracking-wider ${
-                          isCompleted ? "text-emerald-400" : isActive ? "text-white" : "text-zinc-500"
+                        <h4 className={`text-xs font-mono font-bold uppercase tracking-wider ${
+                          isCompleted ? "text-[#00FF66]" : isActive ? "text-white" : "text-zinc-500"
                         }`}>
                           {step.title}
                         </h4>
                         {isCompleted && (
-                          <span className="text-[9px] bg-emerald-500 text-black px-2 py-0.5 rounded-full font-black tracking-widest">
+                          <span className="text-[9px] bg-[#00FF66] text-black px-1.5 py-0.5 rounded font-mono font-black tracking-widest">
                             DONE
                           </span>
                         )}
@@ -285,40 +278,40 @@ export default function Upload() {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 200 }}
-              className="w-16 h-16 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center justify-center mx-auto mb-5 rounded-2xl shadow-[0_0_30px_rgba(16,185,129,0.2)]"
+              className="w-14 h-14 bg-[#00FF66]/10 text-[#00FF66] border border-[#00FF66]/30 flex items-center justify-center mx-auto mb-4 rounded-lg shadow-[0_0_20px_rgba(0,255,102,0.25)]"
             >
-              <CheckCircle className="w-8 h-8" />
+              <CheckCircle className="w-7 h-7" />
             </motion.div>
-            <h3 className="font-black text-white text-xl uppercase tracking-wide">
-              Document Ingested Successfully!
+            <h3 className="font-black text-white text-lg sm:text-xl uppercase tracking-wide">
+              DOCUMENT MOUNTED TO VECTOR STORE
             </h3>
             <p className="text-xs text-zinc-400 mt-2 max-w-sm mx-auto uppercase font-mono">
-              Target <strong className="text-emerald-400 font-bold">"{file?.name}"</strong> is indexed and ready for discussion.
+              TARGET <strong className="text-[#00FF66] font-bold">"{file?.name}"</strong> READY FOR RETRIEVAL & INFERENCE.
             </p>
             
-            <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <div className="mt-7 flex flex-col sm:flex-row items-center justify-center gap-3">
               <motion.button
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={() => setTab("chat")}
-                className="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-emerald-500 to-emerald-400 hover:from-emerald-400 hover:to-emerald-300 text-black font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all shadow-[0_0_15px_rgba(16,185,129,0.25)] flex items-center justify-center gap-1.5 cursor-pointer"
+                className="w-full sm:w-auto px-5 py-3 bg-[#00FF66] hover:bg-[#1aff75] text-black font-mono font-bold text-xs uppercase tracking-wider rounded-lg transition-all shadow-[0_0_15px_rgba(0,255,102,0.25)] flex items-center justify-center gap-2 cursor-pointer"
               >
-                <span>Start Chat Q&A</span>
-                <ArrowRight className="w-4 h-4" />
+                <span>[ INITIALIZE CHAT ]</span>
+                <ArrowRight className="w-4 h-4 text-black" />
               </motion.button>
               <motion.button
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
                 onClick={() => setTab("quiz")}
-                className="w-full sm:w-auto px-6 py-3.5 glass-card hover:bg-white/10 text-white font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer shadow-sm"
+                className="w-full sm:w-auto px-5 py-3 terminal-panel hover:bg-white/10 text-white font-mono font-bold text-xs uppercase tracking-wider rounded-lg transition-all cursor-pointer border border-white/10"
               >
-                Generate Quiz
+                [ GENERATE QUIZ ]
               </motion.button>
               <button
                 onClick={resetUploader}
-                className="w-full sm:w-auto px-4 py-3.5 text-zinc-400 hover:text-white font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer"
+                className="w-full sm:w-auto px-4 py-3 text-zinc-400 hover:text-white font-mono font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer"
               >
-                Upload Another
+                MOUNT ANOTHER
               </button>
             </div>
           </motion.div>

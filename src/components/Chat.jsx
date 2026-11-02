@@ -171,20 +171,19 @@ export default function Chat() {
 
   if (!selectedDocumentId) {
     return (
-      <div className="flex-1 pt-16 md:pt-0 px-4 sm:px-8 bg-dot-grid flex flex-col items-center justify-center min-h-0 relative select-none z-0" id="chat-view">
-        <div className="ambient-glow ambient-glow-green w-[400px] h-[400px] animate-float-slow" />
+      <div className="flex-1 pt-16 md:pt-0 px-4 sm:px-8 bg-tactical-grid flex flex-col items-center justify-center min-h-0 relative select-none z-0" id="chat-view">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="text-center max-w-sm glass-tile bg-noise p-10 rounded-2xl shadow-2xl relative z-10 border border-white/10"
+          className="text-center max-w-sm terminal-panel hud-bracket hud-bracket-accent bg-noise p-8 sm:p-10 rounded-xl shadow-2xl relative z-10 border border-white/10"
         >
           <div className="specular-highlight" />
-          <div className="w-16 h-16 bg-white/5 border border-white/10 text-[#00FF66] rounded-full flex items-center justify-center mx-auto mb-5 shadow-inner">
-            <MessageSquare className="w-8 h-8 drop-shadow-sm" />
+          <div className="w-14 h-14 bg-white/[0.04] border border-white/10 text-[#00FF66] rounded-lg flex items-center justify-center mx-auto mb-4 shadow-inner">
+            <MessageSquare className="w-7 h-7 drop-shadow-sm" />
           </div>
-          <h3 className="font-extrabold text-white text-lg uppercase tracking-wider">No Document Selected</h3>
+          <h3 className="font-mono font-bold text-white text-base uppercase tracking-wider">NO TARGET MOUNTED</h3>
           <p className="text-xs text-zinc-400 font-mono uppercase mt-2 mb-6 leading-relaxed">
-            Select a document from the sidebar or upload a PDF to begin interactive chat sessions.
+            SELECT A TARGET DOCUMENT FROM THE SIDEBAR OR INGEST A PDF TO INITIALIZE CHAT.
           </p>
         </motion.div>
       </div>
@@ -192,20 +191,17 @@ export default function Chat() {
   }
 
   return (
-    <div className="flex-1 bg-dot-grid flex flex-col min-h-0 h-full select-text-content relative pt-14 md:pt-0 z-0" id="chat-view">
-      {/* Ambient Glow */}
-      <div className="ambient-glow ambient-glow-green w-[500px] h-[500px] top-[20%] right-[-100px] animate-float-slow" />
-      
+    <div className="flex-1 bg-tactical-grid flex flex-col min-h-0 h-full select-text-content relative pt-14 md:pt-0 z-0" id="chat-view">
       {/* Thread Header */}
-      <div className="p-3 sm:p-4 px-4 sm:px-6 bg-white/[0.04] backdrop-blur-2xl border-b border-white/10 flex items-center justify-between shadow-lg shrink-0 z-10 relative">
+      <div className="p-3 sm:p-4 px-4 sm:px-6 bg-[#090A0F] border-b border-white/[0.08] flex items-center justify-between shadow-lg shrink-0 z-10 relative">
         <div className="specular-highlight" />
         <div>
-          <div className="flex items-center gap-2.5">
-            <span className="w-2 h-2 rounded-full bg-[#00FF66] shadow-[0_0_8px_#00FF66] animate-pulse" />
-            <h3 className="font-extrabold text-white text-xs uppercase tracking-wider">Interactive Q&A Session</h3>
+          <div className="flex items-center gap-2">
+            <span className="status-led-green" />
+            <h3 className="font-mono font-bold text-white text-xs uppercase tracking-wider">SYS // RETRIEVAL_CHAT_SESSION</h3>
           </div>
           <p className="text-[11px] text-zinc-400 font-mono mt-1 max-w-[200px] sm:max-w-lg truncate uppercase" title={activeDoc?.name}>
-            Active Document: <strong className="text-[#00FF66]">"{activeDoc?.name}"</strong>
+            TARGET: <strong className="text-[#00FF66]">"{activeDoc?.name}"</strong>
           </p>
         </div>
 
@@ -214,10 +210,10 @@ export default function Chat() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => clearChat(selectedDocumentId)}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 hover:border-red-500/40 rounded-xl text-[10px] font-extrabold uppercase tracking-wider transition-all cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 hover:border-red-500/40 rounded-lg text-[10px] font-mono font-bold uppercase tracking-wider transition-all cursor-pointer"
           >
             <Trash2 className="w-3.5 h-3.5" />
-            <span>Clear Chat</span>
+            <span>RESET LOG</span>
           </motion.button>
         )}
       </div>
@@ -281,20 +277,18 @@ export default function Chat() {
                     </div>
 
                     <div
-                      className={`max-w-[85%] rounded-2xl p-4.5 text-xs leading-relaxed shadow-2xl border relative overflow-hidden select-text ${
+                      className={`max-w-[85%] rounded-lg p-4 text-xs leading-relaxed border relative overflow-hidden select-text ${
                         isUser
-                          ? "bg-gradient-to-br from-[#00FF66]/25 via-[#00FF66]/10 to-transparent backdrop-blur-xl border-[#00FF66]/40 text-white shadow-[0_8px_32px_rgba(0,255,102,0.18)]"
-                          : "glass-tile text-zinc-100 border border-white/10 shadow-2xl"
+                          ? "bg-[#0A120E] border-[#00FF66]/35 text-white shadow-[0_4px_20px_rgba(0,0,0,0.5)] border-r-2 border-r-[#00FF66]"
+                          : "terminal-panel hud-bracket text-zinc-100 border-white/10 shadow-2xl"
                       }`}
                     >
                       <div className="specular-highlight" />
-                      {/* Accent bar for user */}
-                      {isUser && <div className="absolute right-0 top-0 bottom-0 w-1 bg-[#00FF66] shadow-[0_0_8px_#00FF66]" />}
                       
                       {!isUser && !msg.text ? (
                         <div className="flex items-center gap-2 text-zinc-400 py-1">
                           <Loader2 className="w-3.5 h-3.5 text-[#00FF66] animate-spin" />
-                          <span className="font-mono text-[11px] uppercase tracking-wider text-zinc-400">Analyzing pages & streaming answer...</span>
+                          <span className="font-mono text-[11px] uppercase tracking-wider text-zinc-400">RETRIEVING CONTEXT & INFERRING ANSWER...</span>
                         </div>
                       ) : (
                         <p className="whitespace-pre-wrap font-sans text-sm">{msg.text}</p>
@@ -302,22 +296,22 @@ export default function Chat() {
 
                       {/* Collapsible Source Citation List */}
                       {!isUser && msg.sources && msg.sources.length > 0 && (
-                        <div className="border-t border-white/10 mt-4 pt-3.5 space-y-2">
-                          <div className="flex flex-wrap items-center justify-between gap-2 text-[9px] font-mono font-bold text-zinc-400 uppercase tracking-widest mb-2">
+                        <div className="border-t border-white/[0.08] mt-4 pt-3 space-y-2">
+                          <div className="flex flex-wrap items-center justify-between gap-2 text-[9px] font-mono font-bold text-zinc-400 uppercase tracking-widest mb-1.5">
                             <div className="flex items-center gap-1.5">
                               <BookOpen className="w-3.5 h-3.5 text-[#00FF66]" />
-                              <span>Matching Sections ({msg.sources.length})</span>
+                              <span>MATCHED_CHUNKS ({msg.sources.length})</span>
                             </div>
                             {(msg.retrievalTimeMs !== undefined || msg.retrievalMethod) && (
-                              <div className="flex items-center gap-1.5 text-[9px] font-mono text-[#00FF66] bg-[#00FF66]/10 border border-[#00FF66]/20 px-2 py-0.5 rounded-md">
+                              <div className="flex items-center gap-1.5 text-[9px] font-mono text-[#00FF66] bg-[#00FF66]/10 border border-[#00FF66]/20 px-1.5 py-0.5 rounded">
                                 <span>⚡ {msg.retrievalTimeMs || 1}ms</span>
-                                <span>•</span>
-                                <span>{msg.retrievalMethod || "Hybrid Vector Search"}</span>
+                                <span>//</span>
+                                <span>{msg.retrievalMethod || "HYBRID_VECTOR"}</span>
                               </div>
                             )}
                           </div>
                           
-                          <div className="flex flex-wrap gap-2">
+                          <div className="flex flex-wrap gap-1.5">
                             {msg.sources.map((src, srcIdx) => {
                               const sourceId = `${msg.id}_src_${srcIdx}`;
                               const isExpanded = expandedSourceId === sourceId;
@@ -326,21 +320,21 @@ export default function Chat() {
                               return (
                                 <div
                                   key={srcIdx}
-                                  className="w-full glass-tile border border-white/10 rounded-xl overflow-hidden text-[10px]"
+                                  className="w-full bg-[#08090D] border border-white/[0.08] rounded-md overflow-hidden text-[10px]"
                                 >
                                   <button
                                     type="button"
                                     onClick={() => toggleSource(sourceId)}
-                                    className="w-full flex items-center justify-between p-3 font-bold text-zinc-300 hover:text-white transition-colors uppercase font-mono cursor-pointer"
+                                    className="w-full flex items-center justify-between p-2.5 font-bold text-zinc-300 hover:text-white transition-colors uppercase font-mono cursor-pointer"
                                   >
                                     <div className="flex items-center gap-2">
-                                      <span className="bg-white/5 border border-white/10 text-[#00FF66] px-2 py-0.5 rounded-md font-mono text-[9px]">
-                                        Section {srcIdx + 1}
+                                      <span className="bg-white/5 border border-white/10 text-[#00FF66] px-1.5 py-0.5 rounded font-mono text-[9px]">
+                                        CHUNK #{srcIdx + 1}
                                       </span>
-                                      <span>Page {src.chunk.pageIndex}</span>
-                                      <span className="text-zinc-600">•</span>
-                                      <span className="font-mono text-[9px] text-[#00FF66] bg-[#00FF66]/10 border border-[#00FF66]/20 px-2 py-0.5 rounded-md">
-                                        Relevance: {scorePercent}%
+                                      <span>PAGE {src.chunk.pageIndex}</span>
+                                      <span className="text-zinc-600">//</span>
+                                      <span className="font-mono text-[9px] text-[#00FF66] bg-[#00FF66]/10 border border-[#00FF66]/20 px-1.5 py-0.5 rounded">
+                                        SIM_SCORE: {scorePercent}% [COSINE]
                                       </span>
                                     </div>
                                     {isExpanded ? (
@@ -356,9 +350,9 @@ export default function Chat() {
                                         initial={{ opacity: 0, height: 0 }}
                                         animate={{ opacity: 1, height: "auto" }}
                                         exit={{ opacity: 0, height: 0 }}
-                                        className="p-3.5 bg-black/60 border-t border-white/5 text-zinc-300 font-sans text-xs leading-relaxed"
+                                        className="p-3 bg-black/60 border-t border-white/5 text-zinc-300 font-sans text-xs leading-relaxed"
                                       >
-                                        <p className="italic">"{src.chunk.text}"</p>
+                                        <p className="italic font-mono text-[11px]">"{src.chunk.text}"</p>
                                       </motion.div>
                                     )}
                                   </AnimatePresence>
@@ -371,12 +365,12 @@ export default function Chat() {
 
                       {/* Low Groundedness Flag */}
                       {isGroundedFallback && (
-                        <div className="mt-3.5 p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-300 text-[10px] flex items-start gap-2 font-mono uppercase">
+                        <div className="mt-3.5 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-300 text-[10px] flex items-start gap-2 font-mono uppercase">
                           <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
                           <div>
-                            <strong className="font-extrabold text-white block mb-0.5 tracking-wider">Note on Source Content</strong>
+                            <strong className="font-bold text-white block mb-0.5 tracking-wider">TELEMETRY // LOW_CONFIDENCE</strong>
                             <p className="text-zinc-400 leading-relaxed font-sans normal-case">
-                              We couldn't find explicit coverage for this question directly in the document text.
+                              The document vector corpus does not contain high-similarity context for this prompt.
                             </p>
                           </div>
                         </div>
@@ -393,31 +387,31 @@ export default function Chat() {
       </div>
 
       {/* Chat Input Bar */}
-      <div className="p-3 sm:p-4 px-4 sm:px-6 bg-white/[0.04] backdrop-blur-2xl border-t border-white/10 shrink-0 relative z-10 shadow-2xl" id="chat-input-bar">
+      <div className="p-3 sm:p-4 px-4 sm:px-6 bg-[#090A0F] border-t border-white/[0.08] shrink-0 relative z-10 shadow-2xl" id="chat-input-bar">
         <div className="specular-highlight" />
-        <form onSubmit={handleSend} className="max-w-4xl mx-auto flex items-center gap-3">
+        <form onSubmit={handleSend} className="max-w-4xl mx-auto flex items-center gap-2.5">
           <input
             type="text"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             disabled={isSending}
-            placeholder={`Query document context... (e.g. "Summarize core findings")`}
-            className="flex-1 text-xs p-3.5 px-4 border border-white/10 hover:border-[#00FF66]/40 focus:border-[#00FF66] focus:ring-1 focus:ring-[#00FF66]/30 rounded-xl transition-all bg-black/30 backdrop-blur-md text-white font-mono placeholder-zinc-500 outline-none shadow-inner"
+            placeholder={`Query document corpus... (e.g. "Summarize core findings")`}
+            className="flex-1 text-xs p-3 px-4 border border-white/10 hover:border-[#00FF66]/40 focus:border-[#00FF66] focus:ring-1 focus:ring-[#00FF66]/30 rounded-lg transition-all bg-black/50 text-white font-mono placeholder-zinc-500 outline-none shadow-inner"
           />
           <motion.button
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             type="submit"
             disabled={!inputText.trim() || isSending}
-            className="p-3.5 bg-gradient-to-r from-[#00FF66] to-[#00E55B] hover:from-[#00E55B] hover:to-[#00CC55] disabled:opacity-30 disabled:cursor-not-allowed text-black rounded-xl shadow-[0_0_20px_rgba(0,255,102,0.35)] transition-all cursor-pointer relative group"
+            className="p-3 bg-[#00FF66] hover:bg-[#1aff75] disabled:opacity-30 disabled:cursor-not-allowed text-black rounded-lg shadow-[0_0_15px_rgba(0,255,102,0.3)] transition-all cursor-pointer relative font-mono font-bold"
           >
             <Send className="w-4 h-4 text-black" />
           </motion.button>
         </form>
-        <div className="max-w-4xl mx-auto flex items-center justify-center gap-1.5 text-[10px] text-zinc-500 mt-2 font-mono uppercase tracking-widest">
-          <span>Target Context Discussion</span>
+        <div className="max-w-4xl mx-auto flex items-center justify-center gap-2 text-[10px] text-zinc-500 mt-2 font-mono uppercase tracking-widest">
+          <span>VECTOR_RETRIEVAL // GROUNDED</span>
           <span>•</span>
-          <span className="text-[#00FF66]">Grounded in Uploaded Pages</span>
+          <span className="text-[#00FF66]">COSINE_SIMILARITY</span>
         </div>
       </div>
     </div>

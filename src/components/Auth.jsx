@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useAppState } from "../lib/state-context";
-import { Loader2, Lock, User, Key, ArrowRight, ShieldCheck, Zap } from "lucide-react";
+import { Loader2, Lock, User, Key, ArrowRight, ShieldCheck, Terminal, Cpu } from "lucide-react";
 import VectorAIIcon from "./VectorAIIcon";
 import PDFScholarLogo from "./PDFScholarLogo";
 import { motion, AnimatePresence } from "motion/react";
@@ -36,126 +36,131 @@ export default function Auth() {
         await login(username, password);
       } else {
         const res = await register(username, password);
-        setMessage(res.message || "Account created successfully! Please sign in.");
+        setMessage(res.message || "Account registered successfully. Please authenticate.");
         setIsLogin(true);
         setPassword("");
         setConfirmPassword("");
       }
     } catch (err) {
-      setError(err.message || "An error occurred. Please try again.");
+      setError(err.message || "Authentication failed. Check credentials.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen w-screen overflow-y-auto bg-dot-grid flex flex-col items-center justify-center p-4 md:p-8 select-text-content relative" id="auth-view">
-      {/* Swapped Cyber Ambient Gradient Glows (Animations preserved) */}
-      <div className="ambient-glow ambient-glow-cyan w-[400px] h-[400px] sm:w-[550px] sm:h-[550px] top-[-80px] left-[-80px] sm:top-[10%] sm:left-[15%] animate-float-slow opacity-25" />
-      <div className="ambient-glow ambient-glow-green w-[350px] h-[350px] sm:w-[480px] sm:h-[480px] bottom-[-80px] right-[-80px] sm:bottom-[10%] sm:right-[15%] animate-pulse-glow" />
-      <div className="ambient-glow ambient-glow-amber w-[300px] h-[300px] top-[40%] right-[10%] opacity-15" />
-
-      {/* Main Glassmorphism Auth Card - Slightly Taller Vertical Silhouette & Sleek Curves */}
+    <div className="min-h-screen w-screen overflow-y-auto bg-tactical-grid flex flex-col items-center justify-center p-4 md:p-8 select-text-content relative" id="auth-view">
+      {/* High-Precision Hardware Terminal Auth Card */}
       <motion.div
-        initial={{ opacity: 0, y: 20, scale: 0.97 }}
+        initial={{ opacity: 0, y: 15, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-        className="max-w-[430px] w-full glass-card bg-noise rounded-2xl p-7 sm:p-9 py-9 sm:py-11 relative z-10 my-auto overflow-hidden shadow-2xl border border-white/10"
+        transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+        className="max-w-[440px] w-full terminal-panel hud-bracket hud-bracket-accent laser-top bg-noise rounded-xl p-7 sm:p-9 relative z-10 my-auto shadow-2xl"
       >
-        {/* Top border accent */}
-        <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-[#00FF66] to-transparent shadow-[0_0_15px_rgba(0,255,102,0.6)]" />
-
-        {/* Feature Badges */}
-        <div className="flex items-center justify-center gap-2 mb-7">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-white/80 text-[10px] font-mono font-medium uppercase tracking-wider shadow-inner">
-            <VectorAIIcon className="w-3 h-3 text-[#00FF66] drop-shadow-[0_0_5px_currentColor]" /> Vector AI Study Partner
-          </span>
-          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-white/80 text-[10px] font-mono font-medium uppercase tracking-wider shadow-inner">
-            <ShieldCheck className="w-3 h-3 text-[#00FF66] drop-shadow-[0_0_5px_currentColor]" /> Private & Secure
+        {/* Top Hardware Telemetry Header */}
+        <div className="flex items-center justify-between gap-2 border-b border-white/[0.08] pb-4 mb-6">
+          <div className="flex items-center gap-2">
+            <span className="status-led-green" />
+            <span className="text-[10px] font-mono font-bold tracking-widest text-zinc-400 uppercase">
+              TERMINAL // {isLogin ? "AUTH_GATEWAY" : "KEY_GEN"}
+            </span>
+          </div>
+          <span className="terminal-badge terminal-badge-green">
+            SYS // ONLINE
           </span>
         </div>
 
-        {/* Brand Header with Matching Gradient Fade */}
-        <div className="text-center mb-8 flex flex-col items-center">
+        {/* Brand Identity */}
+        <div className="text-center mb-7 flex flex-col items-center">
           <motion.div
             whileHover={{ scale: 1.05 }}
-            className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-[#00FF66] mb-4 shadow-inner"
+            className="w-14 h-14 rounded-xl bg-white/[0.04] border border-white/10 flex items-center justify-center text-[#00FF66] mb-3.5 shadow-inner"
           >
-            <PDFScholarLogo className="w-8 h-8 text-[#00FF66] drop-shadow-[0_0_12px_currentColor]" />
+            <PDFScholarLogo className="w-7 h-7 text-[#00FF66] drop-shadow-[0_0_8px_currentColor]" />
           </motion.div>
           
-          <h1 className="flex items-center justify-center gap-2 font-black text-2xl sm:text-3xl tracking-tight leading-none">
-            <span className="text-[#00FF66] drop-shadow-[0_0_15px_rgba(0,255,102,0.4)]">PDF</span>
-            <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-zinc-100 to-zinc-400">
+          <h1 className="flex items-center justify-center gap-2 font-black text-2xl tracking-tight leading-none">
+            <span className="text-[#00FF66]">PDF</span>
+            <span className="text-white">
               Scholar Hub
             </span>
           </h1>
-          <p className="text-[11px] text-zinc-400 font-mono uppercase tracking-wider mt-3 bg-white/5 inline-block px-3.5 py-1 rounded-full border border-white/5">
-            Your Personal AI Study Companion
+          <p className="text-[10px] text-zinc-400 font-mono uppercase tracking-widest mt-2">
+            NEURAL RAG RESEARCH TERMINAL
           </p>
         </div>
 
-        {/* Form Container with Comfortable Vertical Rhythm */}
+        {/* Form Container */}
         <AnimatePresence mode="wait">
           <motion.form
             key={isLogin ? "login" : "signup"}
-            initial={{ opacity: 0, x: isLogin ? -10 : 10 }}
+            initial={{ opacity: 0, x: isLogin ? -6 : 6 }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: isLogin ? 10 : -10 }}
-            transition={{ duration: 0.2 }}
+            exit={{ opacity: 0, x: isLogin ? 6 : -6 }}
+            transition={{ duration: 0.15 }}
             onSubmit={handleSubmit}
             className="space-y-4"
           >
             {/* Error Notification */}
             {error && (
               <motion.div
-                initial={{ opacity: 0, y: -10 }}
+                initial={{ opacity: 0, y: -6 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-red-500/10 text-red-400 border border-red-500/30 rounded-xl p-3.5 text-xs font-sans normal-case text-center leading-relaxed backdrop-blur-sm"
+                className="bg-red-500/10 text-red-400 border border-red-500/30 rounded-lg p-3 text-xs font-mono normal-case text-center leading-relaxed"
               >
-                {error}
+                ERR // {error}
               </motion.div>
             )}
 
             {/* Success Notification */}
             {message && (
               <motion.div
-                initial={{ opacity: 0, y: -10 }}
+                initial={{ opacity: 0, y: -6 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-[#00FF66]/10 text-[#00FF66] border border-[#00FF66]/30 rounded-xl p-3.5 text-xs font-sans normal-case text-center leading-relaxed backdrop-blur-sm"
+                className="bg-[#00FF66]/10 text-[#00FF66] border border-[#00FF66]/30 rounded-lg p-3 text-xs font-mono normal-case text-center leading-relaxed"
               >
-                {message}
+                OK // {message}
               </motion.div>
             )}
 
-            {/* Form Inputs with Sleek Curves */}
-            <div className="space-y-3.5">
-              <div className="relative group">
-                <span className="absolute inset-y-0 left-0 pl-4 flex items-center text-zinc-500 group-focus-within:text-[#00FF66] transition-colors">
-                  <User className="w-4 h-4 drop-shadow-sm" />
-                </span>
-                <input
-                  type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="Username (e.g. ayush_scholar)"
-                  className="w-full bg-black/50 border border-white/10 focus:border-[#00FF66] focus:ring-1 focus:ring-[#00FF66]/30 hover:border-white/20 text-white text-xs sm:text-sm px-4 py-3.5 pl-12 rounded-xl transition-all outline-none placeholder-zinc-500 font-mono shadow-inner"
-                  required
-                />
+            {/* Form Inputs */}
+            <div className="space-y-3">
+              <div>
+                <label className="block text-[10px] font-mono uppercase tracking-wider text-zinc-400 mb-1.5">
+                  OPERATOR // USERNAME
+                </label>
+                <div className="relative group">
+                  <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-500 group-focus-within:text-[#00FF66] transition-colors">
+                    <User className="w-4 h-4" />
+                  </span>
+                  <input
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="e.g. ayush_scholar"
+                    className="w-full bg-black/60 border border-white/10 focus:border-[#00FF66] focus:ring-1 focus:ring-[#00FF66]/30 hover:border-white/20 text-white text-xs sm:text-sm px-4 py-3 pl-11 rounded-lg transition-all outline-none placeholder-zinc-600 font-mono shadow-inner"
+                    required
+                  />
+                </div>
               </div>
 
-              <div className="relative group">
-                <span className="absolute inset-y-0 left-0 pl-4 flex items-center text-zinc-500 group-focus-within:text-[#00FF66] transition-colors">
-                  <Lock className="w-4 h-4 drop-shadow-sm" />
-                </span>
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Password"
-                  className="w-full bg-black/50 border border-white/10 focus:border-[#00FF66] focus:ring-1 focus:ring-[#00FF66]/30 hover:border-white/20 text-white text-xs sm:text-sm px-4 py-3.5 pl-12 rounded-xl transition-all outline-none placeholder-zinc-500 font-mono shadow-inner"
-                  required
-                />
+              <div>
+                <label className="block text-[10px] font-mono uppercase tracking-wider text-zinc-400 mb-1.5">
+                  SECURITY // PASSWORD
+                </label>
+                <div className="relative group">
+                  <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-500 group-focus-within:text-[#00FF66] transition-colors">
+                    <Lock className="w-4 h-4" />
+                  </span>
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••••••"
+                    className="w-full bg-black/60 border border-white/10 focus:border-[#00FF66] focus:ring-1 focus:ring-[#00FF66]/30 hover:border-white/20 text-white text-xs sm:text-sm px-4 py-3 pl-11 rounded-lg transition-all outline-none placeholder-zinc-600 font-mono shadow-inner"
+                    required
+                  />
+                </div>
               </div>
 
               <AnimatePresence>
@@ -164,40 +169,45 @@ export default function Auth() {
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
-                    className="relative group overflow-hidden"
+                    className="space-y-1.5 overflow-hidden"
                   >
-                    <span className="absolute inset-y-0 left-0 pl-4 flex items-center text-zinc-500 group-focus-within:text-[#00FF66] transition-colors">
-                      <Key className="w-4 h-4 drop-shadow-sm" />
-                    </span>
-                    <input
-                      type="password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      placeholder="Confirm Password"
-                      className="w-full bg-black/50 border border-white/10 focus:border-[#00FF66] focus:ring-1 focus:ring-[#00FF66]/30 hover:border-white/20 text-white text-xs sm:text-sm px-4 py-3.5 pl-12 rounded-xl transition-all outline-none placeholder-zinc-500 font-mono shadow-inner"
-                      required
-                    />
+                    <label className="block text-[10px] font-mono uppercase tracking-wider text-zinc-400 mb-1.5">
+                      VERIFY // CONFIRM_PASSWORD
+                    </label>
+                    <div className="relative group">
+                      <span className="absolute inset-y-0 left-0 pl-3.5 flex items-center text-zinc-500 group-focus-within:text-[#00FF66] transition-colors">
+                        <Key className="w-4 h-4" />
+                      </span>
+                      <input
+                        type="password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        placeholder="••••••••••••"
+                        className="w-full bg-black/60 border border-white/10 focus:border-[#00FF66] focus:ring-1 focus:ring-[#00FF66]/30 hover:border-white/20 text-white text-xs sm:text-sm px-4 py-3 pl-11 rounded-lg transition-all outline-none placeholder-zinc-600 font-mono shadow-inner"
+                        required
+                      />
+                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>
             </div>
 
-            {/* Subtle Curved Cyber Submit Button */}
+            {/* Tactical High-Contrast Action Button */}
             <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}
               type="submit"
               disabled={loading}
-              className="w-full inline-flex items-center justify-center gap-2.5 px-5 py-4 bg-gradient-to-r from-[#00FF66] to-[#00E55B] hover:from-[#00E55B] hover:to-[#00CC55] disabled:opacity-50 disabled:cursor-not-allowed text-black text-xs sm:text-sm font-black uppercase tracking-wider rounded-xl transition-all shadow-[0_0_20px_rgba(0,255,102,0.35)] mt-6 cursor-pointer"
+              className="w-full inline-flex items-center justify-center gap-2 px-5 py-3.5 bg-[#00FF66] hover:bg-[#1aff75] disabled:opacity-50 disabled:cursor-not-allowed text-black text-xs font-black uppercase tracking-wider rounded-lg transition-all shadow-[0_0_20px_rgba(0,255,102,0.3)] mt-6 cursor-pointer font-mono"
             >
               {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 text-black animate-spin" />
-                  <span>{isLogin ? "Signing In..." : "Setting Up Account..."}</span>
+                  <span>{isLogin ? "AUTHENTICATING..." : "GENERATING CREDS..."}</span>
                 </>
               ) : (
                 <>
-                  <span>{isLogin ? "Sign In to PDF Scholar Hub" : "Create Free Account"}</span>
+                  <span>{isLogin ? "[ INITIALIZE SESSION ]" : "[ REGISTER OPERATOR ]"}</span>
                   <ArrowRight className="w-4 h-4 text-black" />
                 </>
               )}
@@ -206,7 +216,7 @@ export default function Auth() {
         </AnimatePresence>
 
         {/* Toggle Mode Footer */}
-        <div className="mt-8 text-center border-t border-white/10 pt-6">
+        <div className="mt-7 text-center border-t border-white/[0.08] pt-5">
           <button
             type="button"
             onClick={() => {
@@ -214,10 +224,14 @@ export default function Auth() {
               setError("");
               setMessage("");
             }}
-            className="text-xs font-bold text-zinc-400 hover:text-white uppercase tracking-wider transition-colors inline-flex items-center gap-1.5 cursor-pointer"
+            className="text-xs font-mono text-zinc-400 hover:text-[#00FF66] uppercase tracking-wider transition-colors inline-flex items-center gap-2 cursor-pointer"
           >
-            <Zap className="w-3.5 h-3.5 text-[#00FF66] drop-shadow-[0_0_5px_currentColor]" />
-            {isLogin ? <span>New to <strong className="text-[#00FF66]">PDF</strong> Scholar? Create account</span> : <span>Already have an account? Sign In</span>}
+            <Terminal className="w-3.5 h-3.5 text-[#00FF66]" />
+            {isLogin ? (
+              <span>NEW OPERATOR? <strong className="text-[#00FF66] underline">CREATE ACCESS KEY</strong></span>
+            ) : (
+              <span>EXISTING OPERATOR? <strong className="text-[#00FF66] underline">SIGN IN</strong></span>
+            )}
           </button>
         </div>
       </motion.div>

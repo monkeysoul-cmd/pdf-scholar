@@ -649,39 +649,35 @@ export default function Overview() {
 
   return (
     <div
-      className="flex-1 pt-14 md:pt-6 px-4 sm:px-6 md:px-10 pb-12 overflow-y-auto min-h-0 flex flex-col bg-dot-grid text-white select-text-content relative z-0"
+      className="flex-1 pt-14 md:pt-6 px-4 sm:px-6 md:px-10 pb-12 overflow-y-auto min-h-0 flex flex-col bg-tactical-grid text-white select-text-content relative z-0"
       id="overview-view"
     >
-      {/* Dynamic Cyber Ambient Glows */}
-      <div className="ambient-glow ambient-glow-green w-[550px] h-[550px] top-[-100px] right-[-100px] animate-pulse-glow" />
-      <div className="ambient-glow ambient-glow-cyan w-[400px] h-[400px] bottom-[20%] left-[-80px] opacity-15" />
-
       {/* Top Header Branding with Matching Color & Gradient Fade */}
       <motion.div
-        initial={{ opacity: 0, y: -15 }}
+        initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/5 pb-5 mb-8 relative z-10"
+        className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/[0.08] pb-5 mb-8 relative z-10"
       >
         <div className="flex items-center gap-3">
           <motion.div
             whileHover={{ scale: 1.05 }}
-            className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-[#00FF66] shrink-0 shadow-inner"
+            className="w-10 h-10 rounded-lg bg-white/[0.04] border border-white/10 flex items-center justify-center text-[#00FF66] shrink-0 shadow-inner"
           >
-            <PDFScholarLogo className="w-5 h-5 text-[#00FF66] drop-shadow-[0_0_12px_currentColor]" />
+            <PDFScholarLogo className="w-5 h-5 text-[#00FF66] drop-shadow-[0_0_8px_currentColor]" />
           </motion.div>
           <div>
             <div className="flex items-center gap-2 font-black text-2xl sm:text-3xl tracking-tight leading-none">
-              <span className="text-[#00FF66] drop-shadow-[0_0_15px_rgba(0,255,102,0.4)]">PDF</span>
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-zinc-100 to-zinc-400">
+              <span className="text-[#00FF66]">PDF</span>
+              <span className="text-white">
                 Scholar Hub
               </span>
-              <span className="bg-[#00FF66]/10 text-[#00FF66] border border-[#00FF66]/30 text-[9px] font-black px-2.5 py-0.5 rounded-md uppercase tracking-wider ml-1.5 flex items-center gap-1 shadow-[0_0_10px_rgba(0,255,102,0.2)]">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#00FF66] animate-pulse" />
-                Vector AI
+              <span className="terminal-badge terminal-badge-green ml-1.5">
+                <span className="status-led-green" />
+                SYS // ONLINE
               </span>
             </div>
-            <p className="text-[11px] text-zinc-400 font-mono uppercase tracking-wider mt-1">
-              Smart Study Assistant & Knowledge Companion
+            <p className="text-[10px] text-zinc-400 font-mono uppercase tracking-widest mt-1.5">
+              NEURAL RAG TELEMETRY & RESEARCH HUB
             </p>
           </div>
         </div>
@@ -691,11 +687,11 @@ export default function Overview() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => setTab("upload")}
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-[#00FF66] to-[#00E55B] hover:from-[#00E55B] hover:to-[#00CC55] text-black text-xs font-black uppercase tracking-wider rounded-xl transition-all shadow-[0_0_20px_rgba(0,255,102,0.35)] cursor-pointer"
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#00FF66] hover:bg-[#1aff75] text-black text-xs font-mono font-bold uppercase tracking-wider rounded-lg transition-all shadow-[0_0_15px_rgba(0,255,102,0.3)] cursor-pointer"
             id="overview-upload-cta"
           >
             <Plus className="w-4 h-4 text-black" />
-            <span>Upload PDF</span>
+            <span>[ MOUNT NEW PDF ]</span>
           </motion.button>
         </div>
       </motion.div>
@@ -718,7 +714,7 @@ export default function Overview() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.08 }}
                 onClick={() => setActiveModal(stat.id)}
-                className={`glass-tile glass-tile-interactive ${stat.tileClass || ""} p-5 sm:p-6 rounded-2xl relative group overflow-hidden shadow-2xl cursor-pointer ${stat.glow}`}
+                className={`glass-tile glass-tile-interactive hud-bracket ${stat.tileClass || ""} p-5 sm:p-6 rounded-lg relative group overflow-hidden shadow-2xl cursor-pointer ${stat.glow}`}
               >
                 {/* Top Specular Light Bevel */}
                 <div className="specular-highlight" />
@@ -732,11 +728,11 @@ export default function Overview() {
                   </span>
                   <div className="flex items-center gap-2">
                     {stat.badge && (
-                      <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-md uppercase tracking-wider glass-pill text-zinc-200">
+                      <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded uppercase tracking-wider glass-pill text-zinc-200">
                         {stat.badge}
                       </span>
                     )}
-                    <div className={`w-8 h-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center ${stat.iconColor} group-hover:scale-110 group-hover:bg-white/10 transition-all shadow-inner`}>
+                    <div className={`w-8 h-8 rounded-md bg-white/[0.04] border border-white/10 flex items-center justify-center ${stat.iconColor} group-hover:scale-105 group-hover:bg-white/10 transition-all shadow-inner`}>
                       <Icon className="w-4 h-4 drop-shadow-[0_0_8px_currentColor]" />
                     </div>
                   </div>
@@ -769,7 +765,7 @@ export default function Overview() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: (index + 3) * 0.08 }}
                 onClick={() => setActiveModal(stat.id)}
-                className={`glass-tile glass-tile-interactive ${stat.tileClass || ""} p-5 sm:p-6 rounded-2xl relative group overflow-hidden shadow-2xl cursor-pointer ${stat.glow}`}
+                className={`glass-tile glass-tile-interactive hud-bracket ${stat.tileClass || ""} p-5 sm:p-6 rounded-lg relative group overflow-hidden shadow-2xl cursor-pointer ${stat.glow}`}
               >
                 {/* Top Specular Light Bevel */}
                 <div className="specular-highlight" />
@@ -783,11 +779,11 @@ export default function Overview() {
                   </span>
                   <div className="flex items-center gap-2">
                     {stat.badge && (
-                      <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded-md uppercase tracking-wider glass-pill text-zinc-200">
+                      <span className="text-[9px] font-mono font-bold px-2 py-0.5 rounded uppercase tracking-wider glass-pill text-zinc-200">
                         {stat.badge}
                       </span>
                     )}
-                    <div className={`w-8 h-8 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center ${stat.iconColor} group-hover:scale-110 group-hover:bg-white/10 transition-all shadow-inner`}>
+                    <div className={`w-8 h-8 rounded-md bg-white/[0.04] border border-white/10 flex items-center justify-center ${stat.iconColor} group-hover:scale-105 group-hover:bg-white/10 transition-all shadow-inner`}>
                       <Icon className="w-4 h-4 drop-shadow-[0_0_8px_currentColor]" />
                     </div>
                   </div>
@@ -829,7 +825,7 @@ export default function Overview() {
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="lg:col-span-7 glass-tile bg-noise rounded-2xl p-5 sm:p-6 flex flex-col justify-between shadow-2xl relative overflow-hidden border border-white/10"
+          className="lg:col-span-7 terminal-panel hud-bracket bg-noise rounded-lg p-5 sm:p-6 flex flex-col justify-between shadow-2xl relative overflow-hidden border border-white/10"
         >
           <div className="specular-highlight" />
           <div>
@@ -910,7 +906,7 @@ export default function Overview() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25 }}
           onClick={() => setActiveModal("pages")}
-          className="lg:col-span-5 glass-tile glass-tile-interactive glass-tile-cyan bg-noise rounded-2xl p-5 sm:p-6 flex flex-col justify-between cursor-pointer shadow-2xl relative overflow-hidden"
+          className="lg:col-span-5 terminal-panel hud-bracket hud-bracket-cyan bg-noise rounded-lg p-5 sm:p-6 flex flex-col justify-between cursor-pointer shadow-2xl relative overflow-hidden"
         >
           <div className="specular-highlight" />
           <div>
@@ -1010,14 +1006,14 @@ export default function Overview() {
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 15 }}
               onClick={(e) => e.stopPropagation()}
-              className="glass-card bg-noise rounded-2xl w-full max-w-2xl max-h-[85vh] overflow-y-auto p-6 sm:p-8 relative text-white flex flex-col gap-5 shadow-2xl border-t-2 border-t-[#00FF66]"
+              className="terminal-panel hud-bracket laser-top bg-noise rounded-xl w-full max-w-2xl max-h-[85vh] overflow-y-auto p-6 sm:p-8 relative text-white flex flex-col gap-5 shadow-2xl"
             >
               {/* Structured Header Bar with Title and Close Button (No Overlapping!) */}
               {(() => {
                 const header = getModalTitle(activeModal);
                 const HeaderIcon = header.icon;
                 return (
-                  <div className="flex items-center justify-between border-b border-white/10 pb-4 shrink-0">
+                  <div className="flex items-center justify-between border-b border-white/[0.08] pb-4 shrink-0">
                     <div className="flex items-center gap-2.5 min-w-0 pr-3">
                       <HeaderIcon className={`w-5 h-5 ${header.color} shrink-0`} />
                       <h3 className="text-base sm:text-lg font-black uppercase text-white tracking-tight truncate">
@@ -1026,7 +1022,7 @@ export default function Overview() {
                     </div>
                     <button
                       onClick={() => setActiveModal(null)}
-                      className="p-2 bg-white/5 hover:bg-white/15 border border-white/10 text-zinc-300 hover:text-white rounded-xl transition-all cursor-pointer shrink-0"
+                      className="p-2 bg-white/5 hover:bg-white/15 border border-white/10 text-zinc-300 hover:text-white rounded-lg transition-all cursor-pointer shrink-0"
                       title="Close Window"
                     >
                       <X className="w-4 h-4" />
