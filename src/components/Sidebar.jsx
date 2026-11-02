@@ -12,10 +12,13 @@ import {
   ChevronLeft,
   ChevronRight,
   Menu,
-  X
+  X,
+  Volume2,
+  VolumeX
 } from "lucide-react";
 import PDFScholarLogo from "./PDFScholarLogo";
 import { motion, AnimatePresence } from "motion/react";
+import { playClick, playBlip, isSoundEnabled, toggleSound } from "../lib/sound-effects";
 
 export default function Sidebar() {
   const {
@@ -31,6 +34,7 @@ export default function Sidebar() {
 
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [sfxOn, setSfxOn] = useState(isSoundEnabled());
 
   useEffect(() => {
     setIsMobileOpen(false);
@@ -44,11 +48,39 @@ export default function Sidebar() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Global hotkey navigation for developer affordance: [1], [2], [3], [4], [m]
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      const activeTag = document.activeElement?.tagName?.toLowerCase();
+      if (activeTag === "input" || activeTag === "textarea" || document.activeElement?.isContentEditable) {
+        return;
+      }
+      if (e.key === "1") {
+        setTab("overview");
+        playClick();
+      } else if (e.key === "2") {
+        setTab("upload");
+        playClick();
+      } else if (e.key === "3" && selectedDocumentId) {
+        setTab("quiz");
+        playClick();
+      } else if (e.key === "4" && selectedDocumentId) {
+        setTab("chat");
+        playClick();
+      } else if (e.key.toLowerCase() === "m") {
+        const next = toggleSound();
+        setSfxOn(next);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [selectedDocumentId, setTab]);
+
   const menuItems = [
-    { id: "overview", label: "Overview", icon: BookOpen },
-    { id: "upload", label: "Upload PDF", icon: UploadCloud },
-    { id: "quiz", label: "Practice Quiz", icon: GraduationCap, disabled: !selectedDocumentId },
-    { id: "chat", label: "Chat with PDF", icon: MessageSquare, disabled: !selectedDocumentId }
+    { id: "overview", label: "Overview", icon: BookOpen, shortcut: "1" },
+    { id: "upload", label: "Upload PDF", icon: UploadCloud, shortcut: "2" },
+    { id: "quiz", label: "Practice Quiz", icon: GraduationCap, disabled: !selectedDocumentId, shortcut: "3" },
+    { id: "chat", label: "Chat with PDF", icon: MessageSquare, disabled: !selectedDocumentId, shortcut: "4" }
   ];
 
   const activeDoc = documents.find((d) => d.id === selectedDocumentId);
@@ -143,34 +175,40 @@ export default function Sidebar() {
                 key={item.id}
                 whileHover={!isDisabled ? { x: collapsed ? 0 : 3, scale: collapsed ? 1.05 : 1 } : {}}
                 whileTap={!isDisabled ? { scale: 0.96 } : {}}
-                onClick={() => !isDisabled && setTab(item.id)}
+                onClick={() => {
+                  if (!isDisabled) {
+                    playClick();
+                    setTab(item.id);
+                  }
+                }}
                 disabled={isDisabled}
                 title={collapsed ? `${item.label}${isDisabled ? " (Select a PDF first)" : ""}` : undefined}
                 id={`nav-btn-${item.id}`}
                 className={`w-full relative flex items-center ${
-                  collapsed ? "justify-center px-0 py-3 rounded-xl" : "justify-between px-3 py-2.5 rounded-xl"
+                  collapsed ? "justify-center px-0 py-3 rounded-lg" : "justify-between px-3 py-2.5 rounded-lg"
                 } text-xs font-bold uppercase tracking-wider text-left transition-all ${
                   isDisabled ? "cursor-not-allowed opacity-40 text-zinc-600 bg-transparent" : "cursor-pointer"
                 } ${
                   isActive
-                    ? "text-black bg-gradient-to-r from-[#00FF66] to-[#00E55B] shadow-[0_0_15px_rgba(0,255,102,0.35)] font-black"
+                    ? "text-black bg-[#00FF66] shadow-[0_0_15px_rgba(0,255,102,0.3)] font-black"
                     : isDisabled
                     ? ""
-                    : "text-zinc-400 hover:text-white glass-card hover:border-white/20"
+                    : "text-zinc-400 hover:text-white terminal-panel hover:border-white/20"
                 }`}
               >
-                <div className={`flex items-center ${collapsed ? "justify-center" : "gap-3"} relative z-10`}>
+                <div className={`flex items-center ${collapsed ? "justify-center" : "gap-2.5"} relative z-10`}>
                   <Icon className={`w-4 h-4 transition-colors ${isActive ? "text-black drop-shadow-sm" : "text-zinc-400"}`} />
-                  {!collapsed && <span>{item.label}</span>}
+                  {!collapsed && <span className="font-mono">{item.label}</span>}
                 </div>
-                {!collapsed && item.id === "quiz" && selectedDocumentId && !isActive && (
-                  <motion.span
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    className="text-[9px] font-black bg-[#00FF66] text-black px-2 py-0.5 rounded-full relative z-10 shadow-sm"
-                  >
-                    READY
-                  </motion.span>
+                {!collapsed && (
+                  <div className="flex items-center gap-1.5 relative z-10">
+                    {item.id === "quiz" && selectedDocumentId && !isActive && (
+                      <span className="text-[9px] font-mono font-bold bg-[#00FF66] text-black px-1.5 py-0.5 rounded shadow-sm">
+                        READY
+                      </span>
+                    )}
+                    <kbd className={`text-[8px] ${isActive ? "text-black border-black/40 bg-black/10" : ""}`}>{item.shortcut}</kbd>
+                  </div>
                 )}
                 {collapsed && isActive && (
                   <span className="absolute right-1 top-1 w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_8px_white]" />
@@ -285,6 +323,21 @@ export default function Sidebar() {
               </div>
               <div className="status-led-green shrink-0" />
             </div>
+
+            {/* Audio Feedback Toggle */}
+            <button
+              type="button"
+              onClick={() => setSfxOn(toggleSound())}
+              className="flex items-center justify-between text-[9px] font-mono text-zinc-500 hover:text-zinc-300 py-1 px-1 transition-colors cursor-pointer"
+              title="Toggle Audio Haptics (HotKey: M)"
+            >
+              <span className="flex items-center gap-1.5">
+                {sfxOn ? <Volume2 className="w-3 h-3 text-[#00FF66]" /> : <VolumeX className="w-3 h-3 text-zinc-600" />}
+                <span>SFX // {sfxOn ? "ACTIVE" : "MUTED"}</span>
+              </span>
+              <kbd className="text-[8px]">M</kbd>
+            </button>
+
             <motion.button
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.98 }}
@@ -296,15 +349,25 @@ export default function Sidebar() {
             </motion.button>
           </>
         ) : (
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={logout}
-            title={`Sign Out (${user?.username})`}
-            className="w-full py-2.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/40 text-red-400 rounded-lg flex items-center justify-center transition-colors cursor-pointer"
-          >
-            <LogOut className="w-4 h-4" />
-          </motion.button>
+          <div className="flex flex-col gap-2">
+            <button
+              type="button"
+              onClick={() => setSfxOn(toggleSound())}
+              title={`Toggle SFX (${sfxOn ? "Active" : "Muted"})`}
+              className="w-full py-2 bg-white/[0.03] hover:bg-white/[0.08] text-zinc-400 hover:text-white rounded-lg flex items-center justify-center transition-colors cursor-pointer"
+            >
+              {sfxOn ? <Volume2 className="w-3.5 h-3.5 text-[#00FF66]" /> : <VolumeX className="w-3.5 h-3.5 text-zinc-600" />}
+            </button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={logout}
+              title={`Sign Out (${user?.username})`}
+              className="w-full py-2.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/40 text-red-400 rounded-lg flex items-center justify-center transition-colors cursor-pointer"
+            >
+              <LogOut className="w-4 h-4" />
+            </motion.button>
+          </div>
         )}
       </div>
     </aside>

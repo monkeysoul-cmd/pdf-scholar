@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import VectorAIIcon from "./VectorAIIcon";
 import { motion, AnimatePresence } from "motion/react";
+import { playClick, playBlip, playChime } from "../lib/sound-effects";
 
 export default function Quiz() {
   const {
@@ -57,6 +58,7 @@ export default function Quiz() {
 
   const generateQuiz = async () => {
     if (!selectedDocumentId) return;
+    playClick();
     setIsGenerating(true);
     setQuizError("");
     setShowResults(false);
@@ -78,6 +80,7 @@ export default function Quiz() {
 
       const data = await res.json();
       if (res.ok && data.questions) {
+        playChime();
         const normalized = data.questions.map((q, idx) => {
           const isMC = Boolean(q.type && (q.type.toLowerCase().includes("choice") || q.type.toLowerCase().includes("mc")));
           return {
@@ -102,11 +105,13 @@ export default function Quiz() {
 
   const handleMultipleChoiceSelect = (qId, optionText) => {
     if (answers[qId]) return; // locked once chosen
+    playClick();
     setAnswers(prev => ({ ...prev, [qId]: optionText }));
   };
 
   const submitShortAnswer = (qId) => {
     if (!shortAnswersText[qId]?.trim()) return;
+    playBlip();
     setRevealedShortAnswers(prev => ({ ...prev, [qId]: true }));
     if (!shortAnswerSelfGrades[qId]) {
       setShortAnswerSelfGrades(prev => ({ ...prev, [qId]: "full" })); // default to full credit
@@ -114,6 +119,7 @@ export default function Quiz() {
   };
 
   const handleSelfGrade = (qId, grade) => {
+    playClick();
     setShortAnswerSelfGrades(prev => ({ ...prev, [qId]: grade }));
   };
 
@@ -217,6 +223,7 @@ export default function Quiz() {
   };
 
   const handleFinishQuiz = () => {
+    playChime();
     setShowConfirmSubmitModal(false);
     const scores = calculateScore();
     const result = {
@@ -584,22 +591,24 @@ export default function Quiz() {
                           whileTap={!hasAnsweredMC ? { scale: 0.99 } : {}}
                           disabled={hasAnsweredMC}
                           onClick={() => handleMultipleChoiceSelect(q.id, opt)}
-                          className={`w-full text-left p-4 rounded-xl border text-xs font-medium tracking-wide transition-all cursor-pointer ${
+                          className={`w-full text-left p-3.5 rounded-lg border text-xs font-mono tracking-wide transition-all cursor-pointer flex items-center ${
                             shouldHighlightGreen
-                              ? "bg-emerald-500/20 border-emerald-500/50 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)]"
+                              ? "bg-[#00FF66]/15 border-[#00FF66]/60 text-[#00FF66] shadow-[0_0_15px_rgba(0,255,102,0.2)]"
                               : shouldHighlightRed
                               ? "bg-red-500/20 border-red-500/50 text-red-400"
                               : isSelected
                               ? "bg-amber-400/20 border-amber-400/50 text-amber-400 shadow-[0_0_15px_rgba(251,191,36,0.2)]"
                               : hasAnsweredMC
                               ? "bg-black/40 border-white/5 text-zinc-600 cursor-not-allowed"
-                              : "glass-card border-white/5 text-zinc-300 hover:border-white/20 hover:bg-white/5"
+                              : "terminal-panel border-white/10 text-zinc-300 hover:border-amber-400/50 hover:bg-white/[0.03]"
                           }`}
                         >
-                          <span className="font-mono text-xs mr-2 opacity-50">
-                            {String.fromCharCode(65 + optIdx)}.
-                          </span>
-                          {opt}
+                          <kbd className={`kbd-badge mr-3 font-mono text-[9px] font-bold shrink-0 ${
+                            isSelected ? "kbd-badge-green" : ""
+                          }`}>
+                            {String.fromCharCode(65 + optIdx)}
+                          </kbd>
+                          <span className="font-sans flex-1">{opt}</span>
                         </motion.button>
                       );
                     })}

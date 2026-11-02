@@ -10,10 +10,12 @@ import {
   ChevronUp,
   AlertTriangle,
   Bot,
-  User
+  User,
+  Clock
 } from "lucide-react";
 import VectorAIIcon from "./VectorAIIcon";
 import { motion, AnimatePresence } from "motion/react";
+import { playClick, playBlip, playChime } from "../lib/sound-effects";
 
 export default function Chat() {
   const { documents, selectedDocumentId, chatHistory, addMessage, updateLastMessage, clearChat, authenticatedFetch } = useAppState();
@@ -33,6 +35,7 @@ export default function Chat() {
     e.preventDefault();
     if (!inputText.trim() || !selectedDocumentId || isSending) return;
 
+    playClick();
     const userMessage = inputText.trim();
     setInputText("");
     setIsSending(true);
@@ -131,11 +134,14 @@ export default function Chat() {
             ...msg,
             text: msg.text || "No answer returned. Please try again."
           }));
+        } else {
+          playChime();
         }
       } else {
         // Fallback for non-streaming response
         const data = await res.json();
         if (res.ok && data.text) {
+          playChime();
           updateLastMessage(selectedDocumentId, msg => ({
             ...msg,
             text: data.text,
@@ -243,10 +249,14 @@ export default function Chat() {
                   key={i}
                   whileHover={{ scale: 1.01, x: 3 }}
                   whileTap={{ scale: 0.99 }}
-                  onClick={() => setInputText(suggestion)}
-                  className="p-3.5 text-xs font-bold glass-tile glass-tile-interactive text-zinc-300 hover:text-white rounded-xl transition-all uppercase tracking-wide text-left shadow-md border border-white/10 hover:border-[#00FF66]/40 cursor-pointer"
+                  onClick={() => {
+                    playClick();
+                    setInputText(suggestion);
+                  }}
+                  className="p-3 text-xs font-mono font-bold terminal-panel text-zinc-300 hover:text-white rounded-lg transition-all uppercase tracking-wide text-left border border-white/10 hover:border-[#00FF66]/50 cursor-pointer flex items-center justify-between group"
                 >
-                  {suggestion}
+                  <span>{suggestion}</span>
+                  <kbd className="text-[8px] opacity-0 group-hover:opacity-100 transition-opacity">TAB</kbd>
                 </motion.button>
               ))}
             </div>
@@ -268,12 +278,12 @@ export default function Chat() {
                     transition={{ duration: 0.25 }}
                     className={`flex flex-col gap-1.5 ${isUser ? "items-end" : "items-start"}`}
                   >
-                    {/* Speaker Label */}
+                    {/* Speaker Label & High-Precision Telemetry Timestamp */}
                     <div className="flex items-center gap-2 text-[10px] font-mono text-zinc-500 uppercase px-1 tracking-wider">
                       {isUser ? <User className="w-3 h-3 text-zinc-400" /> : <VectorAIIcon className="w-3.5 h-3.5 text-[#00FF66]" />}
-                      <span>{isUser ? "You" : <span><strong className="text-[#00FF66]">PDF</strong> Scholar AI</span>}</span>
-                      <span>•</span>
-                      <span>{msg.timestamp}</span>
+                      <span>{isUser ? "OPERATOR" : <span><strong className="text-[#00FF66]">PDF</strong> SCHOLAR // AI</span>}</span>
+                      <span>//</span>
+                      <span>{msg.timestamp || new Date().toLocaleTimeString()} UTC</span>
                     </div>
 
                     <div
@@ -408,10 +418,18 @@ export default function Chat() {
             <Send className="w-4 h-4 text-black" />
           </motion.button>
         </form>
-        <div className="max-w-4xl mx-auto flex items-center justify-center gap-2 text-[10px] text-zinc-500 mt-2 font-mono uppercase tracking-widest">
-          <span>VECTOR_RETRIEVAL // GROUNDED</span>
-          <span>•</span>
-          <span className="text-[#00FF66]">COSINE_SIMILARITY</span>
+        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-1.5 text-[10px] text-zinc-500 mt-2.5 font-mono uppercase tracking-wider px-1">
+          <div className="flex items-center gap-2">
+            <span>DISPATCH:</span>
+            <kbd className="kbd-badge kbd-badge-green">↵ ENTER</kbd>
+            <span className="text-zinc-700">//</span>
+            <span>CLEAR:</span>
+            <kbd className="kbd-badge">ESC</kbd>
+          </div>
+          <div className="flex items-center gap-1.5 text-zinc-400">
+            <span className="status-led-green" />
+            <span>COSINE_SIMILARITY // STREAMING_ENGINE_v2</span>
+          </div>
         </div>
       </div>
     </div>

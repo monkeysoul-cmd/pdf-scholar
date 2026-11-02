@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import VectorAIIcon from "./VectorAIIcon";
 import { motion } from "motion/react";
+import { playClick, playBlip, playChime } from "../lib/sound-effects";
 
 export default function Upload() {
   const { fetchDocuments, selectDocument, setTab, authenticatedFetch } = useAppState();
@@ -77,6 +78,7 @@ export default function Upload() {
       return;
     }
 
+    playClick();
     setFile(pdfFile);
     setStatus("reading");
     setCurrentStep(0);
@@ -99,6 +101,7 @@ export default function Upload() {
 
       const base64Str = await base64Promise;
       
+      playBlip();
       setCurrentStep(1);
       setStatus("processing");
 
@@ -118,8 +121,10 @@ export default function Upload() {
         throw new Error(data.error || "Failed to ingest document.");
       }
 
+      playBlip();
       setCurrentStep(3);
       await new Promise(resolve => setTimeout(resolve, 600));
+      playChime();
       setCurrentStep(4);
       setStatus("success");
 
@@ -191,11 +196,12 @@ export default function Upload() {
             <div className="w-14 h-14 bg-white/[0.04] border border-white/10 text-[#00FF66] flex items-center justify-center mx-auto mb-4 rounded-lg shadow-inner relative z-10 group-hover:border-[#00FF66]/50 transition-colors">
               <UploadCloud className="w-7 h-7 drop-shadow-[0_0_8px_currentColor]" />
             </div>
-            <h3 className="font-mono font-bold text-white text-xs sm:text-sm uppercase tracking-wider">
-              DRAG & DROP PDF OR [ BROWSE SYSTEM ]
+            <h3 className="font-mono font-bold text-white text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-2 flex-wrap">
+              <span>DRAG & DROP PDF OR</span>
+              <kbd className="kbd-badge kbd-badge-green">[ BROWSE SYSTEM ]</kbd>
             </h3>
             <p className="text-zinc-500 text-[10px] mt-2 font-mono uppercase tracking-wide">
-              MAX_SIZE: 10.0 MB // ENCODING: PDF_STREAMS // 3,072-DIM CHUNKING
+              MAX_PAYLOAD: 10.0 MB // ENCODING: UTF-8 // 3,072-DIM CHUNKING
             </p>
           </motion.div>
         )}
@@ -245,17 +251,22 @@ export default function Upload() {
                       <Icon className="w-4 h-4" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <h4 className={`text-xs font-mono font-bold uppercase tracking-wider ${
-                          isCompleted ? "text-[#00FF66]" : isActive ? "text-white" : "text-zinc-500"
-                        }`}>
-                          {step.title}
-                        </h4>
-                        {isCompleted && (
-                          <span className="text-[9px] bg-[#00FF66] text-black px-1.5 py-0.5 rounded font-mono font-black tracking-widest">
-                            DONE
-                          </span>
-                        )}
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <h4 className={`text-xs font-mono font-bold uppercase tracking-wider ${
+                            isCompleted ? "text-[#00FF66]" : isActive ? "text-white" : "text-zinc-500"
+                          }`}>
+                            {step.title}
+                          </h4>
+                          {isCompleted && (
+                            <span className="text-[9px] bg-[#00FF66] text-black px-1.5 py-0.5 rounded font-mono font-black tracking-widest">
+                              DONE
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-[9px] font-mono text-zinc-500">
+                          {isCompleted ? `T+0.${index * 3}s` : isActive ? "IN_PROGRESS" : "QUEUED"}
+                        </span>
                       </div>
                       <p className="text-[10px] text-zinc-400 font-mono uppercase mt-0.5">{step.desc}</p>
                     </div>

@@ -27,11 +27,23 @@ import {
 import VectorAIIcon from "./VectorAIIcon";
 import PDFScholarLogo from "./PDFScholarLogo";
 import { motion, AnimatePresence } from "motion/react";
+import { playClick, playBlip } from "../lib/sound-effects";
 
 export default function Overview() {
   const { documents = [], quizScores = [], setTab, selectDocument, selectedDocumentId } = useAppState();
   const [activeModal, setActiveModal] = useState(null);
   const [selectedHeatmapCell, setSelectedHeatmapCell] = useState(null);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape" && activeModal) {
+        playClick();
+        setActiveModal(null);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [activeModal]);
   
   const totalDocuments = documents.length;
   const totalPages = documents.reduce((acc, doc) => acc + (doc.pageCount || 0), 0);
@@ -713,7 +725,10 @@ export default function Overview() {
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.08 }}
-                onClick={() => setActiveModal(stat.id)}
+                onClick={() => {
+                  playBlip();
+                  setActiveModal(stat.id);
+                }}
                 className={`glass-tile glass-tile-interactive hud-bracket ${stat.tileClass || ""} p-5 sm:p-6 rounded-lg relative group overflow-hidden shadow-2xl cursor-pointer ${stat.glow}`}
               >
                 {/* Top Specular Light Bevel */}
@@ -764,7 +779,10 @@ export default function Overview() {
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: (index + 3) * 0.08 }}
-                onClick={() => setActiveModal(stat.id)}
+                onClick={() => {
+                  playBlip();
+                  setActiveModal(stat.id);
+                }}
                 className={`glass-tile glass-tile-interactive hud-bracket ${stat.tileClass || ""} p-5 sm:p-6 rounded-lg relative group overflow-hidden shadow-2xl cursor-pointer ${stat.glow}`}
               >
                 {/* Top Specular Light Bevel */}
@@ -1021,11 +1039,15 @@ export default function Overview() {
                       </h3>
                     </div>
                     <button
-                      onClick={() => setActiveModal(null)}
-                      className="p-2 bg-white/5 hover:bg-white/15 border border-white/10 text-zinc-300 hover:text-white rounded-lg transition-all cursor-pointer shrink-0"
-                      title="Close Window"
+                      onClick={() => {
+                        playClick();
+                        setActiveModal(null);
+                      }}
+                      className="flex items-center gap-1.5 px-2 py-1 bg-white/5 hover:bg-white/15 border border-white/10 text-zinc-300 hover:text-white rounded-lg transition-all cursor-pointer shrink-0 font-mono text-[10px]"
+                      title="Close Window (ESC)"
                     >
-                      <X className="w-4 h-4" />
+                      <kbd className="kbd-badge text-[8px]">ESC</kbd>
+                      <X className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 );
