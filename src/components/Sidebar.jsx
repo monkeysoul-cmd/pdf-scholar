@@ -57,14 +57,14 @@ export default function Sidebar() {
     <aside
       className={`${
         collapsed ? "w-16 sm:w-20" : "w-[260px] sm:w-[270px]"
-      } bg-black/60 backdrop-blur-2xl text-white border-r border-white/10 flex flex-col h-full select-none relative shadow-2xl transition-all duration-300 ease-in-out shrink-0 z-50`}
+      } bg-[#08090C] text-white border-r border-white/[0.08] flex flex-col h-full select-none relative shadow-2xl transition-all duration-300 ease-in-out shrink-0 z-50`}
       id="sidebar-container"
     >
-      <div className="absolute inset-0 bg-noise opacity-40 pointer-events-none" />
+      <div className="absolute inset-0 bg-noise opacity-30 pointer-events-none" />
 
       {/* Header */}
       <div
-        className={`border-b border-white/10 relative z-10 ${
+        className={`border-b border-white/[0.08] relative z-10 ${
           collapsed ? "py-4 px-2 flex flex-col items-center gap-3" : "px-4 py-4 sm:py-5 flex items-center justify-between gap-2"
         }`}
       >
@@ -73,14 +73,14 @@ export default function Sidebar() {
             <motion.div
               whileHover={{ scale: 1.05 }}
               onClick={() => setIsCollapsed(false)}
-              className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-[#00FF66] shrink-0 cursor-pointer shadow-inner"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-white/[0.04] border border-white/10 flex items-center justify-center text-[#00FF66] shrink-0 cursor-pointer shadow-inner"
               title="Expand PDF Scholar Hub"
             >
               <PDFScholarLogo className="w-4 h-4 sm:w-5 sm:h-5 text-[#00FF66]" />
             </motion.div>
             <button
               onClick={() => setIsCollapsed(false)}
-              className="w-7 h-7 sm:w-8 sm:h-8 bg-white/5 hover:bg-[#00FF66] text-zinc-400 hover:text-black border border-white/10 hover:border-[#00FF66] rounded-full transition-all flex items-center justify-center cursor-pointer shrink-0"
+              className="w-7 h-7 sm:w-8 sm:h-8 bg-white/5 hover:bg-[#00FF66] text-zinc-400 hover:text-black border border-white/10 hover:border-[#00FF66] rounded-md transition-all flex items-center justify-center cursor-pointer shrink-0"
               title="Expand Sidebar"
             >
               <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
@@ -91,33 +91,33 @@ export default function Sidebar() {
             <div className="flex items-center gap-2.5 min-w-0 flex-nowrap">
               <motion.div
                 whileHover={{ scale: 1.05 }}
-                className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-[#00FF66] shrink-0 shadow-inner"
+                className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-white/[0.04] border border-white/10 flex items-center justify-center text-[#00FF66] shrink-0 shadow-inner"
               >
                 <PDFScholarLogo className="w-4 h-4 sm:w-5 sm:h-5 text-[#00FF66]" />
               </motion.div>
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="min-w-0 flex-1">
                 <div className="flex items-center gap-1 font-black text-base sm:text-[17px] tracking-tight leading-none whitespace-nowrap">
-                  <span className="text-[#00FF66] drop-shadow-[0_0_12px_rgba(0,255,102,0.35)] shrink-0">PDF</span>
-                  <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-zinc-100 to-zinc-400 whitespace-nowrap truncate">
+                  <span className="text-[#00FF66] shrink-0">PDF</span>
+                  <span className="text-white whitespace-nowrap truncate">
                     Scholar Hub
                   </span>
                 </div>
-                <div className="flex items-center gap-1.5 text-[9px] font-mono tracking-wider text-zinc-500 uppercase mt-1 whitespace-nowrap">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#00FF66] animate-pulse shrink-0" />
-                  <span>Vector AI Active</span>
+                <div className="flex items-center gap-1.5 text-[9px] font-mono tracking-widest text-zinc-400 uppercase mt-1 whitespace-nowrap">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#00FF66] shadow-[0_0_6px_#00FF66] shrink-0" />
+                  <span>SYS // ONLINE</span>
                 </div>
               </motion.div>
             </div>
             <button
               onClick={() => setIsCollapsed(true)}
-              className="hidden md:flex p-1.5 bg-white/5 hover:bg-[#00FF66] text-zinc-400 hover:text-black border border-white/10 hover:border-[#00FF66] rounded-full transition-all cursor-pointer shrink-0 items-center justify-center"
+              className="hidden md:flex p-1.5 bg-white/5 hover:bg-[#00FF66] text-zinc-400 hover:text-black border border-white/10 hover:border-[#00FF66] rounded-md transition-all cursor-pointer shrink-0 items-center justify-center"
               title="Collapse Sidebar"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
             <button
               onClick={() => setIsMobileOpen(false)}
-              className="flex md:hidden p-1.5 bg-white/5 hover:bg-white/15 text-zinc-400 hover:text-white border border-white/10 rounded-full transition-all cursor-pointer shrink-0 items-center justify-center"
+              className="flex md:hidden p-1.5 bg-white/5 hover:bg-white/15 text-zinc-400 hover:text-white border border-white/10 rounded-md transition-all cursor-pointer shrink-0 items-center justify-center"
               title="Close Navigation"
             >
               <X className="w-4 h-4" />
@@ -227,10 +227,10 @@ export default function Sidebar() {
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
-                  className="p-3.5 sm:p-4 glass-card border-l-2 border-l-[#00FF66] rounded-xl flex flex-col gap-3 relative group/doc shadow-lg overflow-hidden"
+                  className="p-3.5 sm:p-4 terminal-panel hud-bracket hud-bracket-accent border-l-2 border-l-[#00FF66] rounded-lg flex flex-col gap-3 relative group/doc shadow-lg overflow-hidden"
                 >
                   <div className="flex items-start gap-3 relative z-10">
-                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center shrink-0 mt-0.5 shadow-inner">
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-md bg-white/[0.04] border border-white/10 flex items-center justify-center shrink-0 mt-0.5 shadow-inner">
                       <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#00FF66] drop-shadow-sm" />
                     </div>
                     <div className="min-w-0 flex-1">
@@ -238,9 +238,9 @@ export default function Sidebar() {
                         {activeDoc.name}
                       </div>
                       <div className="text-[10px] font-mono text-zinc-400 mt-1 flex items-center gap-1.5">
-                        <span>{activeDoc.pageCount || 1} Pgs</span>
-                        <span>•</span>
-                        <span>{activeDoc.chunkCount || 0} Chnks</span>
+                        <span>{activeDoc.pageCount || 1} PGS</span>
+                        <span>//</span>
+                        <span>{activeDoc.chunkCount || 0} CHUNKS</span>
                       </div>
                     </div>
                   </div>
@@ -249,16 +249,16 @@ export default function Sidebar() {
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => setTab("chat")}
-                      className="flex-1 text-center bg-gradient-to-r from-[#00FF66] to-[#00E55B] hover:from-[#00E55B] hover:to-[#00CC55] text-black font-extrabold text-[10px] uppercase tracking-wider py-2 rounded-lg transition-all shadow-[0_0_12px_rgba(0,255,102,0.25)] cursor-pointer"
+                      className="flex-1 text-center bg-[#00FF66] hover:bg-[#1aff75] text-black font-mono font-black text-[10px] uppercase tracking-wider py-2 rounded transition-all shadow-[0_0_12px_rgba(0,255,102,0.25)] cursor-pointer"
                     >
-                      Chat with PDF
+                      [ OPEN CHAT ]
                     </motion.button>
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={() => deleteDocument(activeDoc.id)}
                       title="Delete Document"
-                      className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 hover:border-red-500/40 rounded-lg transition-all cursor-pointer"
+                      className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 hover:border-red-500/40 rounded transition-all cursor-pointer"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </motion.button>
@@ -266,8 +266,8 @@ export default function Sidebar() {
                 </motion.div>
               )
             ) : !collapsed ? (
-              <div className="text-[11px] font-mono text-zinc-500 p-4 border border-dashed border-white/10 rounded-xl text-center uppercase bg-white/5">
-                No Document Selected
+              <div className="text-[10px] font-mono text-zinc-500 p-3.5 border border-dashed border-white/10 rounded-lg text-center uppercase bg-white/[0.02]">
+                NO TARGET MOUNTED
               </div>
             ) : null}
           </AnimatePresence>
@@ -275,24 +275,24 @@ export default function Sidebar() {
       </nav>
 
       {/* User Profile & Sign Out */}
-      <div className={`${collapsed ? "p-2 sm:p-3" : "p-4 sm:p-5"} border-t border-white/10 flex flex-col gap-3 text-xs font-mono uppercase tracking-wider shrink-0 relative z-10`}>
+      <div className={`${collapsed ? "p-2 sm:p-3" : "p-4 sm:p-5"} border-t border-white/[0.08] flex flex-col gap-2.5 text-xs font-mono uppercase tracking-wider shrink-0 relative z-10`}>
         {!collapsed ? (
           <>
-            <div className="flex items-center justify-between text-[11px] text-zinc-400 glass-card p-3 rounded-xl">
+            <div className="flex items-center justify-between text-[10px] text-zinc-400 terminal-panel p-2.5 rounded-lg border border-white/[0.06]">
               <div className="flex items-center gap-2 min-w-0">
                 <Cloud className="w-3.5 h-3.5 text-[#00FF66] shrink-0" />
-                <span className="truncate">User: <strong className="text-white drop-shadow-sm">{user?.username}</strong></span>
+                <span className="truncate">OP // <strong className="text-white drop-shadow-sm">{user?.username}</strong></span>
               </div>
-              <div className="w-2 h-2 rounded-full bg-[#00FF66] shadow-[0_0_8px_#00FF66] animate-pulse shrink-0" />
+              <div className="status-led-green shrink-0" />
             </div>
             <motion.button
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.98 }}
               onClick={logout}
-              className="w-full py-3 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/40 text-red-400 hover:text-red-300 rounded-xl text-[10px] font-extrabold uppercase tracking-wider transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+              className="w-full py-2.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/40 text-red-400 hover:text-red-300 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm"
             >
               <LogOut className="w-3.5 h-3.5" />
-              <span>Sign Out</span>
+              <span>TERMINATE SESSION</span>
             </motion.button>
           </>
         ) : (
@@ -301,7 +301,7 @@ export default function Sidebar() {
             whileTap={{ scale: 0.95 }}
             onClick={logout}
             title={`Sign Out (${user?.username})`}
-            className="w-full py-3 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/40 text-red-400 rounded-xl flex items-center justify-center transition-colors cursor-pointer"
+            className="w-full py-2.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/40 text-red-400 rounded-lg flex items-center justify-center transition-colors cursor-pointer"
           >
             <LogOut className="w-4 h-4" />
           </motion.button>
