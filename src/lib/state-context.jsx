@@ -3,7 +3,14 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 const StateContext = createContext(undefined);
 
 export function StateProvider({ children }) {
-  const [token, setToken] = useState(() => localStorage.getItem("pdf_scholar_token") || null);
+  const [token, setToken] = useState(() => {
+    try {
+      const saved = localStorage.getItem("pdf_scholar_token");
+      return (saved && typeof saved === "string" && saved.split(".").length === 3) ? saved : null;
+    } catch {
+      return null;
+    }
+  });
   const [user, setUser] = useState(() => {
     try {
       const saved = localStorage.getItem("pdf_scholar_user");
