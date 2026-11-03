@@ -16,6 +16,8 @@ let client = null;
 let db = null;
 
 // In-Memory User Store fallback when MongoDB is unreachable
+const MAX_IN_MEMORY_USERS = 5000;
+
 class InMemoryUserStore {
   constructor() {
     this.users = new Map(); // username.toLowerCase() -> userDoc
@@ -37,6 +39,9 @@ class InMemoryUserStore {
   }
 
   async insertOne(doc) {
+    if (this.users.size >= MAX_IN_MEMORY_USERS) {
+      throw new Error(`User registration limit (${MAX_IN_MEMORY_USERS}) reached for in-memory store. Please configure MongoDB for production scale.`);
+    }
     const id = doc._id || `user_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
     const userDoc = {
       ...doc,
