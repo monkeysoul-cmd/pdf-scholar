@@ -8,12 +8,11 @@ import {
   XCircle,
   Layers,
   Cloud,
-  Smile,
+  Check,
   ArrowRight
 } from "lucide-react";
-import VectorAIIcon from "./VectorAIIcon";
 import { motion } from "motion/react";
-import { playClick, playBlip, playChime } from "../lib/sound-effects";
+import { playClick, playChime } from "../lib/sound-effects";
 
 export default function Upload() {
   const { fetchDocuments, selectDocument, setTab, authenticatedFetch } = useAppState();
@@ -25,10 +24,10 @@ export default function Upload() {
   const fileInputRef = useRef(null);
 
   const steps = [
-    { title: "Opening PDF file", desc: "Reading the contents of your document", icon: FileText },
-    { title: "Splitting into Pages", desc: "Organizing topics and key concepts", icon: Layers },
-    { title: "Saving to Vector Store", desc: "Storing document safely in vector database", icon: Cloud },
-    { title: "Getting your study partner ready", desc: "Setting up your academic discussion partner", icon: Smile },
+    { title: "Reading PDF", desc: "Extracting text and structure", icon: FileText },
+    { title: "Page-aware chunking", desc: "Dividing content into semantic sections", icon: Layers },
+    { title: "Indexing vectors", desc: "Computing embeddings for hybrid search", icon: Cloud },
+    { title: "Ready", desc: "Document ready for search and discussion", icon: Check },
   ];
 
   const handleDrag = (e) => {
@@ -58,83 +57,80 @@ export default function Upload() {
     e.target.value = "";
   };
 
-  const showError = (msg) => {
-    setStatus("error");
-    setErrorMessage(msg);
+  const fileToBase64 = (fileToConvert) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(fileToConvert);
+      reader.onload = () => {
+        const base64String = reader.result.split(",")[1];
+        resolve(base64String);
+      };
+      reader.onerror = (error) => reject(error);
+    });
   };
 
-  const handleUpload = async (pdfFile) => {
-    const isPdf = pdfFile.type === "application/pdf" || 
-                  pdfFile.type === "application/x-pdf" || 
-                  pdfFile.name?.toLowerCase().endsWith(".pdf");
-    if (!isPdf) {
-      showError("Invalid file format. Please upload a PDF document.");
+  const handleUpload = async (uploadedFile) => {
+    if (!uploadedFile) return;
+
+    if (uploadedFile.type !== "application/pdf" && !uploadedFile.name.toLowerCase().endsWith(".pdf")) {
+      setStatus("error");
+      setErrorMessage("Please select a valid PDF file.");
       return;
     }
 
-    const MAX_FILE_SIZE = 25 * 1024 * 1024;
-    if (pdfFile.size > MAX_FILE_SIZE) {
-      showError("File size exceeds 25MB limit. Please upload a smaller PDF.");
+    if (uploadedFile.size > 20 * 1024 * 1024) {
+      setStatus("error");
+      setErrorMessage("File exceeds 20MB limit. Please upload a smaller document.");
       return;
     }
 
     playClick();
-    setFile(pdfFile);
+    setFile(uploadedFile);
     setStatus("reading");
     setCurrentStep(0);
     setErrorMessage("");
 
     try {
-      const base64Promise = new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => {
-          if (typeof reader.result === "string") {
-            const base64 = reader.result.split(",")[1];
-            resolve(base64);
-          } else {
-            reject(new Error("Failed to read file buffer"));
-          }
-        };
-        reader.onerror = () => reject(reader.error);
-        reader.readAsDataURL(pdfFile);
-      });
-
-      const base64Str = await base64Promise;
-      
-      playBlip();
-      setCurrentStep(1);
+      const base64Data = await fileToBase64(uploadedFile);
       setStatus("processing");
+      setCurrentStep(1);
+
+      const stepTimer1 = setTimeout(() => setCurrentStep(2), 600);
+      const stepTimer2 = setTimeout(() => setCurrentStep(3), 1200);
 
       const response = await authenticatedFetch("/api/ingest", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({
-          pdfBase64: base64Str,
-          filename: pdfFile.name,
-          size: pdfFile.size,
+          pdfBase64: base64Data,
+          filename: uploadedFile.name,
+          size: uploadedFile.size,
         }),
       });
 
+      clearTimeout(stepTimer1);
+      clearTimeout(stepTimer2);
+
       const data = await response.json();
 
-      if (!response.ok || data.error) {
-        throw new Error(data.error || "Failed to ingest document.");
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to process document.");
       }
 
-      playBlip();
       setCurrentStep(3);
-      await new Promise(resolve => setTimeout(resolve, 600));
-      playChime();
-      setCurrentStep(4);
       setStatus("success");
+      playChime();
 
       await fetchDocuments();
-      if (data.document && data.document.id) {
+      if (data.document?.id) {
         selectDocument(data.document.id);
       }
     } catch (err) {
-      console.error(err);
-      showError(err.message || "An unexpected error occurred during ingestion.");
+      console.error("Upload error:", err);
+      setStatus("error");
+      setErrorMessage(err.message || "An unexpected error occurred during processing.");
     }
   };
 
@@ -150,39 +146,35 @@ export default function Upload() {
   };
 
   return (
-    <div className="flex-1 pt-16 md:pt-0 px-4 sm:px-8 pb-8 bg-tactical-grid overflow-y-auto min-h-0 flex flex-col items-center justify-center relative select-text-content z-0" id="upload-view">
+    <div className="flex-1 pt-16 md:pt-0 px-4 sm:px-8 pb-8 bg-[#07080B] overflow-y-auto min-h-0 flex flex-col items-center justify-center relative select-text-content z-0" id="upload-view">
       <motion.div
-        initial={{ opacity: 0, y: 15, scale: 0.98 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        className="max-w-2xl w-full terminal-panel hud-bracket hud-bracket-accent laser-top bg-noise rounded-xl p-6 sm:p-8 md:p-10 relative z-10 my-auto shadow-2xl"
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.2 }}
+        className="max-w-xl w-full bg-[#0B0D13] border border-white/[0.08] rounded-xl p-6 sm:p-8 relative z-10 my-auto shadow-xl"
       >
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="terminal-badge terminal-badge-green mb-3">
-            INGESTION_BAY // PDF_PARSER_v2
-          </div>
-          <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white uppercase drop-shadow-sm">
-            MOUNT TARGET DOCUMENT
+        <div className="text-center mb-6">
+          <h2 className="text-xl font-semibold text-white tracking-tight">
+            Upload Document
           </h2>
-          <p className="text-[11px] text-zinc-400 max-w-md mx-auto uppercase font-mono mt-1.5">
-            LOAD RESEARCH PAPERS, TEXTBOOKS, OR NOTES INTO THE VECTOR STORE
+          <p className="text-xs text-zinc-400 mt-1 max-w-sm mx-auto">
+            Upload research papers, textbooks, or study notes to index them for search and questions.
           </p>
         </div>
 
         {/* Upload Drop Zone */}
         {status === "idle" && (
-          <motion.div
-            whileHover={{ scale: 1.005 }}
-            whileTap={{ scale: 0.995 }}
+          <div
             onDragEnter={handleDrag}
             onDragOver={handleDrag}
             onDragLeave={handleDrag}
             onDrop={handleDrop}
             onClick={triggerFileSelect}
-            className={`hud-bracket border border-dashed rounded-lg p-6 sm:p-10 md:p-12 text-center cursor-pointer transition-all relative overflow-hidden group ${
+            className={`border border-dashed rounded-xl p-8 sm:p-10 text-center cursor-pointer transition-colors relative overflow-hidden group ${
               dragActive
-                ? "border-[#00FF66] bg-[#00FF66]/10 shadow-[0_0_20px_rgba(0,255,102,0.2)]"
-                : "border-white/15 hover:border-[#00FF66]/60 bg-black/40 hover:bg-white/[0.02]"
+                ? "border-[#00FF66] bg-[#00FF66]/5"
+                : "border-white/15 hover:border-white/30 bg-black/30 hover:bg-white/[0.02]"
             }`}
             id="drop-zone"
           >
@@ -193,84 +185,70 @@ export default function Upload() {
               accept="application/pdf"
               className="hidden"
             />
-            <div className="w-14 h-14 bg-white/[0.04] border border-white/10 text-[#00FF66] flex items-center justify-center mx-auto mb-4 rounded-lg shadow-inner relative z-10 group-hover:border-[#00FF66]/50 transition-colors">
-              <UploadCloud className="w-7 h-7 drop-shadow-[0_0_8px_currentColor]" />
+            <div className="w-12 h-12 bg-white/[0.04] border border-white/10 text-[#00FF66] flex items-center justify-center mx-auto mb-3 rounded-lg group-hover:border-[#00FF66]/40 transition-colors">
+              <UploadCloud className="w-6 h-6" />
             </div>
-            <h3 className="font-mono font-bold text-white text-xs sm:text-sm uppercase tracking-wider flex items-center justify-center gap-2 flex-wrap">
-              <span>DRAG & DROP PDF OR</span>
-              <kbd className="kbd-badge kbd-badge-green">[ BROWSE SYSTEM ]</kbd>
-            </h3>
-            <p className="text-zinc-500 text-[10px] mt-2 font-mono uppercase tracking-wide">
-              MAX_PAYLOAD: 10.0 MB // ENCODING: UTF-8 // 3,072-DIM CHUNKING
+            <p className="text-sm font-medium text-zinc-200">
+              Drag and drop your PDF here, or <span className="text-[#00FF66] hover:underline">browse files</span>
             </p>
-          </motion.div>
+            <p className="text-zinc-500 text-xs mt-1.5 font-mono">
+              PDF documents up to 20MB
+            </p>
+          </div>
         )}
 
         {/* Stepper Progress */}
         {(status === "reading" || status === "processing") && (
           <div className="space-y-4" id="progress-stepper">
-            <div className="terminal-panel rounded-lg p-4 flex items-center gap-4 border-l-2 border-l-[#00FF66]">
-              <Loader2 className="w-5 h-5 text-[#00FF66] animate-spin shrink-0" />
+            <div className="bg-white/[0.03] border border-white/[0.08] rounded-lg p-3.5 flex items-center gap-3.5">
+              <Loader2 className="w-4 h-4 text-[#00FF66] animate-spin shrink-0" />
               <div className="min-w-0 flex-1">
-                <span className="text-xs font-mono font-bold text-white block truncate uppercase tracking-wider">
-                  PARSING // {file?.name}
+                <span className="text-xs font-medium text-white block truncate">
+                  Processing: {file?.name}
                 </span>
-                <span className="text-[10px] text-zinc-400 font-mono uppercase">
-                  EXTRACTING VECTOR TOKENS & GENERATING EMBEDDINGS...
+                <span className="text-[11px] text-zinc-400">
+                  Extracting text and generating vector embeddings...
                 </span>
               </div>
             </div>
 
-            <div className="space-y-2.5">
+            <div className="space-y-2">
               {steps.map((step, index) => {
                 const Icon = step.icon;
                 const isCompleted = index < currentStep;
                 const isActive = index === currentStep;
 
                 return (
-                  <motion.div
+                  <div
                     key={index}
-                    initial={{ opacity: 0, x: -6 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.08 }}
-                    className={`flex items-start gap-3.5 p-3.5 rounded-lg border transition-all ${
+                    className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${
                       isCompleted
                         ? "bg-white/[0.02] border-white/10 text-white"
                         : isActive
-                        ? "terminal-panel border-[#00FF66]/50 shadow-[0_0_15px_rgba(0,255,102,0.1)] border-l-2 border-l-[#00FF66]"
+                        ? "bg-white/[0.04] border-[#00FF66]/30 text-white"
                         : "bg-transparent border-white/5 opacity-40"
                     }`}
                   >
-                    <div className={`p-2 rounded shrink-0 font-mono ${
+                    <div className={`w-7 h-7 rounded flex items-center justify-center shrink-0 ${
                       isCompleted
                         ? "bg-[#00FF66] text-black"
                         : isActive
-                        ? "bg-white text-black animate-pulse"
-                        : "bg-zinc-900 text-zinc-600 border border-zinc-800"
+                        ? "bg-white/[0.1] text-white"
+                        : "bg-zinc-900 text-zinc-600"
                     }`}>
-                      <Icon className="w-4 h-4" />
+                      <Icon className="w-3.5 h-3.5" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-2">
-                          <h4 className={`text-xs font-mono font-bold uppercase tracking-wider ${
-                            isCompleted ? "text-[#00FF66]" : isActive ? "text-white" : "text-zinc-500"
-                          }`}>
-                            {step.title}
-                          </h4>
-                          {isCompleted && (
-                            <span className="text-[9px] bg-[#00FF66] text-black px-1.5 py-0.5 rounded font-mono font-black tracking-widest">
-                              DONE
-                            </span>
-                          )}
-                        </div>
-                        <span className="text-[9px] font-mono text-zinc-500">
-                          {isCompleted ? `T+0.${index * 3}s` : isActive ? "IN_PROGRESS" : "QUEUED"}
+                      <div className="flex items-center justify-between">
+                        <span className={`text-xs font-medium ${isCompleted ? "text-[#00FF66]" : "text-zinc-200"}`}>
+                          {step.title}
+                        </span>
+                        <span className="text-[11px] text-zinc-500 font-mono">
+                          {isCompleted ? "Done" : isActive ? "Working" : "Queued"}
                         </span>
                       </div>
-                      <p className="text-[10px] text-zinc-400 font-mono uppercase mt-0.5">{step.desc}</p>
                     </div>
-                  </motion.div>
+                  </div>
                 );
               })}
             </div>
@@ -279,88 +257,67 @@ export default function Upload() {
 
         {/* Success Screen */}
         {status === "success" && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-center py-6"
-            id="upload-success"
-          >
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: "spring", stiffness: 200 }}
-              className="w-14 h-14 bg-[#00FF66]/10 text-[#00FF66] border border-[#00FF66]/30 flex items-center justify-center mx-auto mb-4 rounded-lg shadow-[0_0_20px_rgba(0,255,102,0.25)]"
-            >
-              <CheckCircle className="w-7 h-7" />
-            </motion.div>
-            <h3 className="font-black text-white text-lg sm:text-xl uppercase tracking-wide">
-              DOCUMENT MOUNTED TO VECTOR STORE
+          <div className="text-center py-4" id="upload-success">
+            <div className="w-12 h-12 bg-[#00FF66]/10 text-[#00FF66] border border-[#00FF66]/30 flex items-center justify-center mx-auto mb-3.5 rounded-xl">
+              <CheckCircle className="w-6 h-6" />
+            </div>
+            <h3 className="font-semibold text-white text-base">
+              Document indexed successfully
             </h3>
-            <p className="text-xs text-zinc-400 mt-2 max-w-sm mx-auto uppercase font-mono">
-              TARGET <strong className="text-[#00FF66] font-bold">"{file?.name}"</strong> READY FOR RETRIEVAL & INFERENCE.
+            <p className="text-xs text-zinc-400 mt-1 max-w-sm mx-auto">
+              "{file?.name}" is ready for research questions and practice quizzes.
             </p>
             
-            <div className="mt-7 flex flex-col sm:flex-row items-center justify-center gap-3">
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+            <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-2.5">
+              <button
                 onClick={() => setTab("chat")}
-                className="w-full sm:w-auto px-5 py-3 bg-[#00FF66] hover:bg-[#1aff75] text-black font-mono font-bold text-xs uppercase tracking-wider rounded-lg transition-all shadow-[0_0_15px_rgba(0,255,102,0.25)] flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full sm:w-auto px-4 py-2.5 bg-[#00FF66] hover:bg-[#1aff75] text-black font-semibold text-xs rounded-lg transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
               >
-                <span>[ INITIALIZE CHAT ]</span>
-                <ArrowRight className="w-4 h-4 text-black" />
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
+                <span>Start Chat</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+              <button
                 onClick={() => setTab("quiz")}
-                className="w-full sm:w-auto px-5 py-3 terminal-panel hover:bg-white/10 text-white font-mono font-bold text-xs uppercase tracking-wider rounded-lg transition-all cursor-pointer border border-white/10"
+                className="w-full sm:w-auto px-4 py-2.5 bg-white/[0.05] hover:bg-white/[0.08] text-white font-medium text-xs rounded-lg transition-colors border border-white/10 cursor-pointer"
               >
-                [ GENERATE QUIZ ]
-              </motion.button>
+                Generate Quiz
+              </button>
               <button
                 onClick={resetUploader}
-                className="w-full sm:w-auto px-4 py-3 text-zinc-400 hover:text-white font-mono font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer"
+                className="w-full sm:w-auto px-3 py-2.5 text-zinc-400 hover:text-white font-medium text-xs transition-colors cursor-pointer"
               >
-                MOUNT ANOTHER
+                Upload another
               </button>
             </div>
-          </motion.div>
+          </div>
         )}
 
         {/* Error Screen */}
         {status === "error" && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-center py-6"
-            id="upload-error"
-          >
-            <div className="w-16 h-16 bg-red-950/40 text-red-400 border border-red-800/40 flex items-center justify-center mx-auto mb-5 rounded-2xl">
-              <XCircle className="w-8 h-8" />
+          <div className="text-center py-4" id="upload-error">
+            <div className="w-12 h-12 bg-red-500/10 text-red-400 border border-red-500/30 flex items-center justify-center mx-auto mb-3.5 rounded-xl">
+              <XCircle className="w-6 h-6" />
             </div>
-            <h3 className="font-black text-white text-lg uppercase tracking-wide">Ingestion Failed</h3>
-            <div className="bg-black/50 text-red-400 border border-red-900/40 rounded-xl p-4 text-xs mt-4 max-w-md mx-auto text-left font-mono break-words normal-case">
+            <h3 className="font-semibold text-white text-base">Upload failed</h3>
+            <div className="bg-black/50 text-red-400 border border-red-500/20 rounded-lg p-3 text-xs mt-3 max-w-md mx-auto text-left font-mono break-words">
               {errorMessage}
             </div>
 
-            <div className="mt-8 flex items-center justify-center gap-3">
-              <motion.button
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
+            <div className="mt-6 flex items-center justify-center gap-2.5">
+              <button
                 onClick={resetUploader}
-                className="px-6 py-3 bg-red-500 hover:bg-red-400 text-white font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer"
+                className="px-4 py-2.5 bg-red-500 hover:bg-red-400 text-white font-semibold text-xs rounded-lg transition-colors cursor-pointer"
               >
-                Try Again
-              </motion.button>
+                Try again
+              </button>
               <button
                 onClick={() => setTab("overview")}
-                className="px-5 py-3 text-zinc-400 hover:text-white font-bold text-xs uppercase tracking-wider transition-colors cursor-pointer"
+                className="px-4 py-2.5 text-zinc-400 hover:text-white font-medium text-xs transition-colors cursor-pointer"
               >
-                Go to Dashboard
+                Go to Overview
               </button>
             </div>
-          </motion.div>
+          </div>
         )}
       </motion.div>
     </div>

@@ -187,9 +187,9 @@ export default function Chat() {
           <div className="w-14 h-14 bg-white/[0.04] border border-white/10 text-[#00FF66] rounded-lg flex items-center justify-center mx-auto mb-4 shadow-inner">
             <MessageSquare className="w-7 h-7 drop-shadow-sm" />
           </div>
-          <h3 className="font-mono font-bold text-white text-base uppercase tracking-wider">NO TARGET MOUNTED</h3>
+          <h3 className="font-mono font-bold text-white text-base uppercase tracking-wider">No document selected</h3>
           <p className="text-xs text-zinc-400 font-mono uppercase mt-2 mb-6 leading-relaxed">
-            SELECT A TARGET DOCUMENT FROM THE SIDEBAR OR INGEST A PDF TO INITIALIZE CHAT.
+            Select a document from the sidebar or upload a PDF to begin chatting.
           </p>
         </motion.div>
       </div>
@@ -204,10 +204,10 @@ export default function Chat() {
         <div>
           <div className="flex items-center gap-2">
             <span className="status-led-green" />
-            <h3 className="font-mono font-bold text-white text-xs uppercase tracking-wider">SYS // RETRIEVAL_CHAT_SESSION</h3>
+            <h3 className="font-mono font-bold text-white text-xs uppercase tracking-wider">Document Chat</h3>
           </div>
           <p className="text-[11px] text-zinc-400 font-mono mt-1 max-w-[200px] sm:max-w-lg truncate uppercase" title={activeDoc?.name}>
-            TARGET: <strong className="text-[#00FF66]">"{activeDoc?.name}"</strong>
+            Document: <strong className="text-[#00FF66] font-medium font-sans">"{activeDoc?.name}"</strong>
           </p>
         </div>
 
@@ -219,7 +219,7 @@ export default function Chat() {
             className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 hover:border-red-500/40 rounded-lg text-[10px] font-mono font-bold uppercase tracking-wider transition-all cursor-pointer"
           >
             <Trash2 className="w-3.5 h-3.5" />
-            <span>RESET LOG</span>
+            <span>Clear chat</span>
           </motion.button>
         )}
       </div>
@@ -281,9 +281,9 @@ export default function Chat() {
                     {/* Speaker Label & High-Precision Telemetry Timestamp */}
                     <div className="flex items-center gap-2 text-[10px] font-mono text-zinc-500 uppercase px-1 tracking-wider">
                       {isUser ? <User className="w-3 h-3 text-zinc-400" /> : <VectorAIIcon className="w-3.5 h-3.5 text-[#00FF66]" />}
-                      <span>{isUser ? "OPERATOR" : <span><strong className="text-[#00FF66]">PDF</strong> SCHOLAR // AI</span>}</span>
-                      <span>//</span>
-                      <span>{msg.timestamp || new Date().toLocaleTimeString()} UTC</span>
+                      <span>{isUser ? "You" : <span>PDF Scholar</span>}</span>
+                      <span>•</span>
+                      <span>{msg.timestamp || new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span>
                     </div>
 
                     <div
@@ -298,7 +298,7 @@ export default function Chat() {
                       {!isUser && !msg.text ? (
                         <div className="flex items-center gap-2 text-zinc-400 py-1">
                           <Loader2 className="w-3.5 h-3.5 text-[#00FF66] animate-spin" />
-                          <span className="font-mono text-[11px] uppercase tracking-wider text-zinc-400">RETRIEVING CONTEXT & INFERRING ANSWER...</span>
+                          <span className="font-mono text-[11px] uppercase tracking-wider text-zinc-400">Searching document and generating answer...</span>
                         </div>
                       ) : (
                         <p className="whitespace-pre-wrap font-sans text-sm">{msg.text}</p>
@@ -310,13 +310,13 @@ export default function Chat() {
                           <div className="flex flex-wrap items-center justify-between gap-2 text-[9px] font-mono font-bold text-zinc-400 uppercase tracking-widest mb-1.5">
                             <div className="flex items-center gap-1.5">
                               <BookOpen className="w-3.5 h-3.5 text-[#00FF66]" />
-                              <span>MATCHED_CHUNKS ({msg.sources.length})</span>
+                              <span>Sources ({msg.sources.length})</span>
                             </div>
                             {(msg.retrievalTimeMs !== undefined || msg.retrievalMethod) && (
                               <div className="flex items-center gap-1.5 text-[9px] font-mono text-[#00FF66] bg-[#00FF66]/10 border border-[#00FF66]/20 px-1.5 py-0.5 rounded">
-                                <span>⚡ {msg.retrievalTimeMs || 1}ms</span>
+                                <span>{msg.retrievalTimeMs || 1}ms</span>
                                 <span>//</span>
-                                <span>{msg.retrievalMethod || "HYBRID_VECTOR"}</span>
+                                <span>{msg.retrievalMethod ? "Hybrid search" : "Vector search"}</span>
                               </div>
                             )}
                           </div>

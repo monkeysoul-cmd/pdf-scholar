@@ -97,7 +97,7 @@ body,
 }
 .glass-tile-green:hover {
   border-color: rgba(0, 255, 102, 0.5);
-  box-shadow: 0 8px 28px -4px rgba(0, 0, 0, 0.8), 0 0 16px -4px rgba(0, 255, 102, 0.25);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
 .glass-tile-cyan {
@@ -107,7 +107,7 @@ body,
 }
 .glass-tile-cyan:hover {
   border-color: rgba(0, 229, 255, 0.5);
-  box-shadow: 0 8px 28px -4px rgba(0, 0, 0, 0.8), 0 0 16px -4px rgba(0, 229, 255, 0.25);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
 .glass-tile-amber {
@@ -117,7 +117,7 @@ body,
 }
 .glass-tile-amber:hover {
   border-color: rgba(255, 184, 0, 0.5);
-  box-shadow: 0 8px 28px -4px rgba(0, 0, 0, 0.8), 0 0 16px -4px rgba(255, 184, 0, 0.25);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
 }
 
 /* Glass Pill Badge Utility */
@@ -143,13 +143,7 @@ body,
 }
 .hud-bracket::before,
 .hud-bracket::after {
-  content: "";
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  pointer-events: none;
-  border-color: rgba(255, 255, 255, 0.25);
-  transition: border-color 0.2s ease;
+  display: none !important;
 }
 .hud-bracket::before {
   top: -1px;
@@ -180,17 +174,10 @@ body,
 .laser-top {
   position: relative;
 }
-.laser-top::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent 0%, #00FF66 30%, #00FF66 70%, transparent 100%);
-  opacity: 0.9;
-  pointer-events: none;
-  z-index: 2;
+.laser-top::before,
+.laser-top-cyan::before,
+.laser-top-amber::before {
+  display: none !important;
 }
 .laser-top-cyan::before {
   background: linear-gradient(90deg, transparent 0%, #00E5FF 30%, #00E5FF 70%, transparent 100%);
@@ -205,21 +192,21 @@ body,
   height: 6px;
   border-radius: 50%;
   background-color: #00FF66;
-  box-shadow: 0 0 6px #00FF66;
+  /* quiet dot */
 }
 .status-led-amber {
   width: 6px;
   height: 6px;
   border-radius: 50%;
   background-color: #FFB800;
-  box-shadow: 0 0 6px #FFB800;
+  /* quiet dot */
 }
 .status-led-cyan {
   width: 6px;
   height: 6px;
   border-radius: 50%;
   background-color: #00E5FF;
-  box-shadow: 0 0 6px #00E5FF;
+  /* quiet dot */
 }
 
 /* Technical Monospace Badge */
