@@ -77,10 +77,10 @@ export default function Sidebar() {
   }, [selectedDocumentId, setTab]);
 
   const menuItems = [
-    { id: "overview", label: "Overview", icon: BookOpen, shortcut: "1" },
-    { id: "upload", label: "Upload PDF", icon: UploadCloud, shortcut: "2" },
-    { id: "quiz", label: "Practice Quiz", icon: GraduationCap, disabled: !selectedDocumentId, shortcut: "3" },
-    { id: "chat", label: "Chat with PDF", icon: MessageSquare, disabled: !selectedDocumentId, shortcut: "4" }
+    { id: "overview", label: "Overview", icon: BookOpen },
+    { id: "upload", label: "Upload PDF", icon: UploadCloud },
+    { id: "quiz", label: "Practice Quiz", icon: GraduationCap, disabled: !selectedDocumentId },
+    { id: "chat", label: "Chat with PDF", icon: MessageSquare, disabled: !selectedDocumentId }
   ];
 
   const activeDoc = documents.find((d) => d.id === selectedDocumentId);
@@ -200,14 +200,11 @@ export default function Sidebar() {
                   <Icon className={`w-4 h-4 transition-colors ${isActive ? "text-black drop-shadow-sm" : "text-zinc-400"}`} />
                   {!collapsed && <span className="font-mono">{item.label}</span>}
                 </div>
-                {!collapsed && (
+                {!collapsed && item.id === "quiz" && selectedDocumentId && !isActive && (
                   <div className="flex items-center gap-1.5 relative z-10">
-                    {item.id === "quiz" && selectedDocumentId && !isActive && (
-                      <span className="text-[9px] font-mono font-bold bg-[#00FF66] text-black px-1.5 py-0.5 rounded shadow-sm">
-                        READY
-                      </span>
-                    )}
-                    <kbd className={`text-[8px] ${isActive ? "text-black border-black/40 bg-black/10" : ""}`}>{item.shortcut}</kbd>
+                    <span className="text-[9px] font-mono font-bold bg-[#00FF66] text-black px-1.5 py-0.5 rounded shadow-sm">
+                      READY
+                    </span>
                   </div>
                 )}
                 {collapsed && isActive && (
