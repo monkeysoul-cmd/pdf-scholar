@@ -128,15 +128,15 @@ export default function Sidebar() {
                 <PDFScholarLogo className="w-4 h-4 sm:w-5 sm:h-5 text-[#00FF66]" />
               </motion.div>
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="min-w-0 flex-1">
-                <div className="flex items-center gap-1 font-black text-base sm:text-[17px] tracking-tight leading-none whitespace-nowrap">
+                <div className="flex items-center gap-1 font-semibold text-base tracking-tight leading-none whitespace-nowrap">
                   <span className="text-[#00FF66] shrink-0">PDF</span>
                   <span className="text-white whitespace-nowrap truncate">
                     Scholar Hub
                   </span>
                 </div>
                 <div className="flex items-center gap-1.5 text-[9px] font-mono tracking-widest text-zinc-400 uppercase mt-1 whitespace-nowrap">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#00FF66] shadow-[0_0_6px_#00FF66] shrink-0" />
-                  <span>SYS // ONLINE</span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#00FF66]  shrink-0" />
+                  <span>Online</span>
                 </div>
               </motion.div>
             </div>
@@ -161,8 +161,8 @@ export default function Sidebar() {
       {/* Nav Menu */}
       <nav className={`flex-1 ${collapsed ? "px-2 sm:px-3" : "px-4 sm:px-5"} py-5 sm:py-6 space-y-4 overflow-y-auto min-h-0 relative z-10`}>
         {!collapsed && (
-          <div className="text-[10px] font-mono tracking-wider text-zinc-500 uppercase font-black px-2">
-            Main Menu
+          <div className="text-xs text-zinc-400 font-medium px-2">
+            Navigation
           </div>
         )}
         <div className="flex flex-col gap-1.5">
@@ -190,19 +190,19 @@ export default function Sidebar() {
                   isDisabled ? "cursor-not-allowed opacity-40 text-zinc-600 bg-transparent" : "cursor-pointer"
                 } ${
                   isActive
-                    ? "text-black bg-[#00FF66] shadow-[0_0_15px_rgba(0,255,102,0.3)] font-black"
+                    ? "text-white bg-white/[0.08] border-l-2 border-[#00FF66] font-medium"
                     : isDisabled
                     ? ""
                     : "text-zinc-400 hover:text-white terminal-panel hover:border-white/20"
                 }`}
               >
                 <div className={`flex items-center ${collapsed ? "justify-center" : "gap-2.5"} relative z-10`}>
-                  <Icon className={`w-4 h-4 transition-colors ${isActive ? "text-black drop-shadow-sm" : "text-zinc-400"}`} />
+                  <Icon className={`w-4 h-4 transition-colors ${isActive ? "text-[#00FF66]" : "text-zinc-400"}`} />
                   {!collapsed && <span className="font-mono">{item.label}</span>}
                 </div>
                 {!collapsed && item.id === "quiz" && selectedDocumentId && !isActive && (
                   <div className="flex items-center gap-1.5 relative z-10">
-                    <span className="text-[9px] font-mono font-bold bg-[#00FF66] text-black px-1.5 py-0.5 rounded shadow-sm">
+                    <span className="text-[10px] bg-[#00FF66]/15 text-[#00FF66] border border-[#00FF66]/30 px-1.5 py-0.5 rounded font-medium">
                       READY
                     </span>
                   </div>
@@ -219,9 +219,9 @@ export default function Sidebar() {
         <div className="pt-5 sm:pt-6">
           {!collapsed && (
             <div className="text-[10px] font-mono tracking-wider text-zinc-500 uppercase font-black mb-3 px-2 flex items-center justify-between">
-              <span>Current Document</span>
+              <span>Current document</span>
               {selectedDocumentId && (
-                <span className="bg-amber-400/20 border border-amber-400/50 text-amber-400 text-[9px] font-black px-2 py-0.5 rounded-full animate-pulse shadow-inner">
+                <span className="bg-[#00FF66]/15 text-[#00FF66] border border-[#00FF66]/30 text-[10px] font-medium px-1.5 py-0.5 rounded">
                   ACTIVE
                 </span>
               )}
@@ -284,9 +284,9 @@ export default function Sidebar() {
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={() => setTab("chat")}
-                      className="flex-1 text-center bg-[#00FF66] hover:bg-[#1aff75] text-black font-mono font-black text-[10px] uppercase tracking-wider py-2 rounded transition-all shadow-[0_0_12px_rgba(0,255,102,0.25)] cursor-pointer"
+                      className="flex-1 text-center bg-[#00FF66] hover:bg-[#1aff75] text-black font-medium text-xs py-2 rounded transition-colors cursor-pointer"
                     >
-                      [ OPEN CHAT ]
+                      Open Chat
                     </motion.button>
                     <motion.button
                       whileHover={{ scale: 1.05 }}
@@ -302,7 +302,7 @@ export default function Sidebar() {
               )
             ) : !collapsed ? (
               <div className="text-[10px] font-mono text-zinc-500 p-3.5 border border-dashed border-white/10 rounded-lg text-center uppercase bg-white/[0.02]">
-                NO TARGET MOUNTED
+                No document selected
               </div>
             ) : null}
           </AnimatePresence>
@@ -316,7 +316,7 @@ export default function Sidebar() {
             <div className="flex items-center justify-between text-[10px] text-zinc-400 terminal-panel p-2.5 rounded-lg border border-white/[0.06]">
               <div className="flex items-center gap-2 min-w-0">
                 <Cloud className="w-3.5 h-3.5 text-[#00FF66] shrink-0" />
-                <span className="truncate">OP // <strong className="text-white drop-shadow-sm">{user?.username}</strong></span>
+                <span className="truncate">User: <strong className="text-white font-medium ml-1">{user?.username}</strong></span>
               </div>
               <div className="status-led-green shrink-0" />
             </div>
@@ -339,10 +339,10 @@ export default function Sidebar() {
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.98 }}
               onClick={logout}
-              className="w-full py-2.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/40 text-red-400 hover:text-red-300 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+              className="w-full py-2.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 hover:text-red-300 rounded-lg text-xs font-medium py-2 transition-colors flex items-center justify-center gap-2 cursor-pointer"
             >
               <LogOut className="w-3.5 h-3.5" />
-              <span>TERMINATE SESSION</span>
+              <span>Sign Out</span>
             </motion.button>
           </>
         ) : (
