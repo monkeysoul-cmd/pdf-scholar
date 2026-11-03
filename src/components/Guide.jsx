@@ -54,23 +54,23 @@ export default function Guide() {
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Header */}
         <div className="border-b border-[#222] pb-6">
-          <h2 className="text-2xl font-black tracking-tight text-white uppercase">How to Use & System Overview</h2>
-          <p className="text-[11px] text-[#00FF66] font-mono uppercase mt-1">
+          <h2 className="text-2xl font-semibold tracking-tight text-white">How to Use & System Overview</h2>
+          <p className="text-xs text-zinc-400 mt-1">
             Learn how PDF documents are processed, indexed, and evaluated with interactive quizzes.
           </p>
         </div>
 
         {/* 1. Processing Pipeline */}
-        <div className="bg-[#101010] border border-[#222] rounded-sm p-6 shadow-2xl">
+        <div className="bg-[#0B0D13] border border-white/[0.08] rounded-xl p-6 shadow-sm">
           <div className="flex items-center gap-2 mb-6">
             <Layers className="w-5 h-5 text-[#00FF66]" />
-            <h3 className="font-black text-white text-sm uppercase tracking-wider">Document Processing Pipeline</h3>
+            <h3 className="font-semibold text-white text-sm">Document Processing Pipeline</h3>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-5 items-center gap-4 text-center select-none" id="rag-diagram">
-            <div className="bg-[#0A0A0A] border border-[#222] p-4 rounded-sm">
+            <div className="bg-white/[0.03] border border-white/[0.08] p-4 rounded-lg">
               <span className="text-[9px] font-mono font-bold text-[#00FF66] block mb-1 uppercase tracking-widest">Step 1</span>
-              <strong className="text-xs font-black text-white block uppercase">Upload PDF</strong>
+              <strong className="text-xs font-semibold text-white block">Upload PDF</strong>
               <span className="text-[9px] text-zinc-500 block font-mono mt-1 uppercase">Read document</span>
             </div>
 
@@ -78,9 +78,9 @@ export default function Guide() {
               <ArrowRight className="w-5 h-5 animate-pulse text-[#00FF66]" />
             </div>
 
-            <div className="bg-[#0A0A0A] border border-[#222] p-4 rounded-sm">
+            <div className="bg-white/[0.03] border border-white/[0.08] p-4 rounded-lg">
               <span className="text-[9px] font-mono font-bold text-[#00FF66] block mb-1 uppercase tracking-widest">Step 2</span>
-              <strong className="text-xs font-black text-white block uppercase">Prepare Text</strong>
+              <strong className="text-xs font-semibold text-white block">Prepare Text</strong>
               <span className="text-[9px] text-zinc-500 block font-mono mt-1 uppercase">Split to sections</span>
             </div>
 
@@ -88,20 +88,20 @@ export default function Guide() {
               <ArrowRight className="w-5 h-5 animate-pulse text-[#00FF66]" />
             </div>
 
-            <div className="bg-[#0A0A0A] border border-[#222] p-4 rounded-sm">
+            <div className="bg-white/[0.03] border border-white/[0.08] p-4 rounded-lg">
               <span className="text-[9px] font-mono font-bold text-[#00FF66] block mb-1 uppercase tracking-widest">Step 3</span>
-              <strong className="text-xs font-black text-white block uppercase">Vector Search</strong>
+              <strong className="text-xs font-semibold text-white block">Vector Search</strong>
               <span className="text-[9px] text-zinc-500 block font-mono mt-1 uppercase">Cloud Vector Engine</span>
             </div>
           </div>
         </div>
 
         {/* 2. Vector Index Setup */}
-        <div className="bg-[#101010] border border-[#222] rounded-sm p-6 shadow-2xl space-y-4">
+        <div className="bg-[#0B0D13] border border-white/[0.08] rounded-xl p-6 shadow-sm space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Cloud className="w-5 h-5 text-[#00FF66]" />
-              <h3 className="font-black text-white text-sm uppercase tracking-wider">Vector Index Schema & Configuration</h3>
+              <h3 className="font-semibold text-white text-sm">Vector Index Schema & Configuration</h3>
             </div>
             <button
               onClick={copyToClipboard}
@@ -131,19 +131,19 @@ export default function Guide() {
         </div>
 
         {/* 3. System Milestones */}
-        <div className="bg-[#101010] border border-[#222] rounded-sm p-6 shadow-2xl">
+        <div className="bg-[#0B0D13] border border-white/[0.08] rounded-xl p-6 shadow-sm">
           <div className="flex items-center gap-2 mb-6">
             <Award className="w-5 h-5 text-[#00FF66]" />
-            <h3 className="font-black text-white text-sm uppercase tracking-wider">Study Engine Highlights</h3>
+            <h3 className="font-semibold text-white text-sm">Study Engine Highlights</h3>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {systemFeatures.map((point, i) => (
-              <div key={i} className="bg-[#0A0A0A] border border-[#222] p-5 rounded-sm relative">
+              <div key={i} className="bg-white/[0.03] border border-white/[0.08] p-5 rounded-lg relative">
                 <span className="absolute top-4 right-4 text-[9px] font-mono font-black text-zinc-600 tracking-widest uppercase">
                   MODULE {i + 1}
                 </span>
-                <h4 className="font-black text-white text-xs uppercase tracking-wider mb-2">{point.title}</h4>
+                <h4 className="font-semibold text-white text-xs mb-1.5">{point.title}</h4>
                 <p className="text-[11px] text-zinc-400 leading-relaxed font-sans">{point.desc}</p>
               </div>
             ))}

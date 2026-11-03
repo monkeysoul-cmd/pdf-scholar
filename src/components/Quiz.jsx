@@ -268,14 +268,14 @@ export default function Quiz() {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="text-center max-w-sm terminal-panel hud-bracket hud-bracket-amber laser-top-amber bg-noise p-8 sm:p-10 rounded-xl relative z-10"
+          className="text-center max-w-sm bg-[#0B0D13] border border-white/10 bg-noise p-8 sm:p-10 rounded-xl relative z-10 shadow-sm"
         >
           <div className="w-14 h-14 bg-white/[0.04] border border-white/10 text-amber-400 rounded-lg flex items-center justify-center mx-auto mb-4 shadow-inner">
             <BrainCircuit className="w-7 h-7 drop-shadow-md" />
           </div>
-          <h3 className="font-mono font-bold text-white text-base uppercase tracking-wider">NO TARGET MOUNTED</h3>
-          <p className="text-xs text-zinc-400 font-mono uppercase mt-2 mb-6 leading-relaxed">
-            SELECT A TARGET DOCUMENT FROM THE SIDEBAR OR INGEST A PDF TO INITIATE SELF-ASSESSMENT.
+          <h3 className="text-base font-semibold text-white tracking-tight">No document selected</h3>
+          <p className="text-xs text-zinc-400 mt-2 mb-6 leading-relaxed">
+            Select a document from the sidebar or upload a PDF to generate a practice quiz.
           </p>
         </motion.div>
       </div>
@@ -295,13 +295,13 @@ export default function Quiz() {
       <div className="mb-8 border-b border-white/[0.08] pb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 relative z-10">
         <div>
           <div className="flex items-center gap-2">
-            <span className="status-led-amber" />
-            <h2 className="text-lg sm:text-2xl font-black tracking-tight text-white uppercase flex items-center gap-2 drop-shadow-sm">
-              EVALUATION // PRACTICE_ASSESSMENT
+            <span className="w-2 h-2 rounded-full bg-amber-400" />
+            <h2 className="text-xl sm:text-2xl font-semibold tracking-tight text-white">
+              Practice Quiz
             </h2>
           </div>
-          <p className="text-xs text-zinc-400 font-mono uppercase mt-1">
-            TARGET: <strong className="text-amber-400">"{activeDoc?.name}"</strong>
+          <p className="text-xs text-zinc-400 mt-1">
+            Document: <strong className="text-zinc-200 font-medium">"{activeDoc?.name}"</strong>
           </p>
         </div>
 
@@ -311,7 +311,7 @@ export default function Quiz() {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={generateQuiz}
-              className="inline-flex items-center gap-2 px-4 py-2 glass-card hover:bg-white/5 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all cursor-pointer shadow-sm"
+              className="inline-flex items-center gap-2 px-4 py-2 glass-card hover:bg-white/5 text-white text-xs font-medium rounded-xl transition-all cursor-pointer shadow-sm"
             >
               <RotateCcw className="w-3.5 h-3.5 text-zinc-400" />
               <span>Regenerate Quiz</span>
@@ -348,9 +348,9 @@ export default function Quiz() {
           <div className="w-14 h-14 bg-white/[0.04] border border-white/10 rounded-lg flex items-center justify-center mx-auto mb-5 shadow-inner">
             <Loader2 className="w-7 h-7 text-amber-400 animate-spin" />
           </div>
-          <h3 className="font-mono font-bold text-white text-base uppercase tracking-wider">SYNTHESIZING {questionCount} QUESTIONS</h3>
+          <h3 className="text-base font-semibold text-white tracking-tight">Generating {questionCount} questions...</h3>
           <p className="text-xs text-zinc-400 mt-2 max-w-xs mx-auto font-mono uppercase leading-relaxed">
-            PARSING DOCUMENT TOPICS & GENERATING ASSESSMENT VECTORS...
+            Analyzing document concepts and synthesizing questions...
           </p>
         </motion.div>
       )}
@@ -365,9 +365,9 @@ export default function Quiz() {
           <div className="w-14 h-14 bg-white/[0.04] border border-white/10 text-amber-400 rounded-lg flex items-center justify-center mx-auto mb-4 shadow-inner">
             <GraduationCap className="w-7 h-7 drop-shadow-md" />
           </div>
-          <h3 className="font-black text-white text-xl uppercase tracking-wide">CONFIGURE ASSESSMENT</h3>
+          <h3 className="text-xl font-semibold text-white tracking-tight">Configure Practice Quiz</h3>
           <p className="text-xs text-zinc-400 font-mono uppercase mt-1.5 mb-5 leading-relaxed">
-            TARGET: <span className="text-amber-400">"{activeDoc?.name}"</span>
+            Document: <span className="text-zinc-200 font-medium">"{activeDoc?.name}"</span>
           </p>
 
           <div className="space-y-5 bg-black/50 border border-white/[0.08] p-5 rounded-lg text-left shadow-inner">
@@ -375,7 +375,7 @@ export default function Quiz() {
               <div className="flex items-center justify-between mb-3">
                 <span className="text-xs font-bold uppercase text-zinc-300 font-mono flex items-center gap-2">
                   <Sliders className="w-4 h-4 text-amber-400" />
-                  QUESTION_COUNT:
+                  Questions:
                 </span>
                 <span className="text-sm font-black text-amber-400 font-mono bg-amber-400/10 px-2.5 py-0.5 border border-amber-400/30 rounded shadow-inner">
                   {questionCount} Qs
@@ -403,7 +403,7 @@ export default function Quiz() {
             {/* Quick Presets */}
             <div>
               <span className="text-[10px] font-mono text-zinc-400 font-bold uppercase tracking-wider block mb-2">
-                PRESETS:
+                Presets:
               </span>
               <div className="grid grid-cols-5 gap-1.5">
                 {[3, 5, 10, 15, 20].map(num => (
@@ -412,7 +412,7 @@ export default function Quiz() {
                     onClick={() => setQuestionCount(num)}
                     className={`py-1.5 rounded text-xs font-mono font-bold transition-all border ${
                       questionCount === num
-                        ? "bg-amber-400 border-amber-400 text-black shadow-[0_0_12px_rgba(251,191,36,0.3)]"
+                        ? "bg-amber-400 border-amber-400 text-black shadow-sm"
                         : "bg-white/5 border-white/10 text-zinc-400 hover:text-white hover:bg-white/10"
                     }`}
                   >
@@ -426,9 +426,9 @@ export default function Quiz() {
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.99 }}
               onClick={generateQuiz}
-              className="w-full py-3.5 bg-amber-400 hover:bg-amber-300 text-black font-mono font-black text-xs uppercase tracking-wider rounded-lg transition-all shadow-[0_0_15px_rgba(251,191,36,0.3)] flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full py-3.5 bg-amber-400 hover:bg-amber-300 text-black font-mono font-black text-xs uppercase tracking-wider rounded-lg transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer"
             >
-              <span>[ INITIALIZE ASSESSMENT ]</span>
+              <span>Start Practice Quiz</span>
               <Sparkles className="w-4 h-4 text-black" />
             </motion.button>
           </div>
@@ -440,14 +440,14 @@ export default function Quiz() {
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="max-w-3xl mx-auto mb-6 terminal-panel hud-bracket hud-bracket-amber bg-noise p-3.5 sm:p-4 rounded-lg flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl sticky top-4 z-20"
+          className="max-w-3xl mx-auto mb-6 bg-[#0B0D13] border border-white/10 bg-noise p-3.5 sm:p-4 rounded-xl flex flex-col sm:flex-row items-center justify-between gap-4 shadow-md sticky top-4 z-20"
         >
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 bg-white/[0.04] border border-white/10 text-amber-400 rounded-md flex items-center justify-center shadow-inner">
               <Trophy className="w-4 h-4 drop-shadow-md" />
             </div>
             <div>
-              <div className="text-[10px] font-mono text-zinc-400 uppercase font-bold tracking-wider">LIVE_SCORE_TELEMETRY</div>
+              <div className="text-[10px] font-mono text-zinc-400 uppercase font-bold tracking-wider">Score & Progress</div>
               <div className="text-base sm:text-lg font-black text-white font-mono flex items-center gap-2">
                 <span>{scores.earnedPoints} / {scores.totalPoints} PTS</span>
                 <span className="text-xs text-amber-400 font-bold">({scores.scorePercent}%)</span>
@@ -457,17 +457,17 @@ export default function Quiz() {
 
           <div className="flex items-center gap-4 text-xs font-mono">
             <div className="text-zinc-400 bg-white/5 px-3 py-1.5 rounded-md border border-white/10">
-              <strong className="text-white">{answeredCount}</strong> / {quizQuestions.length} ANSWERED
+              <strong className="text-white">{answeredCount}</strong> of {quizQuestions.length} answered
             </div>
 
             <motion.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={handleSubmitClick}
-              className="px-4 py-2 bg-amber-400 hover:bg-amber-300 text-black font-mono font-bold text-xs uppercase tracking-wider rounded-md shadow-[0_0_15px_rgba(251,191,36,0.3)] transition-all cursor-pointer flex items-center gap-2"
+              className="px-4 py-2 bg-amber-400 hover:bg-amber-300 text-black font-mono font-bold text-xs uppercase tracking-wider rounded-md shadow-sm transition-all cursor-pointer flex items-center gap-2"
             >
               <Send className="w-3.5 h-3.5 text-black" />
-              <span>SUBMIT ASSESSMENT</span>
+              <span>Submit Quiz</span>
             </motion.button>
           </div>
         </motion.div>
@@ -487,12 +487,12 @@ export default function Quiz() {
                 <AlertTriangle className="w-6 h-6" />
               </div>
 
-              <h3 className="font-mono font-bold text-white text-base uppercase tracking-wider">UNANSWERED_ITEMS_DETECTED</h3>
+              <h3 className="font-mono font-bold text-white text-base uppercase tracking-wider">Unanswered Questions</h3>
               
               <p className="text-xs text-zinc-400 font-mono uppercase leading-relaxed bg-black/50 p-3.5 rounded-lg border border-white/5">
-                YOU HAVE <strong className="text-red-400">{unansweredCount}</strong> UNANSWERED QUESTION(S).
+                You have <strong className="text-red-400">{unansweredCount}</strong> unanswered question(s).
                 <br />
-                SUBMITTING WILL FINALIZE AND SCORE THE CURRENT RESPONSES.
+                Submitting will score only the answered questions.
               </p>
 
               <div className="pt-2 flex flex-col sm:flex-row gap-3">
@@ -500,13 +500,13 @@ export default function Quiz() {
                   onClick={() => setShowConfirmSubmitModal(false)}
                   className="flex-1 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-mono font-bold text-xs uppercase tracking-wider rounded-lg transition-all cursor-pointer"
                 >
-                  RETURN TO ITEMS
+                  Return to Quiz
                 </button>
                 <button
                   onClick={handleFinishQuiz}
-                  className="flex-1 py-2.5 bg-red-500 hover:bg-red-400 text-white font-mono font-bold text-xs uppercase tracking-wider rounded-lg shadow-[0_0_15px_rgba(239,68,68,0.3)] transition-all cursor-pointer"
+                  className="flex-1 py-2.5 bg-red-500 hover:bg-red-400 text-white font-mono font-bold text-xs uppercase tracking-wider rounded-lg shadow-sm transition-all cursor-pointer"
                 >
-                  CONFIRM SUBMISSION
+                  Submit Anyway
                 </button>
               </div>
             </motion.div>
@@ -530,7 +530,7 @@ export default function Quiz() {
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className="terminal-panel hud-bracket hud-bracket-amber bg-noise rounded-lg p-6 md:p-7 shadow-xl flex flex-col gap-4 overflow-hidden relative"
+                className="bg-[#0B0D13] border border-white/[0.08] bg-noise rounded-xl p-6 md:p-7 shadow-sm flex flex-col gap-4 overflow-hidden relative"
               >
                 {/* Accent Top Border */}
                 <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-amber-500 to-amber-300" />
@@ -593,11 +593,11 @@ export default function Quiz() {
                           onClick={() => handleMultipleChoiceSelect(q.id, opt)}
                           className={`w-full text-left p-3.5 rounded-lg border text-xs font-mono tracking-wide transition-all cursor-pointer flex items-center ${
                             shouldHighlightGreen
-                              ? "bg-[#00FF66]/15 border-[#00FF66]/60 text-[#00FF66] shadow-[0_0_15px_rgba(0,255,102,0.2)]"
+                              ? "bg-[#00FF66]/15 border-[#00FF66]/60 text-[#00FF66] "
                               : shouldHighlightRed
                               ? "bg-red-500/20 border-red-500/50 text-red-400"
                               : isSelected
-                              ? "bg-amber-400/20 border-amber-400/50 text-amber-400 shadow-[0_0_15px_rgba(251,191,36,0.2)]"
+                              ? "bg-amber-400/20 border-amber-400/50 text-amber-400 "
                               : hasAnsweredMC
                               ? "bg-black/40 border-white/5 text-zinc-600 cursor-not-allowed"
                               : "terminal-panel border-white/10 text-zinc-300 hover:border-amber-400/50 hover:bg-white/[0.03]"
@@ -632,7 +632,7 @@ export default function Quiz() {
                           whileTap={{ scale: 0.98 }}
                           onClick={() => submitShortAnswer(q.id)}
                           disabled={!(shortAnswersText[q.id] || "").trim()}
-                          className="self-end inline-flex items-center gap-1.5 px-5 py-3 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 disabled:opacity-30 disabled:cursor-not-allowed text-black font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer shadow-[0_0_15px_rgba(251,191,36,0.3)]"
+                          className="self-end inline-flex items-center gap-1.5 px-5 py-3 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 disabled:opacity-30 disabled:cursor-not-allowed text-black font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all cursor-pointer shadow-sm"
                         >
                           <span>Check Answer & Compare</span>
                           <ChevronRight className="w-4 h-4" />
@@ -672,7 +672,7 @@ export default function Quiz() {
                               onClick={() => handleSelfGrade(q.id, "full")}
                               className={`py-3 px-4 text-[10px] font-bold rounded-xl border transition-all tracking-wider flex items-center justify-center gap-2 cursor-pointer ${
                                 gradedSA === "full" || gradedSA === "correct"
-                                  ? "bg-emerald-500/20 border-emerald-500/50 text-emerald-400 shadow-[0_0_15px_rgba(16,185,129,0.2)]"
+                                  ? "bg-emerald-500/20 border-emerald-500/50 text-emerald-400 "
                                   : "glass-card hover:bg-white/5 border-white/10 text-zinc-300"
                               }`}
                             >
@@ -684,7 +684,7 @@ export default function Quiz() {
                               onClick={() => handleSelfGrade(q.id, "partial")}
                               className={`py-3 px-4 text-[10px] font-bold rounded-xl border transition-all tracking-wider flex items-center justify-center gap-2 cursor-pointer ${
                                 gradedSA === "partial" || gradedSA === "needs-review"
-                                  ? "bg-amber-500/20 border-amber-500/50 text-amber-400 shadow-[0_0_15px_rgba(251,191,36,0.2)]"
+                                  ? "bg-amber-500/20 border-amber-500/50 text-amber-400 "
                                   : "glass-card hover:bg-white/5 border-white/10 text-zinc-300"
                               }`}
                             >
@@ -696,7 +696,7 @@ export default function Quiz() {
                               onClick={() => handleSelfGrade(q.id, "incorrect")}
                               className={`py-3 px-4 text-[10px] font-bold rounded-xl border transition-all tracking-wider flex items-center justify-center gap-2 cursor-pointer ${
                                 gradedSA === "incorrect"
-                                  ? "bg-red-500/20 border-red-500/50 text-red-400 shadow-[0_0_15px_rgba(239,68,68,0.2)]"
+                                  ? "bg-red-500/20 border-red-500/50 text-red-400 "
                                   : "glass-card hover:bg-white/5 border-white/10 text-zinc-300"
                               }`}
                             >
@@ -733,7 +733,7 @@ export default function Quiz() {
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
               onClick={handleSubmitClick}
-              className="px-10 py-4 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-black font-black text-sm uppercase tracking-wider rounded-xl shadow-[0_0_30px_rgba(251,191,36,0.3)] transition-all cursor-pointer flex items-center gap-3"
+              className="px-8 py-3.5 bg-amber-400 hover:bg-amber-300 text-black font-semibold text-sm rounded-xl shadow-sm transition-all cursor-pointer flex items-center gap-2.5"
             >
               <Trophy className="w-5 h-5 drop-shadow-sm" />
               <span>Submit Quiz & View Evaluation</span>
@@ -753,41 +753,41 @@ export default function Quiz() {
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 15 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            className="terminal-panel hud-bracket hud-bracket-amber laser-top-amber bg-noise rounded-xl p-6 sm:p-8 md:p-10 text-center shadow-2xl relative overflow-hidden"
+            className="bg-[#0B0D13] border border-white/10 bg-noise rounded-xl p-6 sm:p-8 md:p-10 text-center shadow-sm relative overflow-hidden"
           >
             <div className="w-16 h-16 bg-amber-500/10 border border-amber-500/30 text-amber-400 rounded-lg flex items-center justify-center mx-auto mb-4 shadow-[0_0_20px_rgba(245,158,11,0.2)]">
               <Award className="w-8 h-8 drop-shadow-md" />
             </div>
             
-            <h3 className="font-mono font-black text-white text-xl md:text-2xl uppercase tracking-tight">ASSESSMENT_EVALUATION_REPORT</h3>
+            <h3 className="text-xl md:text-2xl font-semibold text-white tracking-tight">Quiz Evaluation Report</h3>
             <p className="text-xs text-zinc-400 font-mono uppercase mt-1 max-w-sm mx-auto">
-              TARGET: <strong className="text-amber-400">"{activeDoc?.name}"</strong>
+              Document: <strong className="text-zinc-200 font-medium">"{activeDoc?.name}"</strong>
             </p>
 
             {/* Score & Points Grid */}
             <div className="my-5 p-5 bg-black/60 border border-white/[0.08] rounded-lg relative overflow-hidden">
               <div className="text-[10px] font-mono text-zinc-400 uppercase tracking-widest font-bold mb-1">
-                TOTAL_ACCURACY_SCORE
+                Overall Score
               </div>
-              <div className={`text-5xl md:text-6xl font-black font-mono tracking-tight my-2 ${
+              <div className={`text-5xl md:text-6xl font-semibold font-mono tracking-tight my-2 ${
                 scores.scorePercent >= 80 ? "text-[#00FF66]" : scores.scorePercent >= 60 ? "text-amber-400" : "text-rose-400"
               }`}>
                 {scores.scorePercent}%
               </div>
               <div className="text-xs font-mono font-bold text-zinc-300">
-                EARNED: <span className="text-amber-400 font-black">{scores.earnedPoints} / {scores.totalPoints} PTS</span>
+                Score: <span className="text-amber-400 font-semibold">{scores.earnedPoints} / {scores.totalPoints} PTS</span>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3.5 my-5">
               <div className="bg-black/60 border border-white/[0.08] p-3.5 rounded-lg text-center shadow-inner">
-                <span className="text-[10px] font-mono text-zinc-400 block uppercase mb-1 tracking-wider font-bold">MULTIPLE_CHOICE</span>
-                <div className="text-xl font-black text-[#00FF66] tracking-tight">{scores.mcCorrect} / {scores.mcTotal}</div>
+                <span className="text-[10px] font-mono text-zinc-400 block uppercase mb-1 tracking-wider font-bold">Multiple Choice</span>
+                <div className="text-xl font-semibold text-[#00FF66] tracking-tight">{scores.mcCorrect} / {scores.mcTotal}</div>
                 <span className="text-[10px] font-mono text-zinc-500 block mt-0.5">{scores.mcPointsEarned} / {scores.mcPointsTotal} PTS</span>
               </div>
               <div className="bg-black/60 border border-white/[0.08] p-3.5 rounded-lg text-center shadow-inner">
-                <span className="text-[10px] font-mono text-zinc-400 block uppercase mb-1 tracking-wider font-bold">SHORT_RESPONSE</span>
-                <div className="text-base font-black text-amber-400 tracking-tight mt-0.5">
+                <span className="text-[10px] font-mono text-zinc-400 block uppercase mb-1 tracking-wider font-bold">Written Response</span>
+                <div className="text-base font-semibold text-amber-400 tracking-tight mt-0.5">
                   {scores.saFull} FULL // {scores.saPartial} PARTIAL
                 </div>
                 <span className="text-[10px] font-mono text-zinc-500 block mt-0.5">{scores.saPointsEarned} / {scores.saPointsTotal} PTS</span>
@@ -800,23 +800,23 @@ export default function Quiz() {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={resetQuiz}
-                className="py-3 bg-amber-400 hover:bg-amber-300 text-black font-mono font-bold text-xs uppercase tracking-wider rounded-lg transition-all shadow-[0_0_15px_rgba(251,191,36,0.25)] cursor-pointer"
+                className="py-3 bg-amber-400 hover:bg-amber-300 text-black font-mono font-bold text-xs uppercase tracking-wider rounded-lg transition-all shadow-sm cursor-pointer"
               >
-                [ RETRY SET ]
+                Retry Quiz
               </motion.button>
               
               <button
                 onClick={generateQuiz}
                 className="py-3 terminal-panel hover:bg-white/10 text-white font-mono font-bold text-xs uppercase tracking-wider rounded-lg transition-all cursor-pointer border border-white/10"
               >
-                [ NEW SET ({questionCount} Qs) ]
+                New Quiz ({questionCount} Qs)
               </button>
 
               <button
                 onClick={() => setTab("overview")}
                 className="py-3 bg-[#00FF66]/10 hover:bg-[#00FF66]/20 text-[#00FF66] border border-[#00FF66]/30 font-mono font-bold text-xs uppercase tracking-wider rounded-lg transition-all cursor-pointer flex items-center justify-center gap-1.5"
               >
-                <span>[ TELEMETRY HUB ]</span>
+                <span>Return to Overview</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
@@ -824,7 +824,7 @@ export default function Quiz() {
 
           {/* Detailed Question Review List */}
           <div className="space-y-6">
-            <h4 className="text-sm font-black uppercase text-white tracking-wider flex items-center gap-2 border-b border-white/5 pb-3">
+            <h4 className="text-sm font-semibold text-white flex items-center gap-2 border-b border-white/5 pb-3">
               <CheckCircle2 className="w-4 h-4 text-emerald-400" />
               Detailed Question-by-Question Review
             </h4>
@@ -859,7 +859,7 @@ export default function Quiz() {
                       }`}>
                         {isCorrect ? <CheckCircle2 className="w-4 h-4" /> : isPartial ? <HelpCircle className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
                       </div>
-                      <span className="text-xs font-black uppercase text-zinc-300 font-mono">Question {index + 1}</span>
+                      <span className="text-xs font-semibold uppercase text-zinc-300 font-mono">Question {index + 1}</span>
                     </div>
                     
                     <div className="text-[10px] font-mono font-black uppercase bg-black/40 px-3 py-1.5 rounded-full border border-white/5 text-zinc-300">

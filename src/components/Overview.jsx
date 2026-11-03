@@ -124,11 +124,11 @@ export default function Overview() {
   }, [totalDocuments, totalPages, totalChunks, averageScore, quizzesTaken, totalPointsEarned]);
 
   const getScoreGrade = (percent) => {
-    if (percent >= 90) return { label: "S Rank", color: "text-[#00FF66]", border: "border-[#00FF66]/40", bg: "bg-[#00FF66]/10", shadow: "shadow-[0_0_15px_rgba(0,255,102,0.3)]" };
-    if (percent >= 80) return { label: "A Rank", color: "text-[#00E5FF]", border: "border-[#00E5FF]/40", bg: "bg-[#00E5FF]/10", shadow: "shadow-[0_0_15px_rgba(0,229,255,0.25)]" };
-    if (percent >= 70) return { label: "B Rank", color: "text-[#FFB800]", border: "border-[#FFB800]/40", bg: "bg-[#FFB800]/10", shadow: "shadow-[0_0_15px_rgba(255,184,0,0.25)]" };
-    if (percent >= 60) return { label: "C Rank", color: "text-amber-500", border: "border-amber-500/40", bg: "bg-amber-500/10", shadow: "shadow-[0_0_15px_rgba(245,158,11,0.2)]" };
-    return { label: "Needs Practice", color: "text-rose-400", border: "border-rose-400/40", bg: "bg-rose-400/10", shadow: "shadow-[0_0_15px_rgba(244,63,94,0.2)]" };
+    if (percent >= 90) return { label: "Mastery", color: "text-[#00FF66]", border: "border-[#00FF66]/30", bg: "bg-[#00FF66]/10", shadow: "" };
+    if (percent >= 80) return { label: "Proficient", color: "text-[#00E5FF]", border: "border-[#00E5FF]/30", bg: "bg-[#00E5FF]/10", shadow: "" };
+    if (percent >= 70) return { label: "Solid", color: "text-[#FFB800]", border: "border-[#FFB800]/30", bg: "bg-[#FFB800]/10", shadow: "" };
+    if (percent >= 60) return { label: "Developing", color: "text-amber-500", border: "border-amber-500/30", bg: "bg-amber-500/10", shadow: "" };
+    return { label: "Needs Practice", color: "text-rose-400", border: "border-rose-400/30", bg: "bg-rose-400/10", shadow: "" };
   };
 
   const getScoreBadge = (percent) => {
@@ -148,7 +148,7 @@ export default function Overview() {
       subtitle: "Files in your library",
       badge: `${totalDocuments} Active`,
       color: "from-[#00FF66]/50",
-      glow: "hover:shadow-[0_0_35px_rgba(0,255,102,0.28)]",
+      glow: "",
       tileClass: "glass-tile-green",
       iconColor: "text-[#00FF66]"
     },
@@ -158,9 +158,9 @@ export default function Overview() {
       value: animatedStats.pages,
       icon: FileText,
       subtitle: "Total pages analyzed",
-      badge: "Deep Parsed",
+      badge: "Indexed",
       color: "from-[#00E5FF]/50",
-      glow: "hover:shadow-[0_0_35px_rgba(0,229,255,0.28)]",
+      glow: "",
       tileClass: "glass-tile-cyan",
       iconColor: "text-[#00E5FF]"
     },
@@ -172,7 +172,7 @@ export default function Overview() {
       subtitle: "Key concepts indexed",
       badge: "RAG Indexed",
       color: "from-[#FFB800]/50",
-      glow: "hover:shadow-[0_0_35px_rgba(255,184,0,0.28)]",
+      glow: "",
       tileClass: "glass-tile-amber",
       iconColor: "text-[#FFB800]"
     }
@@ -188,7 +188,7 @@ export default function Overview() {
       badge: overallGrade.label,
       isGrade: true,
       color: "from-[#00FF66]/50",
-      glow: "hover:shadow-[0_0_35px_rgba(0,255,102,0.28)]",
+      glow: "",
       tileClass: "glass-tile-green",
       iconColor: "text-[#00FF66]"
     },
@@ -200,7 +200,7 @@ export default function Overview() {
       subtitle: "Completed study sessions",
       badge: quizzesTaken > 0 ? `${quizzesTaken} Runs` : "Ready",
       color: "from-[#00E5FF]/50",
-      glow: "hover:shadow-[0_0_35px_rgba(0,229,255,0.28)]",
+      glow: "",
       tileClass: "glass-tile-cyan",
       iconColor: "text-[#00E5FF]"
     },
@@ -212,7 +212,7 @@ export default function Overview() {
       subtitle: "Total points earned",
       badge: "Scored",
       color: "from-[#FFB800]/50",
-      glow: "hover:shadow-[0_0_35px_rgba(255,184,0,0.28)]",
+      glow: "",
       tileClass: "glass-tile-amber",
       iconColor: "text-[#FFB800]"
     }
@@ -368,7 +368,7 @@ export default function Overview() {
                       initial={{ height: 0 }}
                       animate={{ height: `${item.height}%` }}
                       transition={{ delay: i * 0.05, type: "spring", stiffness: 150 }}
-                      className="w-full max-w-[32px] bg-gradient-to-t from-[#00E5FF]/30 via-[#00E5FF]/70 to-[#00E5FF] rounded-t-lg shadow-[0_0_12px_rgba(0,229,255,0.35)] group-hover:brightness-125 transition-all"
+                      className="w-full max-w-[32px] bg-gradient-to-t from-[#00E5FF]/30 via-[#00E5FF]/70 to-[#00E5FF] rounded-t-lg  group-hover:brightness-125 transition-all"
                     />
                     <span className="text-[10px] font-mono text-zinc-400 font-bold">{item.day}</span>
                   </div>
@@ -379,15 +379,15 @@ export default function Overview() {
             <div className="grid grid-cols-3 gap-3 text-center font-mono">
               <div className="bg-white/5 p-3 rounded-xl border border-white/10">
                 <div className="text-[9px] text-zinc-500 uppercase">Avg Pgs / Doc</div>
-                <div className="text-base font-black text-white mt-0.5">{totalDocuments > 0 ? (totalPages / totalDocuments).toFixed(1) : 0}</div>
+                <div className="text-base font-semibold text-white mt-0.5">{totalDocuments > 0 ? (totalPages / totalDocuments).toFixed(1) : 0}</div>
               </div>
               <div className="bg-white/5 p-3 rounded-xl border border-white/10">
                 <div className="text-[9px] text-zinc-500 uppercase">Chunks per Pg</div>
-                <div className="text-base font-black text-[#00E5FF] mt-0.5">{totalPages > 0 ? (totalChunks / totalPages).toFixed(1) : 0}</div>
+                <div className="text-base font-semibold text-[#00E5FF] mt-0.5">{totalPages > 0 ? (totalChunks / totalPages).toFixed(1) : 0}</div>
               </div>
               <div className="bg-white/5 p-3 rounded-xl border border-white/10">
                 <div className="text-[9px] text-zinc-500 uppercase">Text Accuracy</div>
-                <div className="text-base font-black text-[#00FF66] mt-0.5">99.8%</div>
+                <div className="text-base font-semibold text-[#00FF66] mt-0.5">99.8%</div>
               </div>
             </div>
           </div>
@@ -511,19 +511,19 @@ export default function Overview() {
             <div className="grid grid-cols-4 gap-2 text-center font-mono text-[10px]">
               <div className="bg-[#00FF66]/10 p-2.5 rounded-xl border border-[#00FF66]/30 text-[#00FF66] font-bold">
                 <div>S-Rank (90%+)</div>
-                <div className="text-sm font-black mt-1">{uniqueQuizzes.filter(q => (q.scorePercent || 0) >= 90).length} Runs</div>
+                <div className="text-sm font-semibold mt-1">{uniqueQuizzes.filter(q => (q.scorePercent || 0) >= 90).length} Runs</div>
               </div>
               <div className="bg-[#00E5FF]/10 p-2.5 rounded-xl border border-[#00E5FF]/30 text-[#00E5FF] font-bold">
                 <div>A-Rank (80-89%)</div>
-                <div className="text-sm font-black mt-1">{uniqueQuizzes.filter(q => (q.scorePercent || 0) >= 80 && (q.scorePercent || 0) < 90).length} Runs</div>
+                <div className="text-sm font-semibold mt-1">{uniqueQuizzes.filter(q => (q.scorePercent || 0) >= 80 && (q.scorePercent || 0) < 90).length} Runs</div>
               </div>
               <div className="bg-[#FFB800]/10 p-2.5 rounded-xl border border-[#FFB800]/30 text-[#FFB800] font-bold">
                 <div>B-Rank (70-79%)</div>
-                <div className="text-sm font-black mt-1">{uniqueQuizzes.filter(q => (q.scorePercent || 0) >= 70 && (q.scorePercent || 0) < 80).length} Runs</div>
+                <div className="text-sm font-semibold mt-1">{uniqueQuizzes.filter(q => (q.scorePercent || 0) >= 70 && (q.scorePercent || 0) < 80).length} Runs</div>
               </div>
               <div className="bg-rose-500/10 p-2.5 rounded-xl border border-rose-500/30 text-rose-400 font-bold">
                 <div>Review (&lt;70%)</div>
-                <div className="text-sm font-black mt-1">{uniqueQuizzes.filter(q => (q.scorePercent || 0) < 70).length} Runs</div>
+                <div className="text-sm font-semibold mt-1">{uniqueQuizzes.filter(q => (q.scorePercent || 0) < 70).length} Runs</div>
               </div>
             </div>
           </div>
@@ -619,7 +619,7 @@ export default function Overview() {
                     <div className="text-[10px] text-zinc-400 font-mono mt-0.5">Score: {quiz.scorePercent || 0}%</div>
                   </div>
                   <div className="text-right shrink-0">
-                    <div className="text-xs font-black font-mono text-[#FFB800]">+{quiz.earnedPoints || 0} PTS</div>
+                    <div className="text-xs font-semibold font-mono text-[#FFB800]">+{quiz.earnedPoints || 0} PTS</div>
                     <div className="text-[9px] font-mono text-zinc-400">
                       {formatRecordDate(quiz.timestamp || quiz.date)}
                     </div>
@@ -675,7 +675,7 @@ export default function Overview() {
             whileHover={{ scale: 1.05 }}
             className="w-10 h-10 rounded-lg bg-white/[0.04] border border-white/10 flex items-center justify-center text-[#00FF66] shrink-0 shadow-inner"
           >
-            <PDFScholarLogo className="w-5 h-5 text-[#00FF66] drop-shadow-[0_0_8px_currentColor]" />
+            <PDFScholarLogo className="w-5 h-5 text-[#00FF66] " />
           </motion.div>
           <div>
             <div className="flex items-center gap-2 font-black text-2xl sm:text-3xl tracking-tight leading-none">
@@ -683,13 +683,13 @@ export default function Overview() {
               <span className="text-white">
                 Scholar Hub
               </span>
-              <span className="terminal-badge terminal-badge-green ml-1.5">
-                <span className="status-led-green" />
-                SYS // ONLINE
+              <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-mono bg-[#00FF66]/10 text-[#00FF66] border border-[#00FF66]/20 ml-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#00FF66]" />
+                Online
               </span>
             </div>
-            <p className="text-[10px] text-zinc-400 font-mono uppercase tracking-widest mt-1.5">
-              NEURAL RAG TELEMETRY & RESEARCH HUB
+            <p className="text-xs text-zinc-400 mt-1.5 font-sans">
+              Document intelligence, vector search, and study analytics
             </p>
           </div>
         </div>
@@ -699,11 +699,11 @@ export default function Overview() {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => setTab("upload")}
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#00FF66] hover:bg-[#1aff75] text-black text-xs font-mono font-bold uppercase tracking-wider rounded-lg transition-all shadow-[0_0_15px_rgba(0,255,102,0.3)] cursor-pointer"
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-[#00FF66] hover:bg-[#1aff75] text-black text-xs font-mono font-bold uppercase tracking-wider rounded-lg transition-all shadow-sm cursor-pointer"
             id="overview-upload-cta"
           >
             <Plus className="w-4 h-4 text-black" />
-            <span>[ MOUNT NEW PDF ]</span>
+            <span>Upload PDF</span>
           </motion.button>
         </div>
       </motion.div>
@@ -729,7 +729,7 @@ export default function Overview() {
                   playBlip();
                   setActiveModal(stat.id);
                 }}
-                className={`glass-tile glass-tile-interactive hud-bracket ${stat.tileClass || ""} p-5 sm:p-6 rounded-lg relative group overflow-hidden shadow-2xl cursor-pointer ${stat.glow}`}
+                className={`glass-tile glass-tile-interactive ${stat.tileClass || ""} p-5 sm:p-6 rounded-lg relative group overflow-hidden shadow-2xl cursor-pointer ${stat.glow}`}
               >
                 {/* Top Specular Light Bevel */}
                 <div className="specular-highlight" />
@@ -748,13 +748,13 @@ export default function Overview() {
                       </span>
                     )}
                     <div className={`w-8 h-8 rounded-md bg-white/[0.04] border border-white/10 flex items-center justify-center ${stat.iconColor} group-hover:scale-105 group-hover:bg-white/10 transition-all shadow-inner`}>
-                      <Icon className="w-4 h-4 drop-shadow-[0_0_8px_currentColor]" />
+                      <Icon className="w-4 h-4 " />
                     </div>
                   </div>
                 </div>
 
                 <div className="relative z-10">
-                  <div className="text-3xl sm:text-4xl font-black tracking-tight text-white leading-none drop-shadow-md">
+                  <div className="text-2xl sm:text-3xl font-semibold tracking-tight text-white leading-none">
                     {stat.value}
                   </div>
                   <div className="text-[10px] font-mono text-zinc-400 mt-2.5 uppercase tracking-wider flex items-center justify-between">
@@ -783,7 +783,7 @@ export default function Overview() {
                   playBlip();
                   setActiveModal(stat.id);
                 }}
-                className={`glass-tile glass-tile-interactive hud-bracket ${stat.tileClass || ""} p-5 sm:p-6 rounded-lg relative group overflow-hidden shadow-2xl cursor-pointer ${stat.glow}`}
+                className={`glass-tile glass-tile-interactive ${stat.tileClass || ""} p-5 sm:p-6 rounded-lg relative group overflow-hidden shadow-2xl cursor-pointer ${stat.glow}`}
               >
                 {/* Top Specular Light Bevel */}
                 <div className="specular-highlight" />
@@ -802,7 +802,7 @@ export default function Overview() {
                       </span>
                     )}
                     <div className={`w-8 h-8 rounded-md bg-white/[0.04] border border-white/10 flex items-center justify-center ${stat.iconColor} group-hover:scale-105 group-hover:bg-white/10 transition-all shadow-inner`}>
-                      <Icon className="w-4 h-4 drop-shadow-[0_0_8px_currentColor]" />
+                      <Icon className="w-4 h-4 " />
                     </div>
                   </div>
                 </div>
@@ -810,16 +810,16 @@ export default function Overview() {
                 <div className="relative z-10">
                   {stat.isGrade ? (
                     <div className="flex items-center gap-2.5">
-                      <div className="text-3xl sm:text-4xl font-black tracking-tight text-white leading-none drop-shadow-md">
+                      <div className="text-2xl sm:text-3xl font-semibold tracking-tight text-white leading-none">
                         {stat.value}
                       </div>
-                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-black uppercase tracking-wide border ${overallGrade.bg} ${overallGrade.border} ${overallGrade.color} ${overallGrade.shadow}`}>
-                        <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse drop-shadow-[0_0_5px_currentColor]" />
+                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold uppercase tracking-wide border ${overallGrade.bg} ${overallGrade.border} ${overallGrade.color}`}>
+                        <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse " />
                         {overallGrade.label}
                       </span>
                     </div>
                   ) : (
-                    <div className="text-3xl sm:text-4xl font-black tracking-tight text-white leading-none drop-shadow-md">
+                    <div className="text-2xl sm:text-3xl font-semibold tracking-tight text-white leading-none">
                       {stat.value}
                     </div>
                   )}
@@ -843,14 +843,14 @@ export default function Overview() {
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="lg:col-span-7 terminal-panel hud-bracket bg-noise rounded-lg p-5 sm:p-6 flex flex-col justify-between shadow-2xl relative overflow-hidden border border-white/10"
+          className="lg:col-span-7 glass-card bg-noise rounded-xl p-5 sm:p-6 flex flex-col justify-between shadow-sm relative overflow-hidden border border-white/[0.08]"
         >
           <div className="specular-highlight" />
           <div>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5 border-b border-white/5 pb-4">
               <div className="flex items-center gap-2">
                 <Activity className="w-4 h-4 text-[#00FF66]" />
-                <h3 className="text-xs font-black uppercase tracking-wider text-white">Study Activity & Topic Heatmap</h3>
+                <h3 className="text-sm font-semibold text-white">Study Activity & Topic Heatmap</h3>
               </div>
               
               {/* Expand Graph button and density legend */}
@@ -924,14 +924,14 @@ export default function Overview() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25 }}
           onClick={() => setActiveModal("pages")}
-          className="lg:col-span-5 terminal-panel hud-bracket hud-bracket-cyan bg-noise rounded-lg p-5 sm:p-6 flex flex-col justify-between cursor-pointer shadow-2xl relative overflow-hidden"
+          className="lg:col-span-5 glass-card bg-noise rounded-xl p-5 sm:p-6 flex flex-col justify-between cursor-pointer shadow-sm relative overflow-hidden border border-white/[0.08]"
         >
           <div className="specular-highlight" />
           <div>
             <div className="flex items-center justify-between gap-3 mb-5 border-b border-white/5 pb-4">
               <div className="flex items-center gap-2">
                 <BarChart3 className="w-4 h-4 text-[#00E5FF]" />
-                <h3 className="text-xs font-black uppercase tracking-wider text-white">Pages Read This Week</h3>
+                <h3 className="text-sm font-semibold text-white">Pages Read This Week</h3>
               </div>
               <span className="text-[10px] font-mono text-[#00E5FF] bg-[#00E5FF]/10 border border-[#00E5FF]/20 px-2 py-0.5 rounded-md font-bold">
                 {totalPages} Total Pgs
@@ -949,7 +949,7 @@ export default function Overview() {
                     initial={{ height: 0 }}
                     animate={{ height: `${item.height}%` }}
                     transition={{ delay: i * 0.05 + 0.3, type: "spring", stiffness: 150 }}
-                    className="w-full max-w-[28px] bg-gradient-to-t from-[#00E5FF]/20 via-[#00E5FF]/60 to-[#00E5FF] rounded-t-lg shadow-[0_0_12px_rgba(0,229,255,0.35)] group-hover:brightness-125 transition-all"
+                    className="w-full max-w-[28px] bg-gradient-to-t from-[#00E5FF]/20 via-[#00E5FF]/60 to-[#00E5FF] rounded-t-lg  group-hover:brightness-125 transition-all"
                   />
                   <span className="text-[10px] font-mono text-zinc-400 font-bold group-hover:text-white transition-colors">
                     {item.day}
@@ -971,9 +971,9 @@ export default function Overview() {
         <div className="stepper grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
           <div className="step relative">
             <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-zinc-700 to-zinc-800" />
-            <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-[#00FF66] to-[#00FF66]/20 shadow-[0_0_8px_rgba(0,255,102,0.5)]" />
+            <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-[#00FF66] to-[#00FF66]/20 " />
             <div className="pt-3">
-              <div className="step-label text-[10px] font-mono font-bold text-[#00FF66] uppercase tracking-wider flex items-center gap-1.5 drop-shadow-[0_0_5px_rgba(0,255,102,0.3)]">
+              <div className="step-label text-[10px] font-mono font-bold text-[#00FF66] uppercase tracking-wider flex items-center gap-1.5 ">
                 <CheckCircle2 className="w-3.5 h-3.5 text-[#00FF66]" />
                 1. Upload PDF
               </div>
@@ -981,9 +981,9 @@ export default function Overview() {
           </div>
           <div className="step relative">
             <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-zinc-700 to-zinc-800" />
-            <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-[#00FF66] to-[#00FF66]/20 shadow-[0_0_8px_rgba(0,255,102,0.5)]" />
+            <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-[#00FF66] to-[#00FF66]/20 " />
             <div className="pt-3">
-              <div className="step-label text-[10px] font-mono font-bold text-[#00FF66] uppercase tracking-wider flex items-center gap-1.5 drop-shadow-[0_0_5px_rgba(0,255,102,0.3)]">
+              <div className="step-label text-[10px] font-mono font-bold text-[#00FF66] uppercase tracking-wider flex items-center gap-1.5 ">
                 <CheckCircle2 className="w-3.5 h-3.5 text-[#00FF66]" />
                 2. Process Topics
               </div>
@@ -991,9 +991,9 @@ export default function Overview() {
           </div>
           <div className="step relative">
             <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-zinc-700 to-zinc-800" />
-            <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-[#00FF66] to-[#00FF66]/20 shadow-[0_0_8px_rgba(0,255,102,0.5)]" />
+            <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-[#00FF66] to-[#00FF66]/20 " />
             <div className="pt-3">
-              <div className="step-label text-[10px] font-mono font-bold text-[#00FF66] uppercase tracking-wider flex items-center gap-1.5 drop-shadow-[0_0_5px_rgba(0,255,102,0.3)]">
+              <div className="step-label text-[10px] font-mono font-bold text-[#00FF66] uppercase tracking-wider flex items-center gap-1.5 ">
                 <CheckCircle2 className="w-3.5 h-3.5 text-[#00FF66]" />
                 3. Vector AI Index
               </div>
@@ -1001,9 +1001,9 @@ export default function Overview() {
           </div>
           <div className="step relative">
             <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-zinc-700 to-zinc-800" />
-            <div className="absolute top-0 left-0 w-full h-[2px] bg-[#00FF66] animate-pulse-glow shadow-[0_0_12px_rgba(0,255,102,0.6)]" />
+            <div className="absolute top-0 left-0 w-full h-[2px] bg-[#00FF66] " />
             <div className="pt-3">
-              <div className="step-label text-[10px] font-mono font-bold text-[#00FF66] uppercase tracking-wider flex items-center gap-1.5 drop-shadow-[0_0_5px_rgba(0,255,102,0.3)]">
+              <div className="step-label text-[10px] font-mono font-bold text-[#00FF66] uppercase tracking-wider flex items-center gap-1.5 ">
                 <BrainCircuit className="w-3.5 h-3.5 text-[#00FF66]" />
                 4. Ready to Study
               </div>
@@ -1024,7 +1024,7 @@ export default function Overview() {
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 15 }}
               onClick={(e) => e.stopPropagation()}
-              className="terminal-panel hud-bracket laser-top bg-noise rounded-xl w-full max-w-2xl max-h-[85vh] overflow-y-auto p-6 sm:p-8 relative text-white flex flex-col gap-5 shadow-2xl"
+              className="bg-[#0B0D13] border border-white/10 bg-noise rounded-xl w-full max-w-2xl max-h-[85vh] overflow-y-auto p-6 sm:p-8 relative text-white flex flex-col gap-5 shadow-2xl"
             >
               {/* Structured Header Bar with Title and Close Button (No Overlapping!) */}
               {(() => {
@@ -1034,7 +1034,7 @@ export default function Overview() {
                   <div className="flex items-center justify-between border-b border-white/[0.08] pb-4 shrink-0">
                     <div className="flex items-center gap-2.5 min-w-0 pr-3">
                       <HeaderIcon className={`w-5 h-5 ${header.color} shrink-0`} />
-                      <h3 className="text-base sm:text-lg font-black uppercase text-white tracking-tight truncate">
+                      <h3 className="text-base sm:text-lg font-semibold text-white tracking-tight truncate">
                         {header.label}
                       </h3>
                     </div>
