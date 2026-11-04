@@ -342,7 +342,7 @@ export default function Quiz() {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="py-20 text-center max-w-md mx-auto terminal-panel hud-bracket hud-bracket-amber laser-top-amber bg-noise p-8 sm:p-10 rounded-xl relative z-10 shadow-2xl"
+          className="py-16 text-center max-w-md mx-auto bg-[#0B0D13] border border-white/10 bg-noise p-8 sm:p-10 rounded-xl relative z-10 shadow-sm"
           id="quiz-loader"
         >
           <div className="w-14 h-14 bg-white/[0.04] border border-white/10 rounded-lg flex items-center justify-center mx-auto mb-5 shadow-inner">
@@ -360,7 +360,7 @@ export default function Quiz() {
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center py-8 max-w-md mx-auto terminal-panel hud-bracket hud-bracket-amber laser-top-amber bg-noise p-6 sm:p-8 rounded-xl relative z-10 shadow-2xl"
+          className="text-center py-8 max-w-md mx-auto bg-[#0B0D13] border border-white/10 bg-noise p-6 sm:p-8 rounded-xl relative z-10 shadow-sm"
         >
           <div className="w-14 h-14 bg-white/[0.04] border border-white/10 text-amber-400 rounded-lg flex items-center justify-center mx-auto mb-4 shadow-inner">
             <GraduationCap className="w-7 h-7 drop-shadow-md" />
@@ -481,7 +481,7 @@ export default function Quiz() {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              className="terminal-panel hud-bracket hud-bracket-amber laser-top-amber bg-noise max-w-md w-full p-6 sm:p-8 rounded-xl shadow-2xl text-center space-y-5"
+              className="bg-[#0B0D13] border border-white/10 bg-noise max-w-md w-full p-6 sm:p-8 rounded-xl shadow-2xl text-center space-y-5"
             >
               <div className="w-12 h-12 bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg flex items-center justify-center mx-auto shadow-inner">
                 <AlertTriangle className="w-6 h-6" />

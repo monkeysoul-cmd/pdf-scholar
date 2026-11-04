@@ -181,14 +181,14 @@ export default function Chat() {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="text-center max-w-sm terminal-panel hud-bracket hud-bracket-accent bg-noise p-8 sm:p-10 rounded-xl shadow-2xl relative z-10 border border-white/10"
+          className="text-center max-w-sm bg-[#0B0D13] border border-white/10 bg-noise p-8 sm:p-10 rounded-xl shadow-sm relative z-10"
         >
           <div className="specular-highlight" />
           <div className="w-14 h-14 bg-white/[0.04] border border-white/10 text-[#00FF66] rounded-lg flex items-center justify-center mx-auto mb-4 shadow-inner">
             <MessageSquare className="w-7 h-7 drop-shadow-sm" />
           </div>
-          <h3 className="font-mono font-bold text-white text-base uppercase tracking-wider">No document selected</h3>
-          <p className="text-xs text-zinc-400 font-mono uppercase mt-2 mb-6 leading-relaxed">
+          <h3 className="text-base font-semibold text-white tracking-tight">No document selected</h3>
+          <p className="text-xs text-zinc-400 mt-2 mb-6 leading-relaxed">
             Select a document from the sidebar or upload a PDF to begin chatting.
           </p>
         </motion.div>
@@ -204,10 +204,10 @@ export default function Chat() {
         <div>
           <div className="flex items-center gap-2">
             <span className="status-led-green" />
-            <h3 className="font-mono font-bold text-white text-xs uppercase tracking-wider">Document Chat</h3>
+            <h3 className="text-xs font-semibold text-white">Document Chat</h3>
           </div>
-          <p className="text-[11px] text-zinc-400 font-mono mt-1 max-w-[200px] sm:max-w-lg truncate uppercase" title={activeDoc?.name}>
-            Document: <strong className="text-[#00FF66] font-medium font-sans">"{activeDoc?.name}"</strong>
+          <p className="text-xs text-zinc-400 mt-0.5 max-w-[200px] sm:max-w-lg truncate" title={activeDoc?.name}>
+            Document: <strong className="text-zinc-200 font-medium">"{activeDoc?.name}"</strong>
           </p>
         </div>
 
@@ -235,8 +235,8 @@ export default function Chat() {
             >
               <VectorAIIcon className="w-8 h-8 text-[#00FF66]" />
             </motion.div>
-            <h4 className="font-extrabold text-white text-base uppercase tracking-wider">Discuss Your Document</h4>
-            <p className="text-zinc-400 text-xs mt-2 max-w-xs font-mono uppercase leading-relaxed">
+            <h4 className="font-semibold text-white text-base tracking-tight">Discuss your document</h4>
+            <p className="text-zinc-400 text-xs mt-1.5 max-w-xs leading-relaxed">
               Ask questions directly based on the indexed content.
             </p>
             <div className="grid grid-cols-1 gap-2.5 mt-8 w-full text-left">
@@ -253,7 +253,7 @@ export default function Chat() {
                     playClick();
                     setInputText(suggestion);
                   }}
-                  className="p-3 text-xs font-mono font-bold terminal-panel text-zinc-300 hover:text-white rounded-lg transition-all uppercase tracking-wide text-left border border-white/10 hover:border-[#00FF66]/50 cursor-pointer flex items-center justify-between group"
+                  className="p-3 text-xs font-sans text-zinc-300 hover:text-white bg-white/[0.03] hover:bg-white/[0.07] rounded-lg transition-all text-left border border-white/[0.08] hover:border-white/20 cursor-pointer flex items-center justify-between group"
                 >
                   <span>{suggestion}</span>
                   <kbd className="text-[8px] opacity-0 group-hover:opacity-100 transition-opacity">TAB</kbd>
@@ -288,9 +288,7 @@ export default function Chat() {
 
                     <div
                       className={`max-w-[85%] rounded-lg p-4 text-xs leading-relaxed border relative overflow-hidden select-text ${
-                        isUser
-                          ? "bg-[#0A120E] border-[#00FF66]/35 text-white shadow-[0_4px_20px_rgba(0,0,0,0.5)] border-r-2 border-r-[#00FF66]"
-                          : "terminal-panel hud-bracket text-zinc-100 border-white/10 shadow-2xl"
+                        isUser ? "bg-white/[0.06] border-white/10 text-zinc-100 shadow-sm" : "bg-[#0B0D13] border-white/[0.08] text-zinc-100 shadow-sm"
                       }`}
                     >
                       <div className="specular-highlight" />
@@ -344,7 +342,7 @@ export default function Chat() {
                                       <span>PAGE {src.chunk.pageIndex}</span>
                                       <span className="text-zinc-600">//</span>
                                       <span className="font-mono text-[9px] text-[#00FF66] bg-[#00FF66]/10 border border-[#00FF66]/20 px-1.5 py-0.5 rounded">
-                                        SIM_SCORE: {scorePercent}% [COSINE]
+                                        Match: {scorePercent}%
                                       </span>
                                     </div>
                                     {isExpanded ? (
@@ -378,9 +376,9 @@ export default function Chat() {
                         <div className="mt-3.5 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-300 text-[10px] flex items-start gap-2 font-mono uppercase">
                           <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
                           <div>
-                            <strong className="font-bold text-white block mb-0.5 tracking-wider">TELEMETRY // LOW_CONFIDENCE</strong>
+                            <strong className="font-medium text-amber-300 block mb-0.5">Low confidence match</strong>
                             <p className="text-zinc-400 leading-relaxed font-sans normal-case">
-                              The document vector corpus does not contain high-similarity context for this prompt.
+                              The document does not appear to contain relevant context for this question.
                             </p>
                           </div>
                         </div>
@@ -405,7 +403,7 @@ export default function Chat() {
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             disabled={isSending}
-            placeholder={`Query document corpus... (e.g. "Summarize core findings")`}
+            placeholder="Ask a question about this document..."
             className="flex-1 text-xs p-3 px-4 border border-white/10 hover:border-[#00FF66]/40 focus:border-[#00FF66] focus:ring-1 focus:ring-[#00FF66]/30 rounded-lg transition-all bg-black/50 text-white font-mono placeholder-zinc-500 outline-none shadow-inner"
           />
           <motion.button
@@ -413,22 +411,18 @@ export default function Chat() {
             whileTap={{ scale: 0.98 }}
             type="submit"
             disabled={!inputText.trim() || isSending}
-            className="p-3 bg-[#00FF66] hover:bg-[#1aff75] disabled:opacity-30 disabled:cursor-not-allowed text-black rounded-lg shadow-[0_0_15px_rgba(0,255,102,0.3)] transition-all cursor-pointer relative font-mono font-bold"
+            className="p-3 bg-[#00FF66] hover:bg-[#1aff75] disabled:opacity-30 disabled:cursor-not-allowed text-black rounded-lg shadow-sm transition-all cursor-pointer relative font-mono font-bold"
           >
             <Send className="w-4 h-4 text-black" />
           </motion.button>
         </form>
-        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-1.5 text-[10px] text-zinc-500 mt-2.5 font-mono uppercase tracking-wider px-1">
+        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-1.5 text-[11px] text-zinc-500 mt-2.5 px-1 font-sans">
           <div className="flex items-center gap-2">
-            <span>DISPATCH:</span>
-            <kbd className="kbd-badge kbd-badge-green">↵ ENTER</kbd>
-            <span className="text-zinc-700">//</span>
-            <span>CLEAR:</span>
-            <kbd className="kbd-badge">ESC</kbd>
+            <span>Press <kbd className="kbd-badge text-[9px]">Enter</kbd> to send, <kbd className="kbd-badge text-[9px]">Esc</kbd> to clear</span>
           </div>
-          <div className="flex items-center gap-1.5 text-zinc-400">
-            <span className="status-led-green" />
-            <span>COSINE_SIMILARITY // STREAMING_ENGINE_v2</span>
+          <div className="flex items-center gap-1.5 text-zinc-400 font-mono text-[10px]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#00FF66]" />
+            <span>Hybrid vector search</span>
           </div>
         </div>
       </div>

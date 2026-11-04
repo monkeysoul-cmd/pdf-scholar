@@ -262,20 +262,18 @@ export default function Sidebar() {
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.95 }}
-                  className="p-3.5 sm:p-4 terminal-panel hud-bracket hud-bracket-accent border-l-2 border-l-[#00FF66] rounded-lg flex flex-col gap-3 relative group/doc shadow-lg overflow-hidden"
+                  className="p-3.5 sm:p-4 bg-[#0B0D13] border border-white/10 border-l-2 border-l-[#00FF66] rounded-xl flex flex-col gap-3 relative group/doc shadow-sm overflow-hidden"
                 >
                   <div className="flex items-start gap-3 relative z-10">
                     <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-md bg-white/[0.04] border border-white/10 flex items-center justify-center shrink-0 mt-0.5 shadow-inner">
                       <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#00FF66] drop-shadow-sm" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="text-xs font-bold uppercase tracking-wide text-zinc-100 truncate drop-shadow-sm" title={activeDoc.name}>
+                      <div className="text-xs font-medium text-zinc-100 truncate" title={activeDoc.name}>
                         {activeDoc.name}
                       </div>
                       <div className="text-[10px] font-mono text-zinc-400 mt-1 flex items-center gap-1.5">
-                        <span>{activeDoc.pageCount || 1} PGS</span>
-                        <span>//</span>
-                        <span>{activeDoc.chunkCount || 0} CHUNKS</span>
+                        <span>{activeDoc.pageCount || 1} pgs</span> <span className="text-zinc-600">•</span> <span>{activeDoc.chunkCount || 0} chunks</span>
                       </div>
                     </div>
                   </div>
