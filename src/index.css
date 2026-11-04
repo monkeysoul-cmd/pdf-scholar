@@ -137,55 +137,6 @@ body,
   pointer-events: none;
 }
 
-/* HUD Corner Brackets for Tactical Hardware Aesthetics */
-.hud-bracket {
-  position: relative;
-}
-.hud-bracket::before,
-.hud-bracket::after {
-  display: none !important;
-}
-.hud-bracket::before {
-  top: -1px;
-  left: -1px;
-  border-top: 1.5px solid;
-  border-left: 1.5px solid;
-}
-.hud-bracket::after {
-  bottom: -1px;
-  right: -1px;
-  border-bottom: 1.5px solid;
-  border-right: 1.5px solid;
-}
-.hud-bracket-accent::before,
-.hud-bracket-accent::after {
-  border-color: #00FF66;
-}
-.hud-bracket-cyan::before,
-.hud-bracket-cyan::after {
-  border-color: #00E5FF;
-}
-.hud-bracket-amber::before,
-.hud-bracket-amber::after {
-  border-color: #FFB800;
-}
-
-/* Precision Laser Top Line Accent */
-.laser-top {
-  position: relative;
-}
-.laser-top::before,
-.laser-top-cyan::before,
-.laser-top-amber::before {
-  display: none !important;
-}
-.laser-top-cyan::before {
-  background: linear-gradient(90deg, transparent 0%, #00E5FF 30%, #00E5FF 70%, transparent 100%);
-}
-.laser-top-amber::before {
-  background: linear-gradient(90deg, transparent 0%, #FFB800 30%, #FFB800 70%, transparent 100%);
-}
-
 /* Status LEDs */
 .status-led-green {
   width: 6px;
