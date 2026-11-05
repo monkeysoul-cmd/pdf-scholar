@@ -555,7 +555,7 @@ export class VectorDB {
     const sparseWeight = options.sparseWeight ?? 0.3;
 
     // Check query result cache
-    const cacheKey = `${userId}:${documentId || "all"}:${queryText}`;
+    const cacheKey = `${userId}:${documentId || "all"}:${queryText.trim().toLowerCase()}`;
     if (queryText && queryResultCache.get(cacheKey)) {
       const cached = queryResultCache.get(cacheKey);
       return {

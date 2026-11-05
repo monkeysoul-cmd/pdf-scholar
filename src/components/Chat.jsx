@@ -419,7 +419,11 @@ export default function Chat() {
             disabled={!inputText.trim() || isSending}
             className="p-3 bg-[#00FF66] hover:bg-[#1aff75] disabled:opacity-30 disabled:cursor-not-allowed text-black rounded-lg shadow-sm transition-all cursor-pointer relative font-mono font-bold"
           >
-            <Send className="w-4 h-4 text-black" />
+            {isSending ? (
+              <Loader2 className="w-4 h-4 text-black animate-spin" />
+            ) : (
+              <Send className="w-4 h-4 text-black" />
+            )}
           </motion.button>
         </form>
         <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-1.5 text-[11px] text-zinc-500 mt-2.5 px-1 font-sans">

@@ -68,7 +68,8 @@ function createRateLimiter({ windowMs = 15 * 60 * 1000, max = 15, message = "Too
   if (timer.unref) timer.unref();
 
   return (req, res, next) => {
-    const ip = req.ip || req.headers["x-forwarded-for"] || req.socket.remoteAddress || "127.0.0.1";
+    const rawIp = req.headers["x-forwarded-for"] || req.ip || req.socket.remoteAddress || "127.0.0.1";
+    const ip = String(rawIp).split(",")[0].trim();
     const now = Date.now();
     const entry = store.get(ip);
 
@@ -194,7 +195,7 @@ async function generateChunkEmbedding(text) {
   if (cached) return Array.from(cached);
 
   const ai = getAIClient();
-  const embeddingModels = ["gemini-embedding-001", "gemini-embedding-2-preview", "text-embedding-004", "embedding-001"];
+  const embeddingModels = ["text-embedding-004", "embedding-001"];
   let lastErr = null;
 
   for (const model of embeddingModels) {
@@ -229,11 +230,9 @@ async function generateContentWithFallback(params, initialModel = "gemini-flash-
   const models = [
     initialModel,
     "gemini-flash-lite-latest",
-    "gemini-2.5-flash",
-
-
-    "gemini-2.5-flash",
-    "gemini-flash-latest"
+    "gemini-2.0-flash",
+    "gemini-1.5-flash",
+    "gemini-1.5-flash-8b"
   ];
   const uniqueModels = [...new Set(models.filter(Boolean))];
 
@@ -268,11 +267,9 @@ async function generateContentStreamWithFallback(params, initialModel = "gemini-
   const models = [
     initialModel,
     "gemini-flash-lite-latest",
-    "gemini-2.5-flash",
-
-
-    "gemini-2.5-flash",
-    "gemini-flash-latest"
+    "gemini-2.0-flash",
+    "gemini-1.5-flash",
+    "gemini-1.5-flash-8b"
   ];
   const uniqueModels = [...new Set(models.filter(Boolean))];
 
@@ -595,9 +592,10 @@ app.post("/api/chat", authenticateToken, async (req, res) => {
         });
         res.write(`data: ${JSON.stringify({ type: "sources", sources: [], retrievalTimeMs, retrievalMethod })}\n\n`);
         res.write(`data: ${JSON.stringify({ type: "token", text: emptyMsg })}\n\n`);
-        res.write(`data: ${JSON.stringify({ type: "done" })}\n\n`);
-
-        res.end();
+        if (!isClosed) {
+          res.write(`data: ${JSON.stringify({ type: "done" })}\n\n`);
+          res.end();
+        }
         return;
       }
       res.json({
@@ -683,9 +681,10 @@ ${contextText}
           }
         }
 
-        res.write(`data: ${JSON.stringify({ type: "done" })}\n\n`);
-
-        res.end();
+        if (!isClosed) {
+          res.write(`data: ${JSON.stringify({ type: "done" })}\n\n`);
+          res.end();
+        }
         return;
       } catch (streamErr) {
         console.error("Chat streaming error:", streamErr);
@@ -804,7 +803,17 @@ For short-answer: leave options empty, provide the correctAnswer as the key crit
     if (rawText.startsWith("```")) {
       rawText = rawText.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim();
     }
-    const parsedData = JSON.parse(rawText);
+    let parsedData = { questions: [] };
+    try {
+      parsedData = JSON.parse(rawText);
+    } catch {
+      const jsonMatch = rawText.match(/\{[\s\S]*"questions"[\s\S]*\}/);
+      if (jsonMatch) {
+        try {
+          parsedData = JSON.parse(jsonMatch[0]);
+        } catch {}
+      }
+    }
     const rawQuestions = Array.isArray(parsedData.questions) ? parsedData.questions : [];
 
     // Normalize and sanitize questions defensively

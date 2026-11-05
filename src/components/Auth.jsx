@@ -19,7 +19,8 @@ export default function Auth() {
     setError("");
     setMessage("");
 
-    if (!username.trim() || !password) {
+    const cleanUsername = username.trim();
+    if (!cleanUsername || !password) {
       setError("Please fill in all required fields.");
       return;
     }
@@ -32,9 +33,9 @@ export default function Auth() {
     setLoading(true);
     try {
       if (isLogin) {
-        await login(username, password);
+        await login(cleanUsername, password);
       } else {
-        const res = await register(username, password);
+        const res = await register(cleanUsername, password);
         setMessage(res.message || "Account created successfully. Please sign in.");
         setIsLogin(true);
         setPassword("");
