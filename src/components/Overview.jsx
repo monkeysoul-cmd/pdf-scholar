@@ -344,7 +344,7 @@ export default function Overview() {
                     <div className="text-[10px] text-zinc-400 font-mono mt-0.5">{doc.chunkCount || 0} Chunks • Indexed Vector Matrix</div>
                   </div>
                   <div className="text-[10px] text-zinc-400 font-mono uppercase tracking-wider shrink-0 bg-black/40 px-2.5 py-1 rounded-lg border border-white/5">
-                    {new Date(doc.uploadedAt || doc.createdAt || Date.now()).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                    {formatRecordDate(doc.uploadedAt || doc.createdAt)}
                   </div>
                 </div>
               ))}
@@ -510,15 +510,15 @@ export default function Overview() {
             {/* Score Tier Distribution */}
             <div className="grid grid-cols-4 gap-2 text-center font-mono text-[10px]">
               <div className="bg-[#00FF66]/10 p-2.5 rounded-xl border border-[#00FF66]/30 text-[#00FF66] font-bold">
-                <div>S-Rank (90%+)</div>
+                <div>Mastery (90%+)</div>
                 <div className="text-sm font-semibold mt-1">{uniqueQuizzes.filter(q => (q.scorePercent || 0) >= 90).length} Runs</div>
               </div>
               <div className="bg-[#00E5FF]/10 p-2.5 rounded-xl border border-[#00E5FF]/30 text-[#00E5FF] font-bold">
-                <div>A-Rank (80-89%)</div>
+                <div>Proficient (80-89%)</div>
                 <div className="text-sm font-semibold mt-1">{uniqueQuizzes.filter(q => (q.scorePercent || 0) >= 80 && (q.scorePercent || 0) < 90).length} Runs</div>
               </div>
               <div className="bg-[#FFB800]/10 p-2.5 rounded-xl border border-[#FFB800]/30 text-[#FFB800] font-bold">
-                <div>B-Rank (70-79%)</div>
+                <div>Solid (70-79%)</div>
                 <div className="text-sm font-semibold mt-1">{uniqueQuizzes.filter(q => (q.scorePercent || 0) >= 70 && (q.scorePercent || 0) < 80).length} Runs</div>
               </div>
               <div className="bg-rose-500/10 p-2.5 rounded-xl border border-rose-500/30 text-rose-400 font-bold">

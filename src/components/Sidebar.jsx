@@ -85,7 +85,7 @@ export default function Sidebar() {
 
   const activeDoc = documents.find((d) => d.id === selectedDocumentId);
 
-  const SidebarInner = ({ collapsed }) => (
+  const renderSidebarInner = (collapsed) => (
     <aside
       className={`${
         collapsed ? "w-16 sm:w-20" : "w-[260px] sm:w-[270px]"
@@ -289,7 +289,11 @@ export default function Sidebar() {
                     <motion.button
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      onClick={() => deleteDocument(activeDoc.id)}
+                      onClick={() => {
+                        if (window.confirm(`Are you sure you want to delete "${activeDoc.name}"? This cannot be undone.`)) {
+                          deleteDocument(activeDoc.id);
+                        }
+                      }}
                       title="Delete Document"
                       className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 hover:border-red-500/40 rounded transition-all cursor-pointer"
                     >
@@ -337,7 +341,7 @@ export default function Sidebar() {
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.98 }}
               onClick={logout}
-              className="w-full py-2.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 hover:text-red-300 rounded-lg text-xs font-medium py-2 transition-colors flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full py-2.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 hover:text-red-300 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-2 cursor-pointer"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span>Sign Out</span>
@@ -404,7 +408,7 @@ export default function Sidebar() {
               className="md:hidden fixed inset-y-0 left-0 z-40"
             >
               <div className="relative h-full shadow-2xl">
-                <SidebarInner collapsed={false} />
+                {renderSidebarInner(false)}
               </div>
             </motion.div>
           </>
@@ -412,7 +416,7 @@ export default function Sidebar() {
       </AnimatePresence>
 
       <div className="hidden md:flex h-full relative z-40">
-        <SidebarInner collapsed={isCollapsed} />
+        {renderSidebarInner(isCollapsed)}
       </div>
     </>
   );

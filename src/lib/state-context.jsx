@@ -98,7 +98,7 @@ export function StateProvider({ children }) {
 
   const authenticatedFetch = async (url, options = {}) => {
     const headers = {
-      "Content-Type": "application/json",
+      ...(options.body ? { "Content-Type": "application/json" } : {}),
       ...options.headers,
     };
     if (token) {
@@ -120,12 +120,19 @@ export function StateProvider({ children }) {
     setIsLoadingDocs(true);
     try {
       const res = await authenticatedFetch("/api/documents");
-      const data = await res.json();
+      const resText = await res.text();
+      let data = {};
+      try {
+        data = JSON.parse(resText);
+      } catch {
+        throw new Error(`Failed to parse document list (status ${res.status})`);
+      }
       if (data.documents) {
         setDocuments(data.documents);
-        if (data.documents.length > 0) {
-          setSelectedDocumentId(prevId => (prevId && data.documents.some(d => d.id === prevId) ? prevId : (data.documents[0]?.id || null)));
-        }
+        setSelectedDocumentId(prevId => {
+          if (prevId && data.documents.some(d => d.id === prevId)) return prevId;
+          return data.documents[0]?.id || null;
+        });
       }
     } catch (err) {
       console.error("Failed to fetch documents:", err);
@@ -207,7 +214,13 @@ export function StateProvider({ children }) {
       if (res.ok) {
         setDocuments(prev => {
           const next = prev.filter(d => d.id !== docId);
-          setSelectedDocumentId(curr => (curr === docId ? (next[0]?.id || null) : curr));
+          setSelectedDocumentId(curr => {
+            if (curr === docId) {
+              setQuizQuestions([]);
+              return next[0]?.id || null;
+            }
+            return curr;
+          });
           return next;
         });
         setChatHistory(prev => {
@@ -223,7 +236,7 @@ export function StateProvider({ children }) {
 
   const addMessage = (docId, role, text, sources) => {
     const newMessage = {
-      id: `msg_${Date.now()}`,
+      id: `msg_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
       role,
       text,
       timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),

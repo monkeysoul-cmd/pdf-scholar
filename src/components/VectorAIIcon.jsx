@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useId } from "react";
 
 /**
  * Custom Vector AI Icon component representing high-dimensional vector embeddings,
@@ -6,6 +6,10 @@ import React from "react";
  * Designed with a sleek glowing aesthetic for a premium SaaS feel.
  */
 export default function VectorAIIcon({ className = "w-4 h-4", ...props }) {
+  const rawId = useId();
+  const safeId = rawId ? rawId.replace(/:/g, "_") : "vec";
+  const gradId = `vectorGradient_${safeId}`;
+  const filterId = `vectorGlow_${safeId}`;
   return (
     <svg
       viewBox="0 0 24 24"
@@ -15,11 +19,11 @@ export default function VectorAIIcon({ className = "w-4 h-4", ...props }) {
       {...props}
     >
       <defs>
-        <filter id="vectorGlow" x="-20%" y="-20%" width="140%" height="140%">
+        <filter id={filterId} x="-20%" y="-20%" width="140%" height="140%">
           <feGaussianBlur stdDeviation="2" result="blur" />
           <feComposite in="SourceGraphic" in2="blur" operator="over" />
         </filter>
-        <linearGradient id="vectorGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+        <linearGradient id={gradId} x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="currentColor" stopOpacity="1" />
           <stop offset="100%" stopColor="currentColor" stopOpacity="0.3" />
         </linearGradient>
@@ -28,7 +32,7 @@ export default function VectorAIIcon({ className = "w-4 h-4", ...props }) {
       {/* Connectivity Network / Dimensions */}
       <path
         d="M12 4L4 8l8 4 8-4-8-4z"
-        stroke="url(#vectorGradient)"
+        stroke={`url(#${gradId})`}
         strokeWidth="1.5"
         strokeLinejoin="round"
       />

@@ -139,7 +139,13 @@ export default function Chat() {
         }
       } else {
         // Fallback for non-streaming response
-        const data = await res.json();
+        const resText = await res.text();
+        let data = {};
+        try {
+          data = JSON.parse(resText);
+        } catch {
+          data = { error: `Server error (${res.status}): ${resText.slice(0, 150) || "No response"}` };
+        }
         if (res.ok && data.text) {
           playChime();
           updateLastMessage(selectedDocumentId, msg => ({

@@ -78,7 +78,15 @@ export default function Quiz() {
         })
       });
 
-      const data = await res.json();
+      const resText = await res.text();
+      let data = {};
+      try {
+        data = JSON.parse(resText);
+      } catch {
+        if (!res.ok) {
+          throw new Error(`Server error (${res.status}): ${resText.slice(0, 150) || "Quiz generation failed"}`);
+        }
+      }
       if (res.ok && data.questions) {
         playChime();
         const normalized = data.questions.map((q, idx) => {
@@ -205,7 +213,7 @@ export default function Quiz() {
     };
   };
 
-  const unansweredCount = quizQuestions.filter(q => {
+  const unansweredCount = (quizQuestions || []).filter(q => {
     const isMC = q.type === "multiple-choice" || Boolean(q.type?.toLowerCase().includes("choice"));
     if (isMC) {
       return !answers[q.id];
@@ -254,6 +262,9 @@ export default function Quiz() {
   };
 
   const resetQuiz = () => {
+    if (containerRef.current) {
+      containerRef.current.scrollTo({ top: 0, behavior: "smooth" });
+    }
     setAnswers({});
     setRevealedShortAnswers({});
     setShortAnswersText({});

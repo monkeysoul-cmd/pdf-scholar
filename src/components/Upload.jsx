@@ -113,10 +113,18 @@ export default function Upload() {
       clearTimeout(stepTimer1);
       clearTimeout(stepTimer2);
 
-      const data = await response.json();
+      const resText = await response.text();
+      let data = {};
+      try {
+        data = JSON.parse(resText);
+      } catch {
+        if (!response.ok) {
+          throw new Error(`Server error (${response.status}): ${resText.slice(0, 150) || "Document processing failed"}`);
+        }
+      }
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to process document.");
+        throw new Error(data.error || `Failed to process document (Status ${response.status}).`);
       }
 
       setCurrentStep(3);
