@@ -212,14 +212,16 @@ export function StateProvider({ children }) {
     try {
       const res = await authenticatedFetch(`/api/documents/${docId}`, { method: "DELETE" });
       if (res.ok) {
-        setDocuments(prev => prev.filter(d => d.id !== docId));
-        setSelectedDocumentId(curr => {
-          if (curr === docId) {
-            setQuizQuestions([]);
-            const remaining = documents.filter(d => d.id !== docId);
-            return remaining[0]?.id || null;
-          }
-          return curr;
+        setDocuments(prev => {
+          const remaining = prev.filter(d => d.id !== docId);
+          setSelectedDocumentId(curr => {
+            if (curr === docId) {
+              setQuizQuestions([]);
+              return remaining[0]?.id || null;
+            }
+            return curr;
+          });
+          return remaining;
         });
         setChatHistory(prev => {
           const updated = { ...prev };
