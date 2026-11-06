@@ -241,7 +241,7 @@ export default function Overview() {
 
     const hasActivity = i < uniqueQuizzes.length || (totalChunks > 0 && i < totalChunks);
     const quizForDay = uniqueQuizzes[i % (uniqueQuizzes.length || 1)];
-    const score = hasActivity ? (quizForDay?.scorePercent || 85) : 15;
+    const score = hasActivity ? (parsePercent(quizForDay?.scorePercent) || 85) : 15;
     const intensity = hasActivity ? Math.min(1, Math.max(0.2, score / 100)) : 0.08;
 
     return {
@@ -471,7 +471,8 @@ export default function Overview() {
               </div>
               <div className="space-y-2.5 max-h-[220px] overflow-y-auto pr-1">
                 {uniqueQuizzes.map((quiz, idx) => {
-                  const grade = getScoreGrade(quiz.scorePercent || 0);
+                  const quizPct = parsePercent(quiz.scorePercent);
+                  const grade = getScoreGrade(quizPct);
                   const rawDate = quiz.timestamp || quiz.date;
                   const parsedDate = rawDate ? new Date(rawDate) : null;
                   const isValid = parsedDate && !isNaN(parsedDate.getTime());
@@ -482,12 +483,12 @@ export default function Overview() {
                     <div key={idx} className="space-y-1 bg-white/5 p-3 rounded-xl border border-white/5">
                       <div className="flex justify-between text-xs font-mono">
                         <span className="text-zinc-200 truncate pr-2 font-bold">{quiz.documentName || quiz.docName || "Diagnostic Test"}</span>
-                        <span className={`font-black ${grade.color}`}>{quiz.scorePercent || 0}% ({grade.label})</span>
+                        <span className={`font-black ${grade.color}`}>{quizPct}% ({grade.label})</span>
                       </div>
                       <div className="w-full h-2 bg-black/40 rounded-full overflow-hidden">
                         <motion.div
                           initial={{ width: 0 }}
-                          animate={{ width: `${quiz.scorePercent || 0}%` }}
+                          animate={{ width: `${quizPct}%` }}
                           transition={{ duration: 0.5, delay: idx * 0.05 }}
                           className="h-full bg-gradient-to-r from-[#00FF66]/60 to-[#00FF66] rounded-full shadow-[0_0_8px_rgba(0,255,102,0.3)]"
                         />
@@ -511,19 +512,19 @@ export default function Overview() {
             <div className="grid grid-cols-4 gap-2 text-center font-mono text-[10px]">
               <div className="bg-[#00FF66]/10 p-2.5 rounded-xl border border-[#00FF66]/30 text-[#00FF66] font-bold">
                 <div>Mastery (90%+)</div>
-                <div className="text-sm font-semibold mt-1">{uniqueQuizzes.filter(q => (q.scorePercent || 0) >= 90).length} Runs</div>
+                <div className="text-sm font-semibold mt-1">{uniqueQuizzes.filter(q => parsePercent(q.scorePercent) >= 90).length} Runs</div>
               </div>
               <div className="bg-[#00E5FF]/10 p-2.5 rounded-xl border border-[#00E5FF]/30 text-[#00E5FF] font-bold">
                 <div>Proficient (80-89%)</div>
-                <div className="text-sm font-semibold mt-1">{uniqueQuizzes.filter(q => (q.scorePercent || 0) >= 80 && (q.scorePercent || 0) < 90).length} Runs</div>
+                <div className="text-sm font-semibold mt-1">{uniqueQuizzes.filter(q => { const p = parsePercent(q.scorePercent); return p >= 80 && p < 90; }).length} Runs</div>
               </div>
               <div className="bg-[#FFB800]/10 p-2.5 rounded-xl border border-[#FFB800]/30 text-[#FFB800] font-bold">
                 <div>Solid (70-79%)</div>
-                <div className="text-sm font-semibold mt-1">{uniqueQuizzes.filter(q => (q.scorePercent || 0) >= 70 && (q.scorePercent || 0) < 80).length} Runs</div>
+                <div className="text-sm font-semibold mt-1">{uniqueQuizzes.filter(q => { const p = parsePercent(q.scorePercent); return p >= 70 && p < 80; }).length} Runs</div>
               </div>
               <div className="bg-rose-500/10 p-2.5 rounded-xl border border-rose-500/30 text-rose-400 font-bold">
                 <div>Review (&lt;70%)</div>
-                <div className="text-sm font-semibold mt-1">{uniqueQuizzes.filter(q => (q.scorePercent || 0) < 70).length} Runs</div>
+                <div className="text-sm font-semibold mt-1">{uniqueQuizzes.filter(q => parsePercent(q.scorePercent) < 70).length} Runs</div>
               </div>
             </div>
           </div>
@@ -565,7 +566,7 @@ export default function Overview() {
                   <div className="min-w-0 pr-4">
                     <div className="font-bold text-xs text-white truncate">{quiz.documentName || quiz.docName || "Diagnostic Session"}</div>
                     <div className="text-[10px] text-zinc-400 font-mono mt-0.5">
-                      {quiz.totalQuestions || 10} Questions • Score: <strong className="text-[#00FF66]">{quiz.scorePercent || 0}%</strong>
+                      {quiz.totalQuestions || 10} Questions • Score: <strong className="text-[#00FF66]">{parsePercent(quiz.scorePercent)}%</strong>
                     </div>
                   </div>
                   <div className="text-[10px] text-zinc-400 font-mono uppercase tracking-wider shrink-0 bg-black/40 px-2.5 py-1 rounded-lg border border-white/5">
@@ -616,7 +617,7 @@ export default function Overview() {
                 <div key={idx} className="bg-white/5 p-3 rounded-xl border border-white/10 flex justify-between items-center hover:border-[#FFB800]/40 transition-colors">
                   <div className="min-w-0 pr-4">
                     <div className="font-bold text-xs text-white truncate">{quiz.documentName || quiz.docName || "Practice Quiz"}</div>
-                    <div className="text-[10px] text-zinc-400 font-mono mt-0.5">Score: {quiz.scorePercent || 0}%</div>
+                    <div className="text-[10px] text-zinc-400 font-mono mt-0.5">Score: {parsePercent(quiz.scorePercent)}%</div>
                   </div>
                   <div className="text-right shrink-0">
                     <div className="text-xs font-semibold font-mono text-[#FFB800]">+{quiz.earnedPoints || 0} PTS</div>

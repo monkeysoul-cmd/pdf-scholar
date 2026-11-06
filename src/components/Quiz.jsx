@@ -87,7 +87,7 @@ export default function Quiz() {
           throw new Error(`Server error (${res.status}): ${resText.slice(0, 150) || "Quiz generation failed"}`);
         }
       }
-      if (res.ok && data.questions) {
+      if (res.ok && Array.isArray(data.questions) && data.questions.length > 0) {
         playChime();
         const normalized = data.questions.map((q, idx) => {
           const isMC = Boolean(q.type && (q.type.toLowerCase().includes("choice") || q.type.toLowerCase().includes("mc")));

@@ -408,6 +408,7 @@ export default function Chat() {
             type="text"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Escape") setInputText(""); }}
             disabled={isSending}
             placeholder="Ask a question about this document..."
             className="flex-1 text-xs p-3 px-4 border border-white/10 hover:border-[#00FF66]/40 focus:border-[#00FF66] focus:ring-1 focus:ring-[#00FF66]/30 rounded-lg transition-all bg-black/50 text-white font-mono placeholder-zinc-500 outline-none shadow-inner"

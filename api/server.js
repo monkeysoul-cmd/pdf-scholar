@@ -101,6 +101,12 @@ const loginLimiter = createRateLimiter({
   message: "Too many login attempts from this IP. Please try again later.",
 });
 
+const apiLimiter = createRateLimiter({
+  windowMs: 15 * 60 * 1000,
+  max: 120,
+  message: "Too many AI requests. Please slow down and try again shortly.",
+});
+
 // Baseline HTTP Security Headers (SEC-006)
 app.use((req, res, next) => {
   res.setHeader("X-Content-Type-Options", "nosniff");
@@ -219,8 +225,8 @@ async function generateChunkEmbedding(text) {
   throw lastErr || new Error("Failed to retrieve embeddings from Gemini API.");
 }
 
-// Helper: safe content generator with fallback models (fastest first: gemini-flash-lite-latest)
-async function generateContentWithFallback(params, initialModel = "gemini-flash-lite-latest") {
+// Helper: safe content generator with fallback models (fastest first: gemini-2.0-flash)
+async function generateContentWithFallback(params, initialModel = "gemini-2.0-flash") {
   const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.GEMINI_KEY;
   if (!apiKey) {
     throw new Error("GEMINI_API_KEY environment variable is missing in Vercel deployment settings.");
@@ -229,7 +235,7 @@ async function generateContentWithFallback(params, initialModel = "gemini-flash-
   const ai = getAIClient();
   const models = [
     initialModel,
-    "gemini-flash-lite-latest",
+    "gemini-2.0-flash",
     "gemini-2.0-flash",
     "gemini-1.5-flash",
     "gemini-1.5-flash-8b"
@@ -257,7 +263,7 @@ async function generateContentWithFallback(params, initialModel = "gemini-flash-
 }
 
 // Helper: safe streaming content generator with fallback models
-async function generateContentStreamWithFallback(params, initialModel = "gemini-flash-lite-latest") {
+async function generateContentStreamWithFallback(params, initialModel = "gemini-2.0-flash") {
   const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.GEMINI_KEY;
   if (!apiKey) {
     throw new Error("GEMINI_API_KEY environment variable is missing in Vercel deployment settings.");
@@ -266,7 +272,7 @@ async function generateContentStreamWithFallback(params, initialModel = "gemini-
   const ai = getAIClient();
   const models = [
     initialModel,
-    "gemini-flash-lite-latest",
+    "gemini-2.0-flash",
     "gemini-2.0-flash",
     "gemini-1.5-flash",
     "gemini-1.5-flash-8b"
@@ -385,7 +391,7 @@ app.delete("/api/documents/:id", authenticateToken, async (req, res) => {
 });
 
 // 3. Upload & Ingest PDF Document
-app.post("/api/ingest", authenticateToken, async (req, res) => {
+app.post("/api/ingest", authenticateToken, apiLimiter, async (req, res) => {
   try {
     const { pdfBase64, filename, size } = req.body;
     if (!pdfBase64 || !filename) {
@@ -550,7 +556,7 @@ app.post("/api/ingest", authenticateToken, async (req, res) => {
 });
 
 // 4. RAG Chat Endpoint (with Hybrid Vector Retrieval & Fast Streaming)
-app.post("/api/chat", authenticateToken, async (req, res) => {
+app.post("/api/chat", authenticateToken, apiLimiter, async (req, res) => {
   try {
     const { documentId, message, history, stream: shouldStream } = req.body;
     if (!message) {
@@ -581,6 +587,10 @@ app.post("/api/chat", authenticateToken, async (req, res) => {
 
     // Check if client requested streaming
     const isStream = shouldStream === true || req.headers.accept?.includes("text/event-stream");
+    let isClosed = false;
+    if (isStream) {
+      req.on("close", () => { isClosed = true; });
+    }
 
     if (searchResults.length === 0) {
       const emptyMsg = "I couldn't find any documents or chunks to base my answer on. Please upload a PDF first.";
@@ -669,10 +679,9 @@ ${contextText}
             temperature: 0.1,
             maxOutputTokens: 1024,
           },
-        }, "gemini-flash-lite-latest");
+        }, "gemini-2.0-flash");
 
-        let isClosed = false;
-        req.on("close", () => { isClosed = true; });
+        // isClosed listener already initialized above
 
         for await (const chunk of stream) {
           if (isClosed) break;
@@ -694,7 +703,7 @@ ${contextText}
       }
     }
 
-    // Non-streaming fallback path (high-speed gemini-flash-lite-latest)
+    // Non-streaming fallback path (high-speed gemini-2.0-flash)
     const response = await generateContentWithFallback({
       contents: [
         ...sanitizedHistory,
@@ -705,7 +714,7 @@ ${contextText}
         temperature: 0.1,
         maxOutputTokens: 1024,
       },
-    }, "gemini-flash-lite-latest");
+    }, "gemini-2.0-flash");
 
     const replyText = response.text || response.candidates?.[0]?.content?.parts?.[0]?.text || "No response received from model.";
     res.json({
@@ -721,7 +730,7 @@ ${contextText}
 });
 
 // 5. Generate Interactive Quiz Endpoint
-app.post("/api/quiz", authenticateToken, async (req, res) => {
+app.post("/api/quiz", authenticateToken, apiLimiter, async (req, res) => {
   try {
     const { documentId, count = 5 } = req.body;
     if (!documentId) {
