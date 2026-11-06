@@ -88,83 +88,89 @@ export default function Sidebar() {
   const renderSidebarInner = (collapsed) => (
     <aside
       className={`${
-        collapsed ? "w-16 sm:w-20" : "w-[260px] sm:w-[270px]"
-      } bg-[#08090C] text-white border-r border-white/[0.08] flex flex-col h-full select-none relative shadow-2xl transition-all duration-300 ease-in-out shrink-0 z-50`}
+        collapsed ? "w-[72px]" : "w-[260px] sm:w-[270px]"
+      } bg-[#08090C] text-white border-r border-white/[0.08] flex flex-col h-full select-none relative shadow-2xl transition-[width] duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] shrink-0 z-50 overflow-hidden will-change-[width]`}
       id="sidebar-container"
     >
       <div className="absolute inset-0 bg-noise opacity-30 pointer-events-none" />
 
       {/* Header */}
-      <div
-        className={`border-b border-white/[0.08] relative z-10 ${
-          collapsed ? "py-4 px-2 flex flex-col items-center gap-3" : "px-4 py-4 sm:py-5 flex items-center justify-between gap-2"
-        }`}
-      >
-        {collapsed ? (
-          <>
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              onClick={() => setIsCollapsed(false)}
-              className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-white/[0.04] border border-white/10 flex items-center justify-center text-[#00FF66] shrink-0 cursor-pointer shadow-inner"
-              title="Expand PDF Scholar Hub"
-            >
-              <PDFScholarLogo className="w-4 h-4 sm:w-5 sm:h-5 text-[#00FF66]" />
-            </motion.div>
-            <button
-              onClick={() => setIsCollapsed(false)}
-              className="w-7 h-7 sm:w-8 sm:h-8 bg-white/5 hover:bg-[#00FF66] text-zinc-400 hover:text-black border border-white/10 hover:border-[#00FF66] rounded-md transition-all flex items-center justify-center cursor-pointer shrink-0"
-              title="Expand Sidebar"
-            >
-              <ChevronRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-            </button>
-          </>
-        ) : (
-          <>
-            <div className="flex items-center gap-2.5 min-w-0 flex-nowrap">
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-white/[0.04] border border-white/10 flex items-center justify-center text-[#00FF66] shrink-0 shadow-inner"
-              >
-                <PDFScholarLogo className="w-4 h-4 sm:w-5 sm:h-5 text-[#00FF66]" />
-              </motion.div>
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="min-w-0 flex-1">
-                <div className="flex items-center gap-1 font-semibold text-base tracking-tight leading-none whitespace-nowrap">
-                  <span className="text-[#00FF66] shrink-0">PDF</span>
-                  <span className="text-white whitespace-nowrap truncate">
-                    Scholar Hub
-                  </span>
-                </div>
-                <div className="flex items-center gap-1.5 text-[9px] font-mono tracking-widest text-zinc-400 uppercase mt-1 whitespace-nowrap">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#00FF66]  shrink-0" />
-                  <span>Online</span>
-                </div>
-              </motion.div>
-            </div>
-            <button
-              onClick={() => setIsCollapsed(true)}
-              className="hidden md:flex p-1.5 bg-white/5 hover:bg-[#00FF66] text-zinc-400 hover:text-black border border-white/10 hover:border-[#00FF66] rounded-md transition-all cursor-pointer shrink-0 items-center justify-center"
-              title="Collapse Sidebar"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => setIsMobileOpen(false)}
-              className="flex md:hidden p-1.5 bg-white/5 hover:bg-white/15 text-zinc-400 hover:text-white border border-white/10 rounded-md transition-all cursor-pointer shrink-0 items-center justify-center"
-              title="Close Navigation"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </>
-        )}
+      <div className="h-16 px-3 border-b border-white/[0.08] relative z-10 flex items-center justify-between shrink-0 overflow-hidden">
+        <motion.button
+          type="button"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => {
+            if (collapsed) {
+              setIsCollapsed(false);
+            } else {
+              setTab("overview");
+            }
+            playClick();
+          }}
+          className="w-10 h-10 rounded-lg bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 flex items-center justify-center text-[#00FF66] shrink-0 shadow-inner cursor-pointer transition-colors relative group/logo"
+          title={collapsed ? "Expand Sidebar (Click to expand)" : "PDF Scholar Hub"}
+        >
+          <PDFScholarLogo className="w-5 h-5 text-[#00FF66]" />
+          {collapsed && (
+            <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-[#00FF66] text-black flex items-center justify-center shadow-md">
+              <ChevronRight className="w-2.5 h-2.5 stroke-[3]" />
+            </span>
+          )}
+        </motion.button>
+
+        <div
+          className={`overflow-hidden whitespace-nowrap transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] flex-1 min-w-0 ${
+            collapsed ? "max-w-0 opacity-0 pointer-events-none -translate-x-2" : "max-w-[170px] opacity-100 translate-x-0 ml-2.5"
+          }`}
+        >
+          <div className="flex items-center gap-1 font-semibold text-base tracking-tight leading-none whitespace-nowrap">
+            <span className="text-[#00FF66] shrink-0">PDF</span>
+            <span className="text-white whitespace-nowrap truncate">Scholar Hub</span>
+          </div>
+          <div className="flex items-center gap-1.5 text-[9px] font-mono tracking-widest text-zinc-400 uppercase mt-1 whitespace-nowrap">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#00FF66] shrink-0" />
+            <span>Online</span>
+          </div>
+        </div>
+
+        <div
+          className={`overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] shrink-0 ${
+            collapsed ? "max-w-0 opacity-0 pointer-events-none" : "max-w-[40px] opacity-100"
+          }`}
+        >
+          <button
+            type="button"
+            onClick={() => {
+              setIsCollapsed(true);
+              playClick();
+            }}
+            className="hidden md:flex p-1.5 bg-white/5 hover:bg-[#00FF66] text-zinc-400 hover:text-black border border-white/10 hover:border-[#00FF66] rounded-md transition-all cursor-pointer items-center justify-center shrink-0"
+            title="Collapse Sidebar"
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsMobileOpen(false)}
+            className="flex md:hidden p-1.5 bg-white/5 hover:bg-white/15 text-zinc-400 hover:text-white border border-white/10 rounded-md transition-all cursor-pointer items-center justify-center shrink-0"
+            title="Close Navigation"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
       </div>
 
       {/* Nav Menu */}
-      <nav className={`flex-1 ${collapsed ? "px-2 sm:px-3" : "px-4 sm:px-5"} py-5 sm:py-6 space-y-4 overflow-y-auto min-h-0 relative z-10`}>
-        {!collapsed && (
-          <div className="text-xs text-zinc-400 font-medium px-2">
-            Navigation
-          </div>
-        )}
+      <nav className="flex-1 px-3 py-5 overflow-y-auto overflow-x-hidden min-h-0 relative z-10 space-y-4">
+        <div
+          className={`overflow-hidden whitespace-nowrap transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] text-[10px] font-mono tracking-wider text-zinc-500 uppercase font-bold px-2 ${
+            collapsed ? "max-h-0 opacity-0 pointer-events-none mb-0" : "max-h-5 opacity-100 mb-2"
+          }`}
+        >
+          Navigation
+        </div>
+
         <div className="flex flex-col gap-1.5">
           {menuItems.map((item) => {
             const Icon = item.icon;
@@ -173,8 +179,8 @@ export default function Sidebar() {
             return (
               <motion.button
                 key={item.id}
-                whileHover={!isDisabled ? { x: collapsed ? 0 : 3, scale: collapsed ? 1.05 : 1 } : {}}
-                whileTap={!isDisabled ? { scale: 0.96 } : {}}
+                whileHover={!isDisabled ? { scale: 1.02 } : {}}
+                whileTap={!isDisabled ? { scale: 0.98 } : {}}
                 onClick={() => {
                   if (!isDisabled) {
                     playClick();
@@ -184,9 +190,7 @@ export default function Sidebar() {
                 disabled={isDisabled}
                 title={collapsed ? `${item.label}${isDisabled ? " (Select a PDF first)" : ""}` : undefined}
                 id={`nav-btn-${item.id}`}
-                className={`w-full relative flex items-center ${
-                  collapsed ? "justify-center px-0 py-3 rounded-lg" : "justify-between px-3 py-2.5 rounded-lg"
-                } text-xs font-bold uppercase tracking-wider text-left transition-all ${
+                className={`w-full h-10 px-2 rounded-lg text-xs font-bold uppercase tracking-wider text-left transition-colors flex items-center relative ${
                   isDisabled ? "cursor-not-allowed opacity-40 text-zinc-600 bg-transparent" : "cursor-pointer"
                 } ${
                   isActive
@@ -196,19 +200,25 @@ export default function Sidebar() {
                     : "text-zinc-400 hover:text-white terminal-panel hover:border-white/20"
                 }`}
               >
-                <div className={`flex items-center ${collapsed ? "justify-center" : "gap-2.5"} relative z-10`}>
+                <div className="w-7 h-7 flex items-center justify-center shrink-0 relative z-10">
                   <Icon className={`w-4 h-4 transition-colors ${isActive ? "text-[#00FF66]" : "text-zinc-400"}`} />
-                  {!collapsed && <span className="font-mono">{item.label}</span>}
                 </div>
-                {!collapsed && item.id === "quiz" && selectedDocumentId && !isActive && (
-                  <div className="flex items-center gap-1.5 relative z-10">
-                    <span className="text-[10px] bg-[#00FF66]/15 text-[#00FF66] border border-[#00FF66]/30 px-1.5 py-0.5 rounded font-medium">
+
+                <div
+                  className={`overflow-hidden whitespace-nowrap transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] flex items-center justify-between flex-1 min-w-0 ${
+                    collapsed ? "max-w-0 opacity-0 pointer-events-none ml-0" : "max-w-[190px] opacity-100 ml-2"
+                  }`}
+                >
+                  <span className="font-mono truncate">{item.label}</span>
+                  {item.id === "quiz" && selectedDocumentId && !isActive && (
+                    <span className="text-[10px] bg-[#00FF66]/15 text-[#00FF66] border border-[#00FF66]/30 px-1.5 py-0.5 rounded font-medium shrink-0 ml-1.5">
                       READY
                     </span>
-                  </div>
-                )}
+                  )}
+                </div>
+
                 {collapsed && isActive && (
-                  <span className="absolute right-1 top-1 w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_8px_white]" />
+                  <span className="absolute right-1.5 top-1.5 w-1.5 h-1.5 rounded-full bg-[#00FF66] shadow-[0_0_8px_#00FF66]" />
                 )}
               </motion.button>
             );
@@ -216,19 +226,28 @@ export default function Sidebar() {
         </div>
 
         {/* Target Document Card */}
-        <div className="pt-5 sm:pt-6">
-          {!collapsed && (
-            <div className="text-[10px] font-mono tracking-wider text-zinc-500 uppercase font-black mb-3 px-2 flex items-center justify-between">
+        <div className="pt-4 border-t border-white/[0.06]">
+          <div
+            className={`overflow-hidden whitespace-nowrap transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+              collapsed ? "max-h-0 opacity-0 pointer-events-none mb-0" : "max-h-6 opacity-100 mb-2 px-1"
+            }`}
+          >
+            <div className="text-[10px] font-mono tracking-wider text-zinc-500 uppercase font-bold flex items-center justify-between">
               <span>Current document</span>
               {selectedDocumentId && (
-                <span className="bg-[#00FF66]/15 text-[#00FF66] border border-[#00FF66]/30 text-[10px] font-medium px-1.5 py-0.5 rounded">
+                <span className="bg-[#00FF66]/15 text-[#00FF66] border border-[#00FF66]/30 text-[9px] font-medium px-1.5 py-0.5 rounded">
                   ACTIVE
                 </span>
               )}
             </div>
-          )}
-          {documents.length > 1 && !collapsed && (
-            <div className="mb-2 px-1">
+          </div>
+
+          {documents.length > 1 && (
+            <div
+              className={`overflow-hidden whitespace-nowrap transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+                collapsed ? "max-h-0 opacity-0 pointer-events-none mb-0" : "max-h-12 opacity-100 mb-2"
+              }`}
+            >
               <select
                 value={selectedDocumentId || ""}
                 onChange={(e) => selectDocument(e.target.value)}
@@ -243,131 +262,156 @@ export default function Sidebar() {
               </select>
             </div>
           )}
-          <AnimatePresence mode="wait">
-            {activeDoc ? (
-              collapsed ? (
-                <motion.button
-                  key={activeDoc.id}
-                  whileHover={{ scale: 1.05 }}
-                  onClick={() => setTab("chat")}
-                  title={`Active Target: ${activeDoc.name}`}
-                  className="w-full p-3 glass-card border-[#00FF66]/50 rounded-xl flex items-center justify-center text-[#00FF66] relative shadow-[0_0_15px_rgba(0,255,102,0.15)] cursor-pointer"
+
+          {activeDoc ? (
+            <div
+              className={`rounded-xl border transition-all duration-300 overflow-hidden relative ${
+                collapsed
+                  ? "p-1 bg-white/[0.03] border-white/10 hover:border-[#00FF66]/50 cursor-pointer"
+                  : "p-3 bg-[#0B0D13] border-white/10 border-l-2 border-l-[#00FF66] shadow-sm flex flex-col gap-2.5"
+              }`}
+              onClick={() => {
+                if (collapsed) {
+                  setTab("chat");
+                  playClick();
+                }
+              }}
+              title={collapsed ? `Target: ${activeDoc.name} (Click to open chat)` : undefined}
+            >
+              <div className={`flex items-center ${collapsed ? "justify-center h-10 w-full" : "gap-2.5"}`}>
+                <div className="w-7 h-7 rounded-md bg-white/[0.04] border border-white/10 flex items-center justify-center shrink-0 shadow-inner">
+                  <FileText className="w-3.5 h-3.5 text-[#00FF66]" />
+                </div>
+
+                <div
+                  className={`overflow-hidden whitespace-nowrap transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] flex-1 min-w-0 ${
+                    collapsed ? "max-w-0 opacity-0 pointer-events-none" : "max-w-[170px] opacity-100"
+                  }`}
                 >
-                  <FileText className="w-4 h-4 drop-shadow-[0_0_5px_currentColor]" />
-                  <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-[#00FF66] animate-pulse" />
-                </motion.button>
-              ) : (
-                <motion.div
-                  key={activeDoc.id}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  className="p-3.5 sm:p-4 bg-[#0B0D13] border border-white/10 border-l-2 border-l-[#00FF66] rounded-xl flex flex-col gap-3 relative group/doc shadow-sm overflow-hidden"
-                >
-                  <div className="flex items-start gap-3 relative z-10">
-                    <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-md bg-white/[0.04] border border-white/10 flex items-center justify-center shrink-0 mt-0.5 shadow-inner">
-                      <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#00FF66] drop-shadow-sm" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <div className="text-xs font-medium text-zinc-100 truncate" title={activeDoc.name}>
-                        {activeDoc.name}
-                      </div>
-                      <div className="text-[10px] font-mono text-zinc-400 mt-1 flex items-center gap-1.5">
-                        <span>{activeDoc.pageCount || 1} pgs</span> <span className="text-zinc-600">•</span> <span>{activeDoc.chunkCount || 0} chunks</span>
-                      </div>
-                    </div>
+                  <div className="text-xs font-medium text-zinc-100 truncate" title={activeDoc.name}>
+                    {activeDoc.name}
                   </div>
-                  <div className="flex items-center gap-2 mt-1 relative z-10">
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={() => setTab("chat")}
-                      className="flex-1 text-center bg-[#00FF66] hover:bg-[#1aff75] text-black font-medium text-xs py-2 rounded transition-colors cursor-pointer"
-                    >
-                      Open Chat
-                    </motion.button>
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => {
-                        if (window.confirm(`Are you sure you want to delete "${activeDoc.name}"? This cannot be undone.`)) {
-                          deleteDocument(activeDoc.id);
-                        }
-                      }}
-                      title="Delete Document"
-                      className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 hover:border-red-500/40 rounded transition-all cursor-pointer"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </motion.button>
+                  <div className="text-[10px] font-mono text-zinc-400 mt-0.5 flex items-center gap-1.5">
+                    <span>{activeDoc.pageCount || 1} pgs</span>
+                    <span className="text-zinc-600">•</span>
+                    <span>{activeDoc.chunkCount || 0} chunks</span>
                   </div>
-                </motion.div>
-              )
-            ) : !collapsed ? (
-              <div className="text-[10px] font-mono text-zinc-500 p-3.5 border border-dashed border-white/10 rounded-lg text-center uppercase bg-white/[0.02]">
+                </div>
+
+                {collapsed && (
+                  <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-[#00FF66] animate-pulse" />
+                )}
+              </div>
+
+              <div
+                className={`overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+                  collapsed ? "max-h-0 opacity-0 pointer-events-none mt-0" : "max-h-12 opacity-100 mt-1"
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <motion.button
+                    type="button"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setTab("chat");
+                      playClick();
+                    }}
+                    className="flex-1 text-center bg-[#00FF66] hover:bg-[#1aff75] text-black font-medium text-xs py-1.5 rounded transition-colors cursor-pointer"
+                  >
+                    Open Chat
+                  </motion.button>
+                  <motion.button
+                    type="button"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (window.confirm(`Are you sure you want to delete "${activeDoc.name}"? This cannot be undone.`)) {
+                        deleteDocument(activeDoc.id);
+                      }
+                    }}
+                    title="Delete Document"
+                    className="p-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 hover:border-red-500/40 rounded transition-all cursor-pointer"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </motion.button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div
+              className={`overflow-hidden whitespace-nowrap transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+                collapsed ? "max-h-0 opacity-0 pointer-events-none" : "max-h-16 opacity-100"
+              }`}
+            >
+              <div className="text-[10px] font-mono text-zinc-500 p-3 border border-dashed border-white/10 rounded-lg text-center uppercase bg-white/[0.02]">
                 No document selected
               </div>
-            ) : null}
-          </AnimatePresence>
+            </div>
+          )}
         </div>
       </nav>
 
       {/* User Profile & Sign Out */}
-      <div className={`${collapsed ? "p-2 sm:p-3" : "p-4 sm:p-5"} border-t border-white/[0.08] flex flex-col gap-2.5 text-xs font-mono uppercase tracking-wider shrink-0 relative z-10`}>
-        {!collapsed ? (
-          <>
-            <div className="flex items-center justify-between text-[10px] text-zinc-400 terminal-panel p-2.5 rounded-lg border border-white/[0.06]">
-              <div className="flex items-center gap-2 min-w-0">
-                <Cloud className="w-3.5 h-3.5 text-[#00FF66] shrink-0" />
-                <span className="truncate">User: <strong className="text-white font-medium ml-1">{user?.username}</strong></span>
-              </div>
-              <div className="status-led-green shrink-0" />
+      <div className="p-3 border-t border-white/[0.08] flex flex-col gap-2 shrink-0 relative z-10 overflow-hidden">
+        <div
+          className={`overflow-hidden whitespace-nowrap transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] ${
+            collapsed ? "max-h-0 opacity-0 pointer-events-none mb-0" : "max-h-12 opacity-100 mb-1"
+          }`}
+        >
+          <div className="flex items-center justify-between text-[10px] text-zinc-400 terminal-panel p-2 rounded-lg border border-white/[0.06]">
+            <div className="flex items-center gap-2 min-w-0">
+              <Cloud className="w-3.5 h-3.5 text-[#00FF66] shrink-0" />
+              <span className="truncate">User: <strong className="text-white font-medium ml-1">{user?.username}</strong></span>
             </div>
-
-            {/* Audio Feedback Toggle */}
-            <button
-              type="button"
-              onClick={() => setSfxOn(toggleSound())}
-              className="flex items-center justify-between text-[9px] font-mono text-zinc-500 hover:text-zinc-300 py-1 px-1 transition-colors cursor-pointer"
-              title="Toggle Audio Haptics (HotKey: M)"
-            >
-              <span className="flex items-center gap-1.5">
-                {sfxOn ? <Volume2 className="w-3 h-3 text-[#00FF66]" /> : <VolumeX className="w-3 h-3 text-zinc-600" />}
-                <span>SFX // {sfxOn ? "ACTIVE" : "MUTED"}</span>
-              </span>
-              <kbd className="text-[8px]">M</kbd>
-            </button>
-
-            <motion.button
-              whileHover={{ scale: 1.01 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={logout}
-              className="w-full py-2.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 hover:text-red-300 rounded-lg text-xs font-medium transition-colors flex items-center justify-center gap-2 cursor-pointer"
-            >
-              <LogOut className="w-3.5 h-3.5" />
-              <span>Sign Out</span>
-            </motion.button>
-          </>
-        ) : (
-          <div className="flex flex-col gap-2">
-            <button
-              type="button"
-              onClick={() => setSfxOn(toggleSound())}
-              title={`Toggle SFX (${sfxOn ? "Active" : "Muted"})`}
-              className="w-full py-2 bg-white/[0.03] hover:bg-white/[0.08] text-zinc-400 hover:text-white rounded-lg flex items-center justify-center transition-colors cursor-pointer"
-            >
-              {sfxOn ? <Volume2 className="w-3.5 h-3.5 text-[#00FF66]" /> : <VolumeX className="w-3.5 h-3.5 text-zinc-600" />}
-            </button>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={logout}
-              title={`Sign Out (${user?.username})`}
-              className="w-full py-2.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/40 text-red-400 rounded-lg flex items-center justify-center transition-colors cursor-pointer"
-            >
-              <LogOut className="w-4 h-4" />
-            </motion.button>
+            <div className="status-led-green shrink-0" />
           </div>
-        )}
+        </div>
+
+        {/* Audio Feedback Toggle */}
+        <button
+          type="button"
+          onClick={() => setSfxOn(toggleSound())}
+          className="w-full h-9 px-2 rounded-lg bg-white/[0.02] hover:bg-white/[0.06] border border-white/[0.04] text-[10px] font-mono text-zinc-400 hover:text-zinc-200 transition-colors flex items-center cursor-pointer relative"
+          title={collapsed ? `SFX // ${sfxOn ? "Active" : "Muted"} (Hotkey: M)` : "Toggle Audio Haptics (HotKey: M)"}
+        >
+          <div className="w-7 h-7 flex items-center justify-center shrink-0">
+            {sfxOn ? <Volume2 className="w-3.5 h-3.5 text-[#00FF66]" /> : <VolumeX className="w-3.5 h-3.5 text-zinc-600" />}
+          </div>
+
+          <div
+            className={`overflow-hidden whitespace-nowrap transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] flex items-center justify-between flex-1 min-w-0 ${
+              collapsed ? "max-w-0 opacity-0 pointer-events-none ml-0" : "max-w-[170px] opacity-100 ml-2"
+            }`}
+          >
+            <span className="truncate">SFX // {sfxOn ? "ACTIVE" : "MUTED"}</span>
+            <kbd className="text-[8px] bg-black/40 border border-white/10 px-1 py-0.5 rounded text-zinc-500 ml-1">M</kbd>
+          </div>
+        </button>
+
+        {/* Sign Out Button */}
+        <motion.button
+          type="button"
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={logout}
+          className="w-full h-9 px-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/30 text-red-400 hover:text-red-300 text-xs font-medium transition-colors flex items-center cursor-pointer relative"
+          title={collapsed ? `Sign Out (${user?.username})` : undefined}
+        >
+          <div className="w-7 h-7 flex items-center justify-center shrink-0 text-red-400">
+            <LogOut className="w-3.5 h-3.5" />
+          </div>
+
+          <div
+            className={`overflow-hidden whitespace-nowrap transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] flex-1 min-w-0 text-center ${
+              collapsed ? "max-w-0 opacity-0 pointer-events-none ml-0" : "max-w-[170px] opacity-100 ml-2"
+            }`}
+          >
+            <span>Sign Out</span>
+          </div>
+        </motion.button>
       </div>
     </aside>
   );
